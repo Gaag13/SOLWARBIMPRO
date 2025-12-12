@@ -1,0 +1,48 @@
+﻿<Window x:Class="WARBIMPRO.Views.ViewSettings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"         
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WARBIMPRO.Views"
+             Title="Load" Height="280" Width="350" WindowStartupLocation="CenterScreen">
+
+    <Border Background="#F5F5F5" Padding="20">
+        <StackPanel>
+
+             <!--Título--> 
+            <TextBlock Text="Library Settings"
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       Margin="0 0 0 20"/>
+
+             <!--Default Library--> 
+            <TextBlock Text="Default Library:" FontWeight="Bold" />
+
+            <CheckBox Content="Load basic families on startup"
+                      IsChecked="{Binding LoadBasicOnStartup}"
+                      Margin="0 5 0 20"/>
+
+             <!--Custom Path--> 
+            <TextBlock Text="Custom Library Path:" FontWeight="Bold" />
+            <StackPanel Orientation="Horizontal">
+                <TextBox Text="{Binding CustomLibraryPath}"
+                         Width="200" Margin="0 0 10 0"/>
+                <Button Content="Browse"
+                        Command="{Binding BrowserPathCommand}"
+                        Width="80"/>
+            </StackPanel>
+
+            <Button Content="Load Now"
+                    Command="{Binding LoadNowCommand}"
+                    Width="100"
+                    Margin="0 10 0 20"/>
+
+             <!--Auto-load--><!-- 
+            <TextBlock Text="Auto-load on project open:" FontWeight="Bold" />
+            <CheckBox Content="Enable"
+                      IsChecked="{Binding AutoLoadOnOpen}"/>-->
+
+        </StackPanel>
+    </Border>
+
+</Window>
