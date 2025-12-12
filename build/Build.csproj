@@ -9,6 +9,7 @@
         <NukeRootDirectory>..</NukeRootDirectory>
         <NukeScriptDirectory>..</NukeScriptDirectory>
         <NukeTelemetryVersion>1</NukeTelemetryVersion>
+        <Configurations>Debug;Release;Debug R26;Release R26</Configurations>
     </PropertyGroup>
 
     <ItemGroup>
