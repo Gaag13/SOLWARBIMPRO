@@ -24,6 +24,7 @@ namespace CANTIDADES.Commands
             var viewModel = new CantidadesViewModel(uidoc);
             var view = new ViewCantidades(viewModel);
             view.ShowDialog();
+            //coment
         }
     }
 }
