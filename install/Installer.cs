@@ -5,8 +5,8 @@ using WixSharp.CommonTasks;
 using WixSharp.Controls;
 using Assembly = System.Reflection.Assembly;
 
-const string outputName = "QUANTITIES";
-const string projectName = "QUANTITIES";
+const string outputName = "WARBIMPRO";
+const string projectName = "WARBIMPRO";
 
 var project = new Project
 {
