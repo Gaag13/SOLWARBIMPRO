@@ -19,7 +19,7 @@
 
 #User-specific files
 *.user
-/CANTIDADES/.env
-/CANTIDADES/env
-/CANTIDADES/CANTIDADES.csproj
+/WARBIMPRO/.env
+/WARBIMPRO/env
+/WARBIMPRO/WARBIMPRO.csproj
 /ConfigGenerator/ConfigGenerator.csproj

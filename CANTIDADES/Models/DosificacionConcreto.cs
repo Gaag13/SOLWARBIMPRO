@@ -1,8 +1,8 @@
-﻿namespace CANTIDADES.Models
+﻿namespace WARBIMPRO.Models
 {
     public class DosificacionConcreto
     {
-        public string Cantidades { get; set; }
+        public string WARBIMPRO { get; set; }
         public int ResistenciaKgCm2 { get; set; }
         public int ResistenciaPSI { get; set; }
         public int ResistenciaMpa { get; set; }

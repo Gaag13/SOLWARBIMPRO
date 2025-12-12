@@ -2,7 +2,7 @@
 
 **SOLCANTIDADES** es un complemento (**addin**) para **Autodesk Revit**, desarrollado en **C#**, que permite calcular en **tiempo real** las áreas y volúmenes de los elementos mientras se modela en **BIM**.  
 
-Su objetivo principal es proporcionar a los modeladores una herramienta que facilite la **extracción de cantidades de obra en tiempo real**, mejorando la precisión y eficiencia en la planificación y ejecución de proyectos de construcción.  
+Su objetivo principal es proporcionar a los modeladores una herramienta que facilite la **extracción de WARBIMPRO de obra en tiempo real**, mejorando la precisión y eficiencia en la planificación y ejecución de proyectos de construcción.  
 
 ## 🔹 **Características Principales**  
 ✔ **Cálculo en tiempo real** de **áreas y volúmenes** durante la modelación BIM.  
@@ -14,16 +14,16 @@ Su objetivo principal es proporcionar a los modeladores una herramienta que faci
 - 🏗 **Autodesk Revit** – Software donde se ejecuta el complemento.  
 
 ## 🔹 **Uso y Aplicaciones**  
-✅ Modeladores BIM que necesiten **calcular cantidades de obra de manera instantánea**.  
+✅ Modeladores BIM que necesiten **calcular WARBIMPRO de obra de manera instantánea**.  
 ✅ Ingenieros y arquitectos que quieran **optimizar el proceso de estimación de costos**.  
 ✅ Empresas de construcción que busquen **automatizar cálculos y mejorar su planificación**.  
 ✅ **Estimación de materiales** basada en los volúmenes extraídos y utilizando **dosificaciones predefinidas**.  
-✅ **Cálculo de cantidades de materiales** como **arena, agua, grava y cemento** según la obra modelada.  
+✅ **Cálculo de WARBIMPRO de materiales** como **arena, agua, grava y cemento** según la obra modelada.  
 ✅ **Generación de un presupuesto preliminar**, calculando el costo total estimado del proyecto.  
 ## 📩 **Contribuciones y Contacto**  
 Si deseas contribuir o necesitas soporte, visita el repositorio en [GitHub](https://github.com/Gaag13/SOLCANTIDADES).  
 
-**¡Optimiza la estimación de cantidades y costos en BIM con SOLCANTIDADES!** 🚀🏗  
+**¡Optimiza la estimación de WARBIMPRO y costos en BIM con SOLCANTIDADES!** 🚀🏗  
 
 
 Autodesk Revit plugin project organised into multiple solution files that target versions 2020 - 2025.

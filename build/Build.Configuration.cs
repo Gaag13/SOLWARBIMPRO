@@ -13,12 +13,12 @@
 
         Bundles =
         [
-            Solution.CANTIDADES
+            Solution.WARBIMPRO
         ];
 
         InstallersMap = new()
         {
-            {Solution.Installer, Solution.CANTIDADES}
+            {Solution.Installer, Solution.WARBIMPRO}
         };
     }
 }

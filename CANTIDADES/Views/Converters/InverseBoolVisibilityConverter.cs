@@ -3,7 +3,7 @@ using System.Windows.Data;
 using System.Windows.Markup;
 using Visibility = System.Windows.Visibility;
 
-namespace CANTIDADES.Views.Converters
+namespace WARBIMPRO.Views.Converters
 {
     public class InverseBoolVisibilityConverter : MarkupExtension, IValueConverter
     {

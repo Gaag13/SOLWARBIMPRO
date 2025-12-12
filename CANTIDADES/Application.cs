@@ -1,8 +1,8 @@
-﻿using CANTIDADES.Commands;
-using CANTIDADES.Models;
+﻿using WARBIMPRO.Commands;
+using WARBIMPRO.Models;
 using Nice3point.Revit.Toolkit.External;
 
-namespace CANTIDADES
+namespace WARBIMPRO
 {
     /// <summary>
     ///     Application entry point
@@ -17,14 +17,14 @@ namespace CANTIDADES
 
         private void CreateRibbon()
         {
-            var panel = Application.CreatePanel("Cuantificacióm", "CANTIDADES");
+            var panel = Application.CreatePanel("Cuantificacióm", "WARBIMPRO");
 
             panel.AddPushButton<CmdKeyFireSharp>("Login")
-                .SetLargeImage("/CANTIDADES;component/Resources/Icons/User16x16.png");
+                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/User16x16.png");
 
             panel.AddPushButton<CmdCantidades>("QUANTITIES")
                 .SetAvailabilityController<AvailabilityButton>()
-                .SetLargeImage("/CANTIDADES;component/Resources/Icons/Contar16x16.png");
+                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16.png");
         }
     }
 }

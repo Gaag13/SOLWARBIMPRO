@@ -11,11 +11,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using CANTIDADES.Models;
-using CANTIDADES.ViewModels;
-using CANTIDADES.Utils;
+using WARBIMPRO.Models;
+using WARBIMPRO.ViewModels;
+using WARBIMPRO.Utils;
 
-namespace CANTIDADES.Views
+namespace WARBIMPRO.Views
 {
     /// <summary>
     /// Lógica de interacción para ViewCantidades.xaml
@@ -48,8 +48,8 @@ namespace CANTIDADES.Views
 
         private void CalcularCantidades_Click(object sender, RoutedEventArgs e)
         {
-            var cantidades = _viewModel.CalcularCantidadesMaterial();
-            MessageBox.Show($"Cemento: {cantidades["Cemento"]}\nArena: {cantidades["Arena"]}\nGrava: {cantidades["Grava"]}\nAgua: {cantidades["Agua"]}");
+            var WARBIMPRO = _viewModel.CalcularCantidadesMaterial();
+            MessageBox.Show($"Cemento: {WARBIMPRO["Cemento"]}\nArena: {WARBIMPRO["Arena"]}\nGrava: {WARBIMPRO["Grava"]}\nAgua: {WARBIMPRO["Agua"]}");
 
         }
         private void dra_grid1_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)

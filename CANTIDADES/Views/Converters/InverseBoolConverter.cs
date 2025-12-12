@@ -2,7 +2,7 @@
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace CANTIDADES.Views.Converters
+namespace WARBIMPRO.Views.Converters
 {
     public class InverseBoolConverter : MarkupExtension, IValueConverter
     {

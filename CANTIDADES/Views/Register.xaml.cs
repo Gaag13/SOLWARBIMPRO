@@ -15,15 +15,15 @@ using System.Configuration;
 using System.Data.SqlClient;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
-using CANTIDADES.Commands;
-using CANTIDADES.Models;
+using WARBIMPRO.Commands;
+using WARBIMPRO.Models;
 using FireSharp.Config;
 using FireSharp.Interfaces;
 using FireSharp;
 using Microsoft.Office.Interop.Excel;
-using CANTIDADES.Utils;
+using WARBIMPRO.Utils;
 
-namespace CANTIDADES.Views
+namespace WARBIMPRO.Views
 {
     /// <summary>
     /// Lógica de interacción para Register.xaml

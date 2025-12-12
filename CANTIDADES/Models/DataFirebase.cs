@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CANTIDADES.Models
+namespace WARBIMPRO.Models
 {
     public class DataFirebase
     {

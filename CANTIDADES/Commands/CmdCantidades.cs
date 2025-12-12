@@ -1,14 +1,14 @@
 ﻿using Autodesk.Revit.Attributes;
 using Nice3point.Revit.Toolkit.External;
-using CANTIDADES.ViewModels;
-using CANTIDADES.Views;
+using WARBIMPRO.ViewModels;
+using WARBIMPRO.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CANTIDADES.Commands
+namespace WARBIMPRO.Commands
 {
     /// <summary>
     /// Punto de entrada del comando externo invocado desde la interfaz de revit.

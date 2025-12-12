@@ -4,15 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CANTIDADES.Models;
-using CANTIDADES.Utils;
+using WARBIMPRO.Models;
+using WARBIMPRO.Utils;
 using System.Windows.Markup;
 using System.Windows;
 using Autodesk.Revit.DB;
 using System.Xml.Linq;
-using CANTIDADES.Views;
+using WARBIMPRO.Views;
 
-namespace CANTIDADES.ViewModels
+namespace WARBIMPRO.ViewModels
 {
     public class CantidadesViewModel: ObservableObject
     {
@@ -33,18 +33,18 @@ namespace CANTIDADES.ViewModels
         {
             _dosificaciones = new List<DosificacionConcreto>
             {
-                new DosificacionConcreto { Cantidades = "1 - 2 - 2", ResistenciaKgCm2 = 280, ResistenciaPSI = 4000, ResistenciaMpa = 27, Cemento = 420, Arena = 0.67, Grava = 0.67, Agua = 190 },
-                new DosificacionConcreto { Cantidades = "1 - 2 - 2,5", ResistenciaKgCm2 = 240, ResistenciaPSI = 3555, ResistenciaMpa = 24, Cemento = 380, Arena = 0.60, Grava = 0.76, Agua = 180 },
-                new DosificacionConcreto { Cantidades = "1 - 2 - 3", ResistenciaKgCm2 = 226, ResistenciaPSI = 3224, ResistenciaMpa = 22, Cemento = 350, Arena = 0.55, Grava = 0.84, Agua = 170 },
-                new DosificacionConcreto { Cantidades = "1 - 2 - 3,5", ResistenciaKgCm2 = 210, ResistenciaPSI = 3000, ResistenciaMpa = 20, Cemento = 320, Arena = 0.52, Grava = 0.90, Agua = 170 },
-                new DosificacionConcreto { Cantidades = "1 - 2 - 4,3", ResistenciaKgCm2 = 200, ResistenciaPSI = 2850, ResistenciaMpa = 19, Cemento = 300, Arena = 0.48, Grava = 0.95, Agua = 158 },
-                new DosificacionConcreto { Cantidades = "1 - 2,5 - 4", ResistenciaKgCm2 = 189, ResistenciaPSI = 2700, ResistenciaMpa = 18, Cemento = 280, Arena = 0.55, Grava = 0.89, Agua = 158 },
-                new DosificacionConcreto { Cantidades = "1 - 3 - 3", ResistenciaKgCm2 = 168, ResistenciaPSI = 2400, ResistenciaMpa = 16, Cemento = 300, Arena = 0.72, Grava = 0.72, Agua = 158 },
-                new DosificacionConcreto { Cantidades = "1 - 3 - 4", ResistenciaKgCm2 = 159, ResistenciaPSI = 2275, ResistenciaMpa = 15, Cemento = 260, Arena = 0.63, Grava = 0.83, Agua = 163 },
-                new DosificacionConcreto { Cantidades = "1 - 3 - 5", ResistenciaKgCm2 = 140, ResistenciaPSI = 2000, ResistenciaMpa = 14, Cemento = 230, Arena = 0.55, Grava = 0.92, Agua = 148 },
-                new DosificacionConcreto { Cantidades = "1 - 3 - 6", ResistenciaKgCm2 = 119, ResistenciaPSI = 1700, ResistenciaMpa = 12, Cemento = 110, Arena = 0.50, Grava = 0.90, Agua = 143 },
-                new DosificacionConcreto { Cantidades = "1 - 4 - 7", ResistenciaKgCm2 = 109, ResistenciaPSI = 1560, ResistenciaMpa = 11, Cemento = 175, Arena = 0.55, Grava = 0.98, Agua = 133 },
-                new DosificacionConcreto { Cantidades = "1 - 4 - 8", ResistenciaKgCm2 = 99, ResistenciaPSI = 1420, ResistenciaMpa = 10, Cemento = 160, Arena = 0.55, Grava = 0.90, Agua = 125 },
+                new DosificacionConcreto { WARBIMPRO = "1 - 2 - 2", ResistenciaKgCm2 = 280, ResistenciaPSI = 4000, ResistenciaMpa = 27, Cemento = 420, Arena = 0.67, Grava = 0.67, Agua = 190 },
+                new DosificacionConcreto { WARBIMPRO = "1 - 2 - 2,5", ResistenciaKgCm2 = 240, ResistenciaPSI = 3555, ResistenciaMpa = 24, Cemento = 380, Arena = 0.60, Grava = 0.76, Agua = 180 },
+                new DosificacionConcreto { WARBIMPRO = "1 - 2 - 3", ResistenciaKgCm2 = 226, ResistenciaPSI = 3224, ResistenciaMpa = 22, Cemento = 350, Arena = 0.55, Grava = 0.84, Agua = 170 },
+                new DosificacionConcreto { WARBIMPRO = "1 - 2 - 3,5", ResistenciaKgCm2 = 210, ResistenciaPSI = 3000, ResistenciaMpa = 20, Cemento = 320, Arena = 0.52, Grava = 0.90, Agua = 170 },
+                new DosificacionConcreto { WARBIMPRO = "1 - 2 - 4,3", ResistenciaKgCm2 = 200, ResistenciaPSI = 2850, ResistenciaMpa = 19, Cemento = 300, Arena = 0.48, Grava = 0.95, Agua = 158 },
+                new DosificacionConcreto { WARBIMPRO = "1 - 2,5 - 4", ResistenciaKgCm2 = 189, ResistenciaPSI = 2700, ResistenciaMpa = 18, Cemento = 280, Arena = 0.55, Grava = 0.89, Agua = 158 },
+                new DosificacionConcreto { WARBIMPRO = "1 - 3 - 3", ResistenciaKgCm2 = 168, ResistenciaPSI = 2400, ResistenciaMpa = 16, Cemento = 300, Arena = 0.72, Grava = 0.72, Agua = 158 },
+                new DosificacionConcreto { WARBIMPRO = "1 - 3 - 4", ResistenciaKgCm2 = 159, ResistenciaPSI = 2275, ResistenciaMpa = 15, Cemento = 260, Arena = 0.63, Grava = 0.83, Agua = 163 },
+                new DosificacionConcreto { WARBIMPRO = "1 - 3 - 5", ResistenciaKgCm2 = 140, ResistenciaPSI = 2000, ResistenciaMpa = 14, Cemento = 230, Arena = 0.55, Grava = 0.92, Agua = 148 },
+                new DosificacionConcreto { WARBIMPRO = "1 - 3 - 6", ResistenciaKgCm2 = 119, ResistenciaPSI = 1700, ResistenciaMpa = 12, Cemento = 110, Arena = 0.50, Grava = 0.90, Agua = 143 },
+                new DosificacionConcreto { WARBIMPRO = "1 - 4 - 7", ResistenciaKgCm2 = 109, ResistenciaPSI = 1560, ResistenciaMpa = 11, Cemento = 175, Arena = 0.55, Grava = 0.98, Agua = 133 },
+                new DosificacionConcreto { WARBIMPRO = "1 - 4 - 8", ResistenciaKgCm2 = 99, ResistenciaPSI = 1420, ResistenciaMpa = 10, Cemento = 160, Arena = 0.55, Grava = 0.90, Agua = 125 },
 
             };
         }

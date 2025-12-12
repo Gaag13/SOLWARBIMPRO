@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using CANTIDADES.Models;
+using WARBIMPRO.Models;
 using FireSharp;
 using FireSharp.Response;
 using Newtonsoft.Json;
 using Microsoft.CSharp;
 
-namespace CANTIDADES.Commands
+namespace WARBIMPRO.Commands
 {
     public class SesionManager
     {
@@ -24,7 +24,7 @@ namespace CANTIDADES.Commands
             };
             string json = JsonConvert.SerializeObject(estadoDeSesion);
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Cantidades");
+                "WARBIMPRO");
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
@@ -35,7 +35,7 @@ namespace CANTIDADES.Commands
         public bool EstaLogueado()
         {
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Cantidades", "estadoSesion.json");
+                "WARBIMPRO", "estadoSesion.json");
             if (File.Exists(path))
             {
                 string json = File.ReadAllText(path);
@@ -49,7 +49,7 @@ namespace CANTIDADES.Commands
         public string ObtenerUsuarioActual()
         {
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Cantidades", "estadoSesion.json");
+                "WARBIMPRO", "estadoSesion.json");
             if (File.Exists(path))
             {
                 string json = File.ReadAllText(path);

@@ -14,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Build", "build\Build.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Installer", "install\Installer.csproj", "{071D2A2D-710E-4AB9-B899-2AF79C428005}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CANTIDADES", "CANTIDADES\CANTIDADES.csproj", "{2F706CD3-DF2A-4680-A963-80841884109F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WARBIMPRO", "CANTIDADES\WARBIMPRO.csproj", "{2F706CD3-DF2A-4680-A963-80841884109F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
