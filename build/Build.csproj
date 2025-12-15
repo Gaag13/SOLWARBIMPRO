@@ -12,12 +12,7 @@
         <Configurations>Debug;Release;Debug R26;Release R26</Configurations>
     </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="dotenv.net" Version="3.2.1" />
-        <PackageReference Include="FireSharp" Version="2.0.4" />
-		<PackageReference Include="Nice3point.Revit.Extensions" Version="$(RevitVersion).*" />
-		<PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
-		<PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
+    <ItemGroup>       
         <PackageReference Include="Nuke.Common" Version="9.0.4" />
         <PackageReference Include="Autodesk.PackageBuilder" Version="1.0.6" />
 </ItemGroup>
