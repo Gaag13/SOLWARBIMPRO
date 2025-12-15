@@ -37,15 +37,18 @@ namespace WARBIMPRO
 
             panel.AddPushButton<CmdLoadFamilys>("Load Family")
                .SetAvailabilityController<AvailabilityButton>()
-               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16.png");
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_dark.png")
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_light.png");
 
             panel.AddPushButton<CmdFamilyBrowser>("FamilyBrowser")
                .SetAvailabilityController<AvailabilityButton>()
-               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16.png");
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_light.png")
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_dark.png");
 
             panel.AddPushButton<CmdFindReplaceView>("FinReplceViews")
-               .SetAvailabilityController<AvailabilityButton>()
-               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16.png");
+               .SetAvailabilityController<AvailabilityButton>();
+               
+            //.SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16.png");
         }
     }
 }

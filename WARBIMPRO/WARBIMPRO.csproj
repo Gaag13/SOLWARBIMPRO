@@ -40,7 +40,11 @@
 
     <ItemGroup>
       <None Remove="Resources\Icons\Contar16x16.png" />
+      <None Remove="Resources\Icons\Contar16x16_dark.png" />
+      <None Remove="Resources\Icons\Contar16x16_light.png" />
       <None Remove="Resources\Icons\User16x16.png" />
+      <None Remove="Resources\Icons\User16x16_dark.png" />
+      <None Remove="Resources\Icons\User16x16_light.png" />
     </ItemGroup>
 
     <ItemGroup>
@@ -59,10 +63,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Resource Include="Resources\Icons\Contar16x16.png" />
+        <Resource Include="Resources\Icons\Contar16x16_light.png" />
         <Resource Include="Resources\Icons\RibbonIcon16.png" />
-        <Resource Include="Resources\Icons\RibbonIcon32.png" />
-        <Resource Include="Resources\Icons\User16x16.png" />
+        <Resource Include="Resources\Icons\User16x16_dark.png" />
+        <Resource Include="Resources\Icons\User16x16_light.png" />
     </ItemGroup>
 	<ItemGroup Condition="$(Configuration.Contains('R25')) OR $(Configuration.Contains('R26'))">
 		<PackageReference Include="System.Drawing.Common" Version="8.0.0" />
