@@ -11,6 +11,7 @@
 
     <ItemGroup>
         <PackageReference Include="dotenv.net" Version="3.2.1" />
+        <PackageReference Include="FireSharp" Version="2.0.4" />
         <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="2020.2.60" />
         <PackageReference Include="WixSharp.bin" Version="1.*" />
         <PackageReference Include="WixSharp.wix.bin" Version="3.*" />

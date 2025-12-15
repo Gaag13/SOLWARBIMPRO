@@ -14,8 +14,7 @@ namespace WARBIMPRO
     {
         public override void OnStartup()
         {
-            CreateRibbon();
-            CreateRibbon();
+            CreateRibbon();            
             DockablePaneProvider.Register(Application, new Guid("0525d7a0-5b14-462b-aa81-1198eb12b387"), "Family Browser")
                 .SetConfiguration(data => {
 
@@ -40,11 +39,11 @@ namespace WARBIMPRO
                .SetAvailabilityController<AvailabilityButton>()
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16.png");
 
-            panel.AddPushButton<CmdFamilyBrowser>("Load Family")
+            panel.AddPushButton<CmdFamilyBrowser>("FamilyBrowser")
                .SetAvailabilityController<AvailabilityButton>()
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16.png");
 
-            panel.AddPushButton<CmdFindReplaceView>("Load Family")
+            panel.AddPushButton<CmdFindReplaceView>("FinReplceViews")
                .SetAvailabilityController<AvailabilityButton>()
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16.png");
         }
