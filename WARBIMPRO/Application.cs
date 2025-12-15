@@ -16,7 +16,7 @@ namespace WARBIMPRO
         {
             CreateRibbon();
             CreateRibbon();
-            DockablePaneProvider.Register(Application, new Guid("32c2ce97-308a-448a-8c1b-aac7533a70d6"), "Family Browser")
+            DockablePaneProvider.Register(Application, new Guid("0525d7a0-5b14-462b-aa81-1198eb12b387"), "Family Browser")
                 .SetConfiguration(data => {
 
                     var provider = new DockPanelProvider();
