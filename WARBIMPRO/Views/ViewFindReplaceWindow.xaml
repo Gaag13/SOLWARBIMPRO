@@ -5,7 +5,7 @@
         Title="Replace" Foreground="Aqua"
         Width="500" 
         Height="700"
-        Background="#4444"
+        Background="#3A3A5C"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize">
 
@@ -19,7 +19,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Border BorderBrush="#4B4B7A" BorderThickness="1" Margin="0">
+    <Border BorderBrush="#3A3A5C" BorderThickness="1" Margin="0">
         <Grid Margin="20">
             <Grid.RowDefinitions>               
                 <RowDefinition Height="Auto"/>

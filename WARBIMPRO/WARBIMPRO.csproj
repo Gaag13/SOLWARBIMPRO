@@ -42,6 +42,12 @@
       <None Remove="Resources\Icons\Cantidades20x20_dark.png" />
       <None Remove="Resources\Icons\Cantidades20x20_light.png" />
       <None Remove="Resources\Icons\Contar16x16.png" />
+      <None Remove="Resources\Icons\find20x20_dark.png" />
+      <None Remove="Resources\Icons\find20x20_light.png" />
+      <None Remove="Resources\Icons\lista20x20_dark.png" />
+      <None Remove="Resources\Icons\lista20x20_light.png" />
+      <None Remove="Resources\Icons\load20x20_dark.png" />
+      <None Remove="Resources\Icons\load20x20_light.png" />
       <None Remove="Resources\Icons\User16x16.png" />
       <None Remove="Resources\Icons\User20x20.png" />
       <None Remove="Resources\Icons\User20x20_dark.png" />
@@ -79,6 +85,12 @@
 	<ItemGroup>
 	  <Resource Include="Resources\Icons\Cantidades20x20_dark.png" />
 	  <Resource Include="Resources\Icons\Cantidades20x20_light.png" />
+	  <Resource Include="Resources\Icons\find20x20_dark.png" />
+	  <Resource Include="Resources\Icons\find20x20_light.png" />
+	  <Resource Include="Resources\Icons\lista20x20_dark.png" />
+	  <Resource Include="Resources\Icons\lista20x20_light.png" />
+	  <Resource Include="Resources\Icons\load20x20_dark.png" />
+	  <Resource Include="Resources\Icons\load20x20_light.png" />
 	  <Resource Include="Resources\Icons\User20x20_dark.png" />
 	  <Resource Include="Resources\Icons\User20x20_light.png" />
 	</ItemGroup>

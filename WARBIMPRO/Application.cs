@@ -41,24 +41,24 @@ namespace WARBIMPRO
 
             var panelFamilys = Application.CreatePanel("Familys", "WARBIMPRO");
 
-            //panelFamilys.AddPushButton<CmdLoadFamilys>("Load Family")
-            //   .SetAvailabilityController<AvailabilityButton>()
-            //   .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_dark.png")
-            //   .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_light.png");
+            panelFamilys.AddPushButton<CmdLoadFamilys>("Load Family")
+               .SetAvailabilityController<AvailabilityButton>()
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/load20x20_light.png")
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/load20x20_light.png");
 
-            //panelFamilys.AddSeparator();
+            panelFamilys.AddSeparator();
 
-            //panelFamilys.AddPushButton<CmdFamilyBrowser>("FamilyBrowser")
-            //   .SetAvailabilityController<AvailabilityButton>()
-            //   .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_light.png")
-            //   .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_dark.png");
+            panelFamilys.AddPushButton<CmdFamilyBrowser>("FamilyBrowser")
+               .SetAvailabilityController<AvailabilityButton>()
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/lista20x20_dark.png")
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/lista20x20_light.png");
 
-            //panelFamilys.AddSeparator();
+            panelFamilys.AddSeparator();
 
-            //panelFamilys.AddPushButton<CmdFindReplaceView>("FinReplceViews")
-            //   .SetAvailabilityController<AvailabilityButton>();
-               
-            //.SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16.png");
+            panelFamilys.AddPushButton<CmdFindReplaceView>("FinReplceViews")
+               .SetAvailabilityController<AvailabilityButton>()
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/find20x20_dark.png")
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/find20x20_light.png");
         }
     }
 }
