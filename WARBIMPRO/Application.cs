@@ -26,27 +26,37 @@ namespace WARBIMPRO
 
         private void CreateRibbon()
         {
-            var panel = Application.CreatePanel("Cuantificacióm", "WARBIMPRO");
+            var panelLogin = Application.CreatePanel("Login", "WARBIMPRO");
 
-            panel.AddPushButton<CmdKeyFireSharp>("Login")
-                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/User16x16.png");
+            panelLogin.AddPushButton<CmdKeyFireSharp>("Login")
+                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/User20x20_dark.png")
+                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/User20x20_light.png");
+
+            var panel = Application.CreatePanel("Cuantificacióm", "WARBIMPRO");
 
             panel.AddPushButton<CmdCantidades>("QUANTITIES")
                 .SetAvailabilityController<AvailabilityButton>()
-                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16.png");
+                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Cantidades20x20_light.png")
+                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Cantidades20x20_dark.png");
 
-            panel.AddPushButton<CmdLoadFamilys>("Load Family")
-               .SetAvailabilityController<AvailabilityButton>()
-               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_dark.png")
-               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_light.png");
+            var panelFamilys = Application.CreatePanel("Familys", "WARBIMPRO");
 
-            panel.AddPushButton<CmdFamilyBrowser>("FamilyBrowser")
-               .SetAvailabilityController<AvailabilityButton>()
-               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_light.png")
-               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_dark.png");
+            //panelFamilys.AddPushButton<CmdLoadFamilys>("Load Family")
+            //   .SetAvailabilityController<AvailabilityButton>()
+            //   .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_dark.png")
+            //   .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_light.png");
 
-            panel.AddPushButton<CmdFindReplaceView>("FinReplceViews")
-               .SetAvailabilityController<AvailabilityButton>();
+            //panelFamilys.AddSeparator();
+
+            //panelFamilys.AddPushButton<CmdFamilyBrowser>("FamilyBrowser")
+            //   .SetAvailabilityController<AvailabilityButton>()
+            //   .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_light.png")
+            //   .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16_dark.png");
+
+            //panelFamilys.AddSeparator();
+
+            //panelFamilys.AddPushButton<CmdFindReplaceView>("FinReplceViews")
+            //   .SetAvailabilityController<AvailabilityButton>();
                
             //.SetLargeImage("/WARBIMPRO;component/Resources/Icons/Contar16x16.png");
         }

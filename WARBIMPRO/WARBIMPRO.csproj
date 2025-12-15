@@ -39,12 +39,13 @@
 	</PropertyGroup>
 
     <ItemGroup>
+      <None Remove="Resources\Icons\Cantidades20x20_dark.png" />
+      <None Remove="Resources\Icons\Cantidades20x20_light.png" />
       <None Remove="Resources\Icons\Contar16x16.png" />
-      <None Remove="Resources\Icons\Contar16x16_dark.png" />
-      <None Remove="Resources\Icons\Contar16x16_light.png" />
       <None Remove="Resources\Icons\User16x16.png" />
-      <None Remove="Resources\Icons\User16x16_dark.png" />
-      <None Remove="Resources\Icons\User16x16_light.png" />
+      <None Remove="Resources\Icons\User20x20.png" />
+      <None Remove="Resources\Icons\User20x20_dark.png" />
+      <None Remove="Resources\Icons\User20x20_light.png" />
     </ItemGroup>
 
     <ItemGroup>
@@ -61,13 +62,6 @@
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.*" />
         <PackageReference Include="System.Text.Json" Version="10.0.1" />
     </ItemGroup>
-
-    <ItemGroup>
-        <Resource Include="Resources\Icons\Contar16x16_light.png" />
-        <Resource Include="Resources\Icons\RibbonIcon16.png" />
-        <Resource Include="Resources\Icons\User16x16_dark.png" />
-        <Resource Include="Resources\Icons\User16x16_light.png" />
-    </ItemGroup>
 	<ItemGroup Condition="$(Configuration.Contains('R25')) OR $(Configuration.Contains('R26'))">
 		<PackageReference Include="System.Drawing.Common" Version="8.0.0" />
 	</ItemGroup>
@@ -79,5 +73,14 @@
       <Folder Include="Handlers\" />
       <Folder Include="Services\" />
     </ItemGroup>
+
+	
+
+	<ItemGroup>
+	  <Resource Include="Resources\Icons\Cantidades20x20_dark.png" />
+	  <Resource Include="Resources\Icons\Cantidades20x20_light.png" />
+	  <Resource Include="Resources\Icons\User20x20_dark.png" />
+	  <Resource Include="Resources\Icons\User20x20_light.png" />
+	</ItemGroup>
 
 </Project>
