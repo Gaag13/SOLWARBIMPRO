@@ -1,7 +1,6 @@
 ﻿using Nuke.Common.Git;
 using Nuke.Common.ProjectModel;
 
-
 sealed partial class Build
 {
     /// <summary>
@@ -17,7 +16,7 @@ sealed partial class Build
     /// </summary>
     Project[] Bundles =>
     [
-        Solution.GetProject("VanRoekel")
+        Solution.GetProject("WARBIMPRO")
     ];
 
     /// <summary>
@@ -25,7 +24,7 @@ sealed partial class Build
     /// </summary>
     Dictionary<Project, Project> InstallersMap => new()
     {
-        {Solution.Automation.Installer, Solution.GetProject("VanRoekel")}
+        {Solution.GetProject("Installer"), Solution.GetProject("WARBIMPRO")}
     };
 
     /// <summary>
@@ -53,7 +52,7 @@ sealed partial class Build
     ///     Git repository metadata.
     /// </summary>
     [GitRepository] readonly GitRepository GitRepository;
-
+    
     /// <summary>
     ///     Solution structure metadata.
     /// </summary>

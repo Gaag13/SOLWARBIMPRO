@@ -1,20 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <Nullable>enable</Nullable>
         <OutputType>Exe</OutputType>
         <LangVersion>latest</LangVersion>
         <PlatformTarget>x64</PlatformTarget>
         <TargetFramework>net48</TargetFramework>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <Configurations>Debug;Release;Debug R26;Release R26</Configurations>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="dotenv.net" Version="3.2.1" />
-        <PackageReference Include="FireSharp" Version="2.0.4" />
-        <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="2020.2.60" />
-        <PackageReference Include="WixSharp.bin" Version="1.*" />
-        <PackageReference Include="WixSharp.wix.bin" Version="3.*" />
+        <PackageReference Include="WixSharp.bin" Version="1.26.0"/>
+        <PackageReference Include="WixSharp.wix.bin" Version="3.14.1"/>
     </ItemGroup>
 
 </Project>

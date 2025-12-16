@@ -15,7 +15,7 @@ var project = new Project
     Platform = Platform.x64,
     UI = WUI.WixUI_FeatureTree,
     MajorUpgrade = MajorUpgrade.Default,
-    GUID = new Guid("6ABEEAC6-734D-429E-9AAC-1C7A2B0A4A9C"),
+    GUID = new Guid("F4D1544B-BC00-4FC4-924A-381791AF64EC"),
     BannerImage = @"install\Resources\Icons\BannerImage.png",
     BackgroundImage = @"install\Resources\Icons\BackgroundImage.png",
     Version = Assembly.GetExecutingAssembly().GetName().Version.ClearRevision(),
@@ -39,7 +39,6 @@ void BuildSingleUserMsi()
     project.Dirs =
     [
         new InstallDir(@"%AppDataFolder%\Autodesk\Revit\Addins\", wixEntities)
-        
     ];
     project.BuildMsi();
 }
@@ -51,7 +50,6 @@ void BuildMultiUserUserMsi()
     project.Dirs =
     [
         new InstallDir(@"%CommonAppDataFolder%\Autodesk\Revit\Addins\", wixEntities)
-       
     ];
     project.BuildMsi();
 }

@@ -13,7 +13,7 @@ sealed partial class Build
         {
             Project[] excludedProjects =
             [
-                Solution.Automation.Build
+                Solution.GetProject("Build")
             ];
             
             CleanDirectory(ArtifactsDirectory);
