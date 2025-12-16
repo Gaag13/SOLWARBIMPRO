@@ -24,7 +24,7 @@ sealed partial class Build
     /// </summary>
     Dictionary<Project, Project> InstallersMap => new()
     {
-        {Solution.GetProject("Installer"), Solution.GetProject("WARBIMPRO")}
+        {Solution.Automation.Installer, Solution.GetProject("WARBIMPRO")}
     };
 
     /// <summary>
