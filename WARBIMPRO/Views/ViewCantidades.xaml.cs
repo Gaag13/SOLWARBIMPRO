@@ -177,11 +177,11 @@ namespace WARBIMPRO.Views
                 wb.SaveAs(saveDialog.FileName);
             }
 
-            //Process.Start(new ProcessStartInfo
-            //{
-            //    FileName = saveDialog.FileName,
-            //    UseShellExecute = true
-            //});
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = saveDialog.FileName,
+                UseShellExecute = true
+            });
 
             TaskDialog.Show("Exportación", "Excel generado correctamente 🚀");
         }
