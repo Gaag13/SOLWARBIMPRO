@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Autodesk.Revit.UI;
+using Microsoft.Win32;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using WARBIMPRO.Models;
 using WARBIMPRO.ViewModels;
-using WARBIMPRO.Utils;
+using ClosedXML.Excel;
+using System.Diagnostics;
+
 
 namespace WARBIMPRO.Views
 {
@@ -132,47 +126,106 @@ namespace WARBIMPRO.Views
             // Redondea el volumen total a 2 decimales
             return System.Math.Round(volumenTotal, 2);
         }
+
         private void btn_ExportExcel_Click(object sender, RoutedEventArgs e)
         {
-            var excel = new Microsoft.Office.Interop.Excel.Application();
-            excel.Workbooks.Add(true);
-
-            int IndiceColumna = 1;
-            int IndiceFilas = 1;
-
-            // Configurar la cultura para formatear los números
-            var culturaEspañola = new System.Globalization.CultureInfo("es-ES");
-
-            foreach (var column in dta_grid1.Columns)
+            var saveDialog = new SaveFileDialog
             {
-                excel.Cells[IndiceFilas, IndiceColumna] = column.Header;
-                IndiceColumna++;
-            }
+                Filter = "Excel (*.xlsx)|*.xlsx",
+                FileName = "Exportacion.xlsx"
+            };
 
-            foreach (var row in dta_grid1.Items)
+            if (saveDialog.ShowDialog() != true)
+                return;
+
+            using (var wb = new XLWorkbook())
             {
-                IndiceFilas++;
-                IndiceColumna = 1;
+                var ws = wb.Worksheets.Add("Datos");
 
-                var fila = row as Data;
-                if (fila != null)
+                int fila = 1;
+                int col = 1;
+
+                // Encabezados
+                foreach (var column in dta_grid1.Columns)
                 {
-                    excel.Cells[IndiceFilas, IndiceColumna] = fila.ID;
-                    excel.Cells[IndiceFilas, IndiceColumna + 1] = fila.NIVEL;
-                    excel.Cells[IndiceFilas, IndiceColumna + 2] = fila.CATEGORIA;                    
-                    excel.Cells[IndiceFilas, IndiceColumna + 3] = fila.AREA;
-                    excel.Cells[IndiceFilas, IndiceColumna + 4] = fila.VOLUMEN;
-                    excel.Cells[IndiceFilas, IndiceColumna + 5] = fila.Cemento;
-                    excel.Cells[IndiceFilas, IndiceColumna + 6] = fila.Arena;
-                    excel.Cells[IndiceFilas, IndiceColumna + 7] = fila.Grava;
-                    excel.Cells[IndiceFilas, IndiceColumna + 8] = fila.Agua;
+                    ws.Cell(fila, col).Value = column.Header?.ToString();
+                    ws.Cell(fila, col).Style.Font.Bold = true;
+                    col++;
                 }
+
+                // Datos
+                foreach (var item in dta_grid1.Items)
+                {
+                    fila++;
+                    col = 1;
+
+                    if (item is Data d)
+                    {
+                        ws.Cell(fila, col++).Value = d.ID;
+                        ws.Cell(fila, col++).Value = d.NIVEL;
+                        ws.Cell(fila, col++).Value = d.CATEGORIA;
+                        ws.Cell(fila, col++).Value = d.AREA;
+                        ws.Cell(fila, col++).Value = d.VOLUMEN;
+                        ws.Cell(fila, col++).Value = d.Cemento;
+                        ws.Cell(fila, col++).Value = d.Arena;
+                        ws.Cell(fila, col++).Value = d.Grava;
+                        ws.Cell(fila, col++).Value = d.Agua;
+                    }
+                }
+
+                ws.Columns().AdjustToContents();
+                wb.SaveAs(saveDialog.FileName);
             }
+
+            //Process.Start(new ProcessStartInfo
+            //{
+            //    FileName = saveDialog.FileName,
+            //    UseShellExecute = true
+            //});
+
+            TaskDialog.Show("Exportación", "Excel generado correctamente 🚀");
+        }
+        //private void btn_ExportExcel_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var excel = new Microsoft.Office.Interop.Excel.Application();
+        //    excel.Workbooks.Add(true);
+
+        //    int IndiceColumna = 1;
+        //    int IndiceFilas = 1;
+
+        //    // Configurar la cultura para formatear los números
+        //    var culturaEspañola = new System.Globalization.CultureInfo("es-ES");
+
+        //    foreach (var column in dta_grid1.Columns)
+        //    {
+        //        excel.Cells[IndiceFilas, IndiceColumna] = column.Header;
+        //        IndiceColumna++;
+        //    }
+
+        //    foreach (var row in dta_grid1.Items)
+        //    {
+        //        IndiceFilas++;
+        //        IndiceColumna = 1;
+
+        //        var fila = row as Data;
+        //        if (fila != null)
+        //        {
+        //            excel.Cells[IndiceFilas, IndiceColumna] = fila.ID;
+        //            excel.Cells[IndiceFilas, IndiceColumna + 1] = fila.NIVEL;
+        //            excel.Cells[IndiceFilas, IndiceColumna + 2] = fila.CATEGORIA;                    
+        //            excel.Cells[IndiceFilas, IndiceColumna + 3] = fila.AREA;
+        //            excel.Cells[IndiceFilas, IndiceColumna + 4] = fila.VOLUMEN;
+        //            excel.Cells[IndiceFilas, IndiceColumna + 5] = fila.Cemento;
+        //            excel.Cells[IndiceFilas, IndiceColumna + 6] = fila.Arena;
+        //            excel.Cells[IndiceFilas, IndiceColumna + 7] = fila.Grava;
+        //            excel.Cells[IndiceFilas, IndiceColumna + 8] = fila.Agua;
+        //        }
+        //    }
            
 
 
-            excel.Visible = true;
-        }
+        //    excel.Visible = true;
+        //}
 
         #region BOTONES CERRAR
 

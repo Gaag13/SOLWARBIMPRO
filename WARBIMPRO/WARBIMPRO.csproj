@@ -56,10 +56,10 @@
 
     <ItemGroup>
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+        <PackageReference Include="ClosedXML" Version="0.105.0" />
         <PackageReference Include="dotenv.net" Version="4.0.0" />
         <PackageReference Include="FireSharp" Version="2.0.4" />
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-        <PackageReference Include="Microsoft.Office.Interop.Excel" Version="16.0.18925.20022" />
         <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="3.0.1" />
 		<PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*" />
 		<PackageReference Include="Nice3point.Revit.Extensions" Version="$(RevitVersion).*" />

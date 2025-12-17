@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WARBIMPRO.Commands;
+
 
 namespace WARBIMPRO.Models
 {
@@ -12,7 +14,8 @@ namespace WARBIMPRO.Models
         public static bool IsEnabled { get; set; } = false;
         public bool IsCommandAvailable(UIApplication applicationData, CategorySet selectedCategories)
         {
-            return IsEnabled;
+           SesionManager sesionManager = new SesionManager();
+           return sesionManager.EstaLogueado();
         }
     }
 }

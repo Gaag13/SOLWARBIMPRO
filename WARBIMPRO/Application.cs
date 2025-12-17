@@ -36,14 +36,15 @@ namespace WARBIMPRO
 
             panel.AddPushButton<CmdCantidades>("QUANTITIES")
                 .SetAvailabilityController<AvailabilityButton>()
-                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Cantidades20x20_light.png")
-                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Cantidades20x20_dark.png");
+                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Cantidades20x20_dark.png")
+                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Cantidades20x20_light.png");
+              
 
             var panelFamilys = Application.CreatePanel("Familys", "WARBIMPRO");
 
             panelFamilys.AddPushButton<CmdLoadFamilys>("Load Family")
                .SetAvailabilityController<AvailabilityButton>()
-               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/load20x20_light.png")
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/load20x20_dark.png")
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/load20x20_light.png");
 
             panelFamilys.AddSeparator();

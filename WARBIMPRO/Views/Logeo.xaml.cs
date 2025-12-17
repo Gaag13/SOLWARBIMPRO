@@ -47,7 +47,7 @@ namespace WARBIMPRO.Views
                 MessageBox.Show("Logueado Exitoso", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                 SesionManager guardarEstadoDeSesion = new SesionManager();
                 guardarEstadoDeSesion.GuardarEstadoDeSesion(email);
-                AvailabilityButton.IsEnabled = true;
+                //AvailabilityButton.IsEnabled = true;
                 this.Close();
             }
             else
@@ -80,7 +80,7 @@ namespace WARBIMPRO.Views
 
             if (estadoLogin.EstaLogueado())
             {
-                AvailabilityButton.IsEnabled = true;
+                //AvailabilityButton.IsEnabled = true;
                 MessageBox.Show("Bienvenido de nuevo. Ya estas logueado");
                 this.Close();
             }
