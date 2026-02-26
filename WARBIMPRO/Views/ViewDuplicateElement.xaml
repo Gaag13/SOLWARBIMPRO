@@ -5,30 +5,44 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:WARBIMPRO.Views"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="450" d:DesignWidth="400"
       Title="ViewDuplicateElement">
 
-    <StackPanel Margin="15">
+    <StackPanel Margin="20">
 
-        <TextBlock Text="Nombre nuevo tipo" FontWeight="Bold"/>
-        <TextBox Text="{Binding NewTypeName}" Margin="0,5,0,10"/>
+        <!-- Categoría -->
+        <TextBlock Text="Categoría:"
+               FontWeight="SemiBold"/>
+        <TextBlock Text="{Binding CategoryName}"
+               Margin="0,0,0,15"
+               Foreground="DarkSlateGray"/>
 
-        <DataGrid ItemsSource="{Binding Parameters}"
-              AutoGenerateColumns="False"
-              CanUserAddRows="False">
+        <!-- Nombre del nuevo tipo -->
+        <TextBlock Text="Nombre nuevo tipo"
+               FontWeight="SemiBold"/>
+        <TextBox Text="{Binding NewTypeName, UpdateSourceTrigger=PropertyChanged}"
+             Margin="0,5,0,15"
+             Height="28"/>
 
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Parámetro"
-                                Binding="{Binding Name}"
-                                IsReadOnly="True"/>
+        <!-- Parámetros editables -->
+        <TextBlock Text="Espesor / Altura / Ancho (m)"
+               FontWeight="SemiBold"/>
 
-                <DataGridTextColumn Header="Valor"
-                                Binding="{Binding Value, Mode=TwoWay}"/>
-            </DataGrid.Columns>
-        </DataGrid>
+        <TextBox Text="{Binding ParamValue1, UpdateSourceTrigger=PropertyChanged}"
+             Margin="0,5,0,5"
+             Height="28"
+             />
 
-        <Button Content="Duplicar"
+        <TextBox Text="{Binding ParamValue2, UpdateSourceTrigger=PropertyChanged}"
+             Margin="0,5,0,15"
+             Height="28"
+             />
+
+        <!-- Botón -->
+        <Button Content="Duplicar y Modificar"
             Command="{Binding DuplicateCommand}"
-            Margin="0,10,0,0"/>
+            Height="32"
+            Width="160"
+            HorizontalAlignment="Left"/>
     </StackPanel>
 </Window>

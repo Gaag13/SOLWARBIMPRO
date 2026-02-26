@@ -24,17 +24,27 @@ namespace WARBIMPRO.Commands
                 TaskDialog.Show("WARBIMPRO", "Selecciona un solo elemento.");
                 return;
             }
-
             var element = doc.GetElement(selection.First());
+            // Validadicon estructural
+            var cat = element.Category;
 
+            if (cat == null ||
+                (cat.Id.Value != (int)BuiltInCategory.OST_StructuralColumns &&
+                cat.Id.Value != (int)BuiltInCategory.OST_StructuralFraming &&
+                cat.Id.Value != (int)BuiltInCategory.OST_Floors &&
+                cat.Id.Value != (int)BuiltInCategory.OST_StructuralFoundation &&
+                cat.Id.Value != (int)BuiltInCategory.OST_Walls))
+            {
+                 TaskDialog.Show("WARBIMPRO", "Selecciona un elemento estructural (columna, viga, losa, cimentación o muro).");
+                return;
+            }
             var viewModel = new DuplicateElementViewModel(doc, element);
             var view = new ViewDuplicateElement(viewModel);
 
           
             view.ShowDialog();
             TaskDialog.Show("Listo", "Elementos copiados.");
-            view.Close();
-
+            
         }
     }
 }

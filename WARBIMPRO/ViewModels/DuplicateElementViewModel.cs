@@ -14,7 +14,11 @@ namespace WARBIMPRO.ViewModels
         private readonly ElementType _originalType;
 
         public string NewTypeName { get; set; }
-        public ObservableCollection<TypeParameterModel> Parameters { get; set; }
+        public string CategoryName { get; }
+        public bool IsStructural { get; }
+        public bool IsWall { get; }
+        public bool IsFloor { get; }
+
 
         public ICommand DuplicateCommand { get; }
 
@@ -25,59 +29,44 @@ namespace WARBIMPRO.ViewModels
             _originalType = _typeService.GetElementType(selectedElement);
 
             NewTypeName = _originalType.Name + "_Copia";
+            
+            CategoryName= selectedElement.Category?.Name ?? "Sin categoría";
 
-            Parameters = new ObservableCollection<TypeParameterModel>(
-                LoadEditableParameters(_originalType)
-            );
+            var bic = (BuiltInCategory)selectedElement.Category?.Id.Value;
+
+            IsStructural =
+                bic == BuiltInCategory.OST_StructuralColumns ||
+                bic == BuiltInCategory.OST_StructuralFraming ||
+                bic == BuiltInCategory.OST_StructuralFoundation;
+
+            IsWall = bic == BuiltInCategory.OST_Walls;
+            IsFloor = bic == BuiltInCategory.OST_Floors;
 
             DuplicateCommand = new RelayCommand(DuplicateType);
         }
 
         private void DuplicateType()
         {
+            if (string.IsNullOrWhiteSpace(NewTypeName))
+                return;
+
             var newType = _typeService.DuplicateType(_originalType, NewTypeName);
-            _typeService.UpdateParameters(newType, Parameters.ToList());
-        }
 
-        private List<TypeParameterModel> LoadEditableParameters(ElementType type)
+            _typeService.UpdateTypeDimensions(newType, ParamValue1, ParamValue2);
+        }
+        private double _paramValue1;
+        public double ParamValue1
         {
-            var list = new List<TypeParameterModel>();
-
-            foreach (Parameter param in type.Parameters)
-            {
-                if (param == null) continue;
-                if (param.IsReadOnly) continue;
-                if (!param.HasValue) continue;
-
-                var model = new TypeParameterModel
-                {
-                    Name = param.Definition.Name,
-                    StorageType = param.StorageType,
-                    IsEditable = true
-                };
-
-                switch (param.StorageType)
-                {
-                    case StorageType.Double:
-                        model.Value = param.AsDouble();
-                        break;
-
-                    case StorageType.Integer:
-                        model.Value = param.AsInteger();
-                        break;
-
-                    case StorageType.String:
-                        model.Value = param.AsString();
-                        break;
-
-                    case StorageType.ElementId:
-                        continue;
-                }
-
-                list.Add(model);
-            }
-
-            return list;
+            get => _paramValue1;
+            set => SetProperty(ref _paramValue1, value);
         }
+
+        private double _paramValue2;
+        public double ParamValue2
+        {
+            get => _paramValue2;
+            set => SetProperty(ref _paramValue2, value);
+        }
+
     }
 }

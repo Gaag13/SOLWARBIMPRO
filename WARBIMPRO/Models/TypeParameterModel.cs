@@ -15,10 +15,6 @@ namespace WARBIMPRO.Models
         public bool IsEditable { get; set; }
     }
     
-    public class TypeInfoModel
-    {
-        public string OriginalName { get; set; }
-        public string NewName { get; set; }
-        public List<TypeParameterModel> Parameters { get; set; }
-    }
+    
+    
 }
