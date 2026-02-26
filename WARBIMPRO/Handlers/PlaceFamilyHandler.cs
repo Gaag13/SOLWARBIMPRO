@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 using System;
 
@@ -7,44 +8,61 @@ namespace WARBIMPRO.Handlers
     public class PlaceFamilyHandler : IExternalEventHandler
     {
         private readonly UIDocument _uidoc;
-        private FamilySymbol? _symbol;
+        private ElementType? _type;
+
         public PlaceFamilyHandler(UIDocument uidoc)
         {
             _uidoc = uidoc;
         }
-        public void SetSymbol(FamilySymbol symbol)
+
+        public void SetType(ElementType type)
         {
-            _symbol = symbol;
+            _type = type;
         }
+
         public void Execute(UIApplication app)
         {
-            if (_symbol == null) return;
+            if (_type == null) return;
+
             try
             {
-                var doc = _uidoc.Document;
-                // ✅ La Transaction debe estar AQUÍ
-                using (var t = new Transaction(doc, "Activar tipo"))
+                // 🔹 FAMILIAS CARGABLES (Component Families)
+                if (_type is FamilySymbol symbol)
                 {
-                    t.Start();
-                    if (!_symbol.IsActive)
+                    var doc = _uidoc.Document;
+
+                    using (var t = new Transaction(doc, "Activate Family Symbol"))
                     {
-                        _symbol.Activate();
+                        t.Start();
+                        if (!symbol.IsActive)
+                            symbol.Activate();
+                        t.Commit();
                     }
-                    t.Commit();
+
+                    _uidoc.PromptForFamilyInstancePlacement(symbol);
+                    return;
                 }
-                // ✅ Ahora sí, coloca la familia
-                _uidoc.PromptForFamilyInstancePlacement(_symbol);
+                else if (_type is ElementType elementType)
+                {
+                    // 🔹 SYSTEM FAMILIES (MUROS, PISOS, MEP, ETC)
+                    _uidoc.PostRequestForElementTypePlacement(_type);
+                    return;
+                }
+
+
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("Operation canceled") || ex.Message.Contains("cancelled"))
-                        
+
                 {
-                    
+
                     return;
                 }
             }
         }
+
         public string GetName() => "Place Family Handler";
     }
+
 }

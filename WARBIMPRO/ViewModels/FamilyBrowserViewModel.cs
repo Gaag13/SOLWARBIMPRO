@@ -1,14 +1,12 @@
-﻿using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB.Architecture;
+using Autodesk.Revit.DB.Electrical;
+using Autodesk.Revit.DB.Mechanical;
+using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.DependencyInjection;
-using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Windows.Media.Imaging;
 using WARBIMPRO.Handlers;
-using WARBIMPRO.Views;
 
 namespace WARBIMPRO.ViewModels
 {
@@ -46,7 +44,7 @@ namespace WARBIMPRO.ViewModels
         public IRelayCommand LimpiarBusquedaCommand { get; }
         public IRelayCommand AbrirSettingsCommand { get; }
 
-       
+
         public FamilyBrowserViewModel(UIDocument uidoc)
         {
             _uidoc = uidoc;
@@ -56,7 +54,7 @@ namespace WARBIMPRO.ViewModels
 
             ColocarFamiliaCommand = new RelayCommand<TiposFamilia>(ColocarFamilia);
             LimpiarBusquedaCommand = new RelayCommand(LimpiarBusqueda);
-            //AbrirSettingsCommand = new RelayCommand(AbrirSettings);
+
 
             CargarFamilias();
         }
@@ -64,14 +62,31 @@ namespace WARBIMPRO.ViewModels
         private void CargarFamilias()
         {
             var doc = _uidoc.Document;
-
             var collector = new FilteredElementCollector(doc)
-                .OfClass(typeof(FamilySymbol))
-                .Cast<FamilySymbol>();
+                .OfClass(typeof(ElementType))
+                .Cast<ElementType>()
+                .Where(t =>
+                    t.Category != null &&
+                    t.IsValidObject &&
+                    (
+                        t is FamilySymbol ||
+                        t is WallType ||
+                        t is FloorType ||
+                        t is RoofType ||
+                        t is CeilingType ||
+                        t is StairsType ||
+                        t is RailingType ||
+                        t is DuctType ||
+                        t is PipeType ||
+                        t is CableTrayType ||
+                        t is ConduitType
+                    )
+                );
 
+
+            // 🔹 Agrupar por categoría
             var categorias = collector
-                .Where(x => x.Category != null)
-                .GroupBy(x => x.Category.Name)
+                .GroupBy(t => t.Category!.Name)
                 .OrderBy(g => g.Key);
 
             _todasLasCategorias.Clear();
@@ -83,8 +98,9 @@ namespace WARBIMPRO.ViewModels
                     NombreCategoria = categoriaGrp.Key
                 };
 
+                // 🔹 Agrupar por "familia lógica"
                 var familias = categoriaGrp
-                    .GroupBy(x => x.Family.Name)
+                    .GroupBy(t => ObtenerNombreFamilia(t))
                     .OrderBy(g => g.Key);
 
                 foreach (var familiaGrp in familias)
@@ -94,13 +110,14 @@ namespace WARBIMPRO.ViewModels
                         NombreFamilia = familiaGrp.Key
                     };
 
-                    foreach (var symbol in familiaGrp.OrderBy(x => x.Name))
+                    foreach (var type in familiaGrp.OrderBy(t => t.Name))
                     {
                         familia.Tipos.Add(new TiposFamilia
                         {
-                            NombreTipo = symbol.Name,
-                            Symbol = symbol,
-                            Preview = GetPreview(symbol)
+                            NombreTipo = type.Name,
+                            ElementType = type,
+                            Symbol = type as FamilySymbol,
+                            Preview = GetPreview(type)
                         });
                     }
 
@@ -110,9 +127,22 @@ namespace WARBIMPRO.ViewModels
                 _todasLasCategorias.Add(categoria);
             }
 
-            // Inicializar mostrando todas las familias
-            CategoriaFamiliasFiltradas = new ObservableCollection<CategoriaFamilia>(_todasLasCategorias);
+            // Mostrar todo inicialmente
+            CategoriaFamiliasFiltradas =
+                new ObservableCollection<CategoriaFamilia>(_todasLasCategorias);
+
+            OnPropertyChanged(nameof(CategoriaFamiliasFiltradas));
         }
+
+        private string ObtenerNombreFamilia(ElementType type)
+        {
+            if (type is FamilySymbol fs)
+                return fs.Family.Name;
+
+            // Tipos de sistema
+            return type.GetType().Name.Replace("Type", "");
+        }
+
 
         private void FiltrarFamilias()
         {
@@ -175,7 +205,7 @@ namespace WARBIMPRO.ViewModels
         private void LimpiarBusqueda()
         {
             TextoBusqueda = "";
-        }      
+        }
 
         private BitmapImage? GetPreview(ElementType symbol)
         {
@@ -224,7 +254,7 @@ namespace WARBIMPRO.ViewModels
             if (tipo == null) return;
 
             // Delegamos al handler
-            _handler.SetSymbol(tipo.Symbol);
+            _handler.SetType(tipo.ElementType);
             _externalEvent.Raise();
         }
     }
@@ -246,5 +276,6 @@ namespace WARBIMPRO.ViewModels
         public string NombreTipo { get; set; } = "";
         public FamilySymbol Symbol { get; set; } = null!;
         public BitmapImage? Preview { get; set; }
+        public ElementType ElementType { get; set; } = null!;
     }
 }
