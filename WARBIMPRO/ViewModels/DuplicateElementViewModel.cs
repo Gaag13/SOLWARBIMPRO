@@ -13,7 +13,10 @@ namespace WARBIMPRO.ViewModels
         private readonly RevitTypeService _typeService;
         private readonly ElementType _originalType;
         private readonly Element _originalElement;
+       
+
         public string NewTypeName { get; set; }
+        public string OriginalTypeName { get; set; }    
         public string CategoryName { get; }
         public bool IsWallOrFloor { get; set; }
         public bool IsFramingOrColumn { get; set; }
@@ -28,6 +31,8 @@ namespace WARBIMPRO.ViewModels
            
             _originalElement = selectedElement;
             _originalType = _typeService.GetElementType(selectedElement);
+
+            OriginalTypeName = _originalType.Name;
 
             NewTypeName = _originalType.Name + "_Copia";
             
@@ -56,7 +61,7 @@ namespace WARBIMPRO.ViewModels
 
             var newType = _typeService.DuplicateType(_originalType, NewTypeName);
 
-            _typeService.UpdateTypeDimensions(newType, ParamValue1, ParamValue2);
+            _typeService.UpdateTypeDimensions(newType, ParamValue1, ParamValue2,ParamValue3);
 
             _typeService.AssignTypeToElement(_originalElement, newType);
         }

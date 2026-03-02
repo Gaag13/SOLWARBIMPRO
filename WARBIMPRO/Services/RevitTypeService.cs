@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Autodesk.Revit.UI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,13 +28,24 @@ namespace WARBIMPRO.Services
         public ElementType DuplicateType(ElementType type, string newName)
         {
             // Verificar si ya existe un tipo con ese nombre
-            var collector = new FilteredElementCollector(_doc)
+            
+
+            try
+            {
+                var collector = new FilteredElementCollector(_doc)
                 .OfClass(typeof(ElementType))
                 .Cast<ElementType>()
                 .FirstOrDefault(t => t.Name.Equals(newName));
 
-            if (collector != null)
-                throw new InvalidOperationException("Ya existe un tipo con ese nombre.");
+               
+            }
+            catch (Autodesk.Revit.Exceptions.ArgumentException)
+            {
+                TaskDialog.Show("WARBIMPRO", $"Ya existe un tipo con el nombre '{newName}'. Elige otro nombre.");
+
+            }
+
+
 
             using (Transaction t = new Transaction(_doc, "Duplicar Tipo Estructural"))
             {
@@ -57,7 +69,7 @@ namespace WARBIMPRO.Services
                 t.Commit();
             }
         }
-        public void UpdateTypeDimensions(ElementType type, double value1, double value2)
+        public void UpdateTypeDimensions(ElementType type, double value1, double value2,double value3)
         {
             using (Transaction t = new Transaction(_doc, "Modificar Dimensiones"))
             {
@@ -65,10 +77,12 @@ namespace WARBIMPRO.Services
 
                 double v1 = Utils.Tools.Cm_to_Feet(value1);
                 double v2 = Utils.Tools.Cm_to_Feet(value2);
+                double v3 = Utils.Tools.Cm_to_Feet(value3); 
 
                 BuiltInCategory bic = (BuiltInCategory)type.Category.Id.Value;
 
                 if (bic == BuiltInCategory.OST_Walls)
+
                 {
                     if (type is WallType wallType)
                     {
@@ -145,7 +159,21 @@ namespace WARBIMPRO.Services
                         h.Set(v2);
                 }
 
-                t.Commit();
+                else if (bic == BuiltInCategory.OST_StructuralFoundation)
+                {
+                    Parameter width= type.LookupParameter("Width");
+                    Parameter length = type.LookupParameter("Length");
+                    Parameter e= type.LookupParameter("Foundation Thickness");
+
+                    if (width != null && !width.IsReadOnly)
+                        width.Set(v1);
+                    if (length != null && !length.IsReadOnly)
+                        length.Set(v2);
+                    if (e != null && !e.IsReadOnly)
+                        e.Set(v3);
+                }
+
+                    t.Commit();
             }
         }
 

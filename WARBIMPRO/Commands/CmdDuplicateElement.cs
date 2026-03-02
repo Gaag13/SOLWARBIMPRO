@@ -43,7 +43,7 @@ namespace WARBIMPRO.Commands
 
           
             view.ShowDialog();
-            TaskDialog.Show("Listo", "Elementos copiados.");
+           
             
         }
     }
