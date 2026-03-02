@@ -5,44 +5,70 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:WARBIMPRO.Views"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="400"
+      Height="500" Width="280"
       Title="ViewDuplicateElement">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
 
     <StackPanel Margin="20">
 
-        <!-- Categoría -->
-        <TextBlock Text="Categoría:"
-               FontWeight="SemiBold"/>
-        <TextBlock Text="{Binding CategoryName}"
-               Margin="0,0,0,15"
-               Foreground="DarkSlateGray"/>
+         <!--Categoría--> 
+        
+         <TextBlock Text="Categoría:"
+                FontWeight="SemiBold"/>
+         <TextBlock Text="{Binding CategoryName}"
+                Margin="0,0,0,15"
+                Foreground="DarkSlateGray"/>
 
-        <!-- Nombre del nuevo tipo -->
-        <TextBlock Text="Nombre nuevo tipo"
-               FontWeight="SemiBold"/>
+ 
+         <!--Nombre del nuevo tipo--> 
+        
+         <TextBlock Text="Nombre nuevo tipo"
+                FontWeight="SemiBold"/>
         <TextBox Text="{Binding NewTypeName, UpdateSourceTrigger=PropertyChanged}"
-             Margin="0,5,0,15"
-             Height="28"/>
+              Margin="0,5,0,15"
+              Height="28"
+              Width="150"
+              HorizontalAlignment="Left"/>
 
-        <!-- Parámetros editables -->
-        <TextBlock Text="Espesor / Altura / Ancho (m)"
-               FontWeight="SemiBold"/>
+        <!-- Wall / Floor -->
+        <StackPanel Visibility="{Binding IsWallOrFloor, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="Espesor (m)" FontWeight="SemiBold"/>
+            <TextBox Text="{Binding ParamValue1}" Height="28" Width="150"/>
+        </StackPanel>
 
-        <TextBox Text="{Binding ParamValue1, UpdateSourceTrigger=PropertyChanged}"
-             Margin="0,5,0,5"
-             Height="28"
-             />
+        <!-- Framing / Column -->
+        <StackPanel Visibility="{Binding IsFramingOrColumn, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="Base (b)" FontWeight="SemiBold"/>
+            <TextBox Text="{Binding ParamValue1}" Height="28" Width="150"/>
 
-        <TextBox Text="{Binding ParamValue2, UpdateSourceTrigger=PropertyChanged}"
-             Margin="0,5,0,15"
-             Height="28"
-             />
+            <TextBlock Text="Altura (h)" FontWeight="SemiBold"/>
+            <TextBox Text="{Binding ParamValue2}" Height="28" Width="150"/>
+        </StackPanel>
 
-        <!-- Botón -->
-        <Button Content="Duplicar y Modificar"
-            Command="{Binding DuplicateCommand}"
-            Height="32"
-            Width="160"
-            HorizontalAlignment="Left"/>
+        <!-- Foundation -->
+        <StackPanel Visibility="{Binding IsFoundation, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="Ancho" FontWeight="SemiBold"/>
+            <TextBox Text="{Binding ParamValue1}" Height="28" Width="150"/>
+
+            <TextBlock Text="Largo" FontWeight="SemiBold"/>
+            <TextBox Text="{Binding ParamValue2}" Height="28" Width="150"/>
+
+            <TextBlock Text="Espesor" FontWeight="SemiBold"/>
+            <TextBox Text="{Binding ParamValue3}" Height="28" Width="150"/>
+        </StackPanel>       
+     
+        
+         <Button Content="Duplicar y Modificar"
+             Command="{Binding DuplicateCommand}"
+             Height="32"
+             Width="160"
+             HorizontalAlignment="Center" Margin="20"/>
+
     </StackPanel>
+
+
+   
 </Window>

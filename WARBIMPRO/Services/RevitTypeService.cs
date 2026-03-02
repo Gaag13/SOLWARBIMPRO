@@ -22,6 +22,7 @@ namespace WARBIMPRO.Services
         {
             return _doc.GetElement(element.GetTypeId()) as ElementType;
         }
+        
 
         public ElementType DuplicateType(ElementType type, string newName)
         {
@@ -38,11 +39,22 @@ namespace WARBIMPRO.Services
             {
                 t.Start();
 
-                ElementType newType = type.Duplicate(newName) as ElementType;
-
+                ElementType newType = type.Duplicate(newName) as ElementType;                
                 t.Commit();
 
                 return newType;
+            }
+        }
+
+        public void AssignTypeToElement(Element element, ElementType newType)
+        {
+            using (Transaction t = new Transaction(_doc, "Asignar Nuevo Tipo"))
+            {
+                t.Start();
+
+                element.ChangeTypeId(newType.Id);
+
+                t.Commit();
             }
         }
         public void UpdateTypeDimensions(ElementType type, double value1, double value2)
@@ -58,18 +70,54 @@ namespace WARBIMPRO.Services
 
                 if (bic == BuiltInCategory.OST_Walls)
                 {
-                    // Espesor de muro
-                    Parameter width = type.get_Parameter(BuiltInParameter.WALL_ATTR_WIDTH_PARAM);
-                    if (width != null && !width.IsReadOnly)
-                        width.Set(v1);
+                    if (type is WallType wallType)
+                    {
+                        CompoundStructure cs = wallType.GetCompoundStructure();
+
+                        if (cs != null)
+                        {
+                            double currentTotal = cs.GetWidth();
+
+                            if (currentTotal > 0)
+                            {
+                                double factor = v1 / currentTotal;
+
+                                for (int i = 0; i < cs.LayerCount; i++)
+                                {
+                                    double layerWidth = cs.GetLayerWidth(i);
+                                    cs.SetLayerWidth(i, layerWidth * factor);
+                                }
+
+                                wallType.SetCompoundStructure(cs);
+                            }
+                        }
+                    }
                 }
 
                 else if (bic == BuiltInCategory.OST_Floors)
                 {
-                    // Espesor de piso
-                    Parameter thickness = type.get_Parameter(BuiltInParameter.FLOOR_ATTR_THICKNESS_PARAM);
-                    if (thickness != null && !thickness.IsReadOnly)
-                        thickness.Set(v1);
+                    if (type is FloorType floorType)
+                    {
+                        CompoundStructure cs = floorType.GetCompoundStructure();
+
+                        if (cs != null)
+                        {
+                            double currentTotal = cs.GetWidth();
+
+                            if (currentTotal > 0)
+                            {
+                                double factor = v1 / currentTotal;
+
+                                for (int i = 0; i < cs.LayerCount; i++)
+                                {
+                                    double layerWidth = cs.GetLayerWidth(i);
+                                    cs.SetLayerWidth(i, layerWidth * factor);
+                                }
+
+                                floorType.SetCompoundStructure(cs);
+                            }
+                        }
+                    }
                 }
 
                 else if (bic == BuiltInCategory.OST_StructuralFraming)
