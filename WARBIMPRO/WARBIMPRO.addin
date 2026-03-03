@@ -6,6 +6,6 @@
         <FullClassName>WARBIMPRO.Application</FullClassName>
         <VendorId>Development</VendorId>
         <VendorDescription></VendorDescription>
-        <VendorEmail></VendorEmail>
+        <VendorEmail>warbimpro@gmail.com</VendorEmail>
     </AddIn>
 </RevitAddIns>

@@ -23,37 +23,27 @@ namespace WARBIMPRO.Services
         {
             return _doc.GetElement(element.GetTypeId()) as ElementType;
         }
-        
+
 
         public ElementType DuplicateType(ElementType type, string newName)
         {
-            // Verificar si ya existe un tipo con ese nombre
-            
-
-            try
-            {
-                var collector = new FilteredElementCollector(_doc)
+            var existing = new FilteredElementCollector(_doc)
                 .OfClass(typeof(ElementType))
                 .Cast<ElementType>()
                 .FirstOrDefault(t => t.Name.Equals(newName));
 
-               
-            }
-            catch (Autodesk.Revit.Exceptions.ArgumentException)
+            if (existing != null)
             {
-                TaskDialog.Show("WARBIMPRO", $"Ya existe un tipo con el nombre '{newName}'. Elige otro nombre.");
-
+                TaskDialog.Show("WARBIMPRO",
+                    $"Ya existe un tipo con el nombre '{newName}'. Elige otro nombre.");
+                return null;
             }
-
-
 
             using (Transaction t = new Transaction(_doc, "Duplicar Tipo Estructural"))
             {
                 t.Start();
-
-                ElementType newType = type.Duplicate(newName) as ElementType;                
+                ElementType newType = type.Duplicate(newName) as ElementType;
                 t.Commit();
-
                 return newType;
             }
         }
@@ -75,9 +65,9 @@ namespace WARBIMPRO.Services
             {
                 t.Start();
 
-                double v1 = Utils.Tools.Cm_to_Feet(value1);
-                double v2 = Utils.Tools.Cm_to_Feet(value2);
-                double v3 = Utils.Tools.Cm_to_Feet(value3); 
+                double v1 = Utils.Tools.m_to_Feet(value1);
+                double v2 = Utils.Tools.m_to_Feet(value2);
+                double v3 = Utils.Tools.m_to_Feet(value3); 
 
                 BuiltInCategory bic = (BuiltInCategory)type.Category.Id.Value;
 

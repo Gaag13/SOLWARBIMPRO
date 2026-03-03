@@ -4,8 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:converters="clr-namespace:WARBIMPRO.Views.Converters"
-        xmlns:local="clr-namespace:WARBIMPRO.Views"
-        mc:Ignorable="d"
+        xmlns:local="clr-namespace:WARBIMPRO.Views"      
         Height="520" Width="300"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize"
@@ -38,22 +37,27 @@
             <!-- Barra de título personalizada -->
             <Border Grid.Row="0"
                     Background="#2C2C54"
-                    CornerRadius="10,10,0,0">
-                <Grid>
-                    <TextBlock Text="✦  Duplicar Elemento"
+                    CornerRadius="10,10,0,0" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" />
+            <Grid MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <TextBlock Text="✦  Duplicar Elemento"
                                Foreground="White"
                                FontWeight="SemiBold"
                                FontSize="13"
                                VerticalAlignment="Center"
                                Margin="15,0,0,0"/>
-                    <!-- Botón cerrar -->
-                    <Button Content="&#xE106;"
+                <!-- Botón cerrar -->
+                <Button Content="&#xE106;"
                             Style="{StaticResource WindowButtonStyle}" Click="CloseButton_Click"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
                             Margin="0,0,5,0"/>
-                </Grid>
-            </Border>
+
+                <Button Content="&#xE949;"
+                            Style="{StaticResource WindowButtonStyle}" Click="MinimizeButton_Click" 
+                            HorizontalAlignment="Right"
+                            Margin="0,0,40,0" />
+            </Grid>
+
 
             <!-- Contenido -->
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">

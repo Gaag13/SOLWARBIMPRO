@@ -60,6 +60,12 @@ namespace WARBIMPRO
                .SetAvailabilityController<AvailabilityButton>()
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/find20x20_dark.png")
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/find20x20_light.png");
+
+            panelFamilys.AddSeparator();
+            panelFamilys.AddPushButton<CmdDuplicateElement>("Duplicate Element")
+               .SetAvailabilityController<AvailabilityButton>()
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/duplicate20x20_dark.png")
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/duplicate20x20_light.png");
         }
     }
 }

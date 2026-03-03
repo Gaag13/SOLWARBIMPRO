@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="f4d1544b-bc00-4fc4-924a-3817b1af74ec" Name="WARBIMPRO" Language="1033" Codepage="Windows-1252" Version="2.0.0" UpgradeCode="f4d1544b-bc00-4fc4-924a-381791af64ec" Manufacturer="gianc">
+    <Package InstallerVersion="200" Compressed="yes" Platform="x64" SummaryCodepage="Windows-1252" InstallScope="perMachine" Languages="1033" />
+    <Media Id="1" Cabinet="WARBIMPRO.cab" EmbedCab="yes" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="CommonAppDataFolder" Name="CommonAppDataFolder">
+        <Directory Id="Autodesk" Name="Autodesk">
+          <Directory Id="Revit" Name="Revit">
+            <Directory Id="INSTALLDIR" Name="Addins">
+
+              <Component Id="Component.INSTALLDIR.EmptyDirectory" Guid="f4d1544b-bc00-4fc4-924a-3817d3f263ce" KeyPath="yes" Win64="yes">
+                <CreateFolder />
+                <RemoveFolder Id="INSTALLDIR" On="uninstall" />
+              </Component>
+
+            </Directory>
+
+            <Component Id="Revit" Guid="f4d1544b-bc00-4fc4-924a-381783e61f60" KeyPath="yes" Win64="yes">
+              <CreateFolder />
+              <RemoveFolder Id="Revit" On="uninstall" />
+            </Component>
+
+          </Directory>
+
+          <Component Id="Autodesk" Guid="f4d1544b-bc00-4fc4-924a-3817181c1866" KeyPath="yes" Win64="yes">
+            <CreateFolder />
+            <RemoveFolder Id="Autodesk" On="uninstall" />
+          </Component>
+
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <Icon Id="app_icon.ico" SourceFile="install\Resources\Icons\ShellIcon.ico" />
+
+    <WixVariable Id="WixUIBannerBmp" Value="install\Resources\Icons\BannerImage.png" />
+    <WixVariable Id="WixUIDialogBmp" Value="install\Resources\Icons\BackgroundImage.png" />
+
+    <MajorUpgrade DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit." Schedule="afterInstallInitialize" />
+
+    <UI>
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="CustomizeDlg" Order="5">1</Publish>
+      <Publish Dialog="CustomizeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="5">1</Publish>
+    </UI>
+
+    <UIRef Id="WixUI_FeatureTree" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <Property Id="ARPPRODUCTICON" Value="app_icon.ico" />
+    <Property Id="REINSTALLMODE" Value="omus" />
+
+    <Feature Id="Complete" Title="Complete" Absent="allow" Level="1">
+      <ComponentRef Id="Component.INSTALLDIR.EmptyDirectory" />
+      <ComponentRef Id="Revit" />
+      <ComponentRef Id="Autodesk" />
+    </Feature>
+
+  </Product>
+</Wix>
+

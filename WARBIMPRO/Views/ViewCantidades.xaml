@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WARBIMPRO.Views"
         mc:Ignorable="d" 
         Title="ViewCantidades" Height="500" Width="850" WindowStartupLocation="CenterScreen"
-        WindowStyle="None"    ResizeMode="CanResize" >
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"   ResizeMode="CanResize" >
 
     <Window.Resources>
         <ResourceDictionary>

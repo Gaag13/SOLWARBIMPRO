@@ -61,6 +61,9 @@ namespace WARBIMPRO.ViewModels
 
             var newType = _typeService.DuplicateType(_originalType, NewTypeName);
 
+            if(newType == null) 
+                return;
+
             _typeService.UpdateTypeDimensions(newType, ParamValue1, ParamValue2,ParamValue3);
 
             _typeService.AssignTypeToElement(_originalElement, newType);
