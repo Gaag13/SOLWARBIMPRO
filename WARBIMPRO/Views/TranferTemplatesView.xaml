@@ -1,0 +1,493 @@
+﻿<Window x:Class="WARBIMPRO.Views.TranferTemplatesView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:WARBIMPRO.Views"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="TranferTemplatesView">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="GlobalStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Filtro de búsqueda: CollectionViewSource en code-behind o ViewModel -->
+
+            <!-- Estilo ComboBox oscuro -->
+            <Style x:Key="DarkComboBoxStyle" TargetType="ComboBox">
+                <Setter Property="Background" Value="#1E1E42"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="BorderBrush" Value="#4B4B7A"/>
+                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                <Setter Property="Padding" Value="10,8"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Height" Value="38"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ComboBox">
+                            <Grid>
+                                <Border x:Name="Border"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="4">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="30"/>
+                                        </Grid.ColumnDefinitions>
+                                        <ContentPresenter Grid.Column="0"
+                                                          Margin="{TemplateBinding Padding}"
+                                                          Content="{TemplateBinding SelectionBoxItem}"
+                                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                          VerticalAlignment="Center"/>
+                                        <Path Grid.Column="1"
+                                              Data="M 0 0 L 6 6 L 12 0"
+                                              Stroke="#3498db"
+                                              StrokeThickness="2"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Center"
+                                              Width="12" Height="6"/>
+                                        <ToggleButton Grid.ColumnSpan="2"
+                                                      IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                                      Background="Transparent"
+                                                      BorderThickness="0"
+                                                      Opacity="0"/>
+                                    </Grid>
+                                </Border>
+                                <Popup IsOpen="{TemplateBinding IsDropDownOpen}"
+                                       Placement="Bottom"
+                                       AllowsTransparency="True"
+                                       Focusable="False"
+                                       PopupAnimation="Slide">
+                                    <Border Background="#2C2C54"
+                                            BorderBrush="#4B4B7A"
+                                            BorderThickness="1"
+                                            CornerRadius="0,0,4,4"
+                                            MaxHeight="200">
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                            <ItemsPresenter/>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Border" Property="BorderBrush" Value="#3498db"/>
+                                </Trigger>
+                                <Trigger Property="IsDropDownOpen" Value="True">
+                                    <Setter TargetName="Border" Property="BorderBrush" Value="#3498db"/>
+                                    <Setter TargetName="Border" Property="BorderThickness" Value="0,0,0,2"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Estilo SearchBox -->
+            <Style x:Key="InlineSearchStyle" TargetType="TextBox">
+                <Setter Property="Background" Value="#1E1E42"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="CaretBrush" Value="White"/>
+                <Setter Property="BorderBrush" Value="#4B4B7A"/>
+                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                <Setter Property="Padding" Value="36,8,10,8"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Height" Value="38"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TextBox">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="4"
+                                    x:Name="border">
+                                <Grid>
+                                    <!-- Ícono de búsqueda -->
+                                    <Path Data="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                                          Fill="#3498db"
+                                          Width="14" Height="14"
+                                          Stretch="Uniform"
+                                          HorizontalAlignment="Left"
+                                          VerticalAlignment="Center"
+                                          Margin="10,0,0,0"/>
+                                    <ScrollViewer x:Name="PART_ContentHost"
+                                                  Margin="{TemplateBinding Padding}"
+                                                  VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="BorderBrush" Value="#3498db"/>
+                                </Trigger>
+                                <Trigger Property="IsFocused" Value="True">
+                                    <Setter TargetName="border" Property="BorderBrush" Value="#3498db"/>
+                                    <Setter TargetName="border" Property="BorderThickness" Value="0,0,0,2"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- ListBox items estilo -->
+            <Style x:Key="TemplateListBoxItemStyle" TargetType="ListBoxItem">
+                <Setter Property="Foreground" Value="#CCCCEE"/>
+                <Setter Property="Padding" Value="12,10"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                <Setter Property="BorderBrush" Value="#3A3A60"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBoxItem">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Padding="{TemplateBinding Padding}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <!-- Indicador de selección -->
+                                    <Rectangle x:Name="SelectionIndicator"
+                                               Grid.Column="0"
+                                               Width="3" Height="16"
+                                               RadiusX="2" RadiusY="2"
+                                               Fill="Transparent"
+                                               HorizontalAlignment="Left"
+                                               VerticalAlignment="Center"/>
+                                    <ContentPresenter Grid.Column="1"
+                                                      VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#353560"/>
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="#2A3A5A"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                    <Setter TargetName="SelectionIndicator" Property="Fill" Value="#3498db"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Label section style -->
+            <Style x:Key="SectionLabelStyle" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="#7A7AAA"/>
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Margin" Value="0,0,0,5"/>
+            </Style>
+
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <!-- Sombra exterior -->
+    <Border CornerRadius="10"
+            Background="#2C2C54">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="30" ShadowDepth="0" Color="#000000" Opacity="0.6"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <!-- Barra de título personalizada -->
+                <RowDefinition Height="48"/>
+                <!-- Separador -->
+                <RowDefinition Height="1"/>
+                <!-- Contenido -->
+                <RowDefinition Height="*"/>
+                <!-- Footer con botón -->
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- ══════════════════════════════════════════ -->
+            <!-- BARRA DE TÍTULO PERSONALIZADA              -->
+            <!-- ══════════════════════════════════════════ -->
+            <Border Grid.Row="0"
+                    Background="#23234A"
+                    CornerRadius="10,10,0,0"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid Margin="16,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Ícono + Título -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Ícono SVG path (flecha de transferencia) -->
+                        <Border Width="28" Height="28"
+                                Background="#3498db"
+                                CornerRadius="6"
+                                Margin="0,0,10,0">
+                            <Path Data="M8 5v14l11-7z"
+                                  Fill="White"
+                                  Width="14" Height="14"
+                                  Stretch="Uniform"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Transfer View Templates"
+                                       Foreground="White"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"/>
+                            <TextBlock Text="WARBIMPRO · Revit Tools"
+                                       Foreground="#6060A0"
+                                       FontSize="10"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Botones de ventana -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="&#xE921;"                                
+                                Click="MinimizeWindow_Click"
+                                ToolTip="Minimizar"/>
+                        <Button Content="&#xE8BB;"
+                                Click="CloseWindow_Click"
+                                ToolTip="Cerrar">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource WindowButtonStyle}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#C0392B"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Separador con gradiente -->
+            <Rectangle Grid.Row="1" Height="1">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#3498db" Offset="0"/>
+                        <GradientStop Color="#4B4B7A" Offset="0.5"/>
+                        <GradientStop Color="Transparent" Offset="1"/>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+
+            <!-- ══════════════════════════════════════════ -->
+            <!-- CONTENIDO PRINCIPAL                        -->
+            <!-- ══════════════════════════════════════════ -->
+            <ScrollViewer Grid.Row="2"
+                          VerticalScrollBarVisibility="Auto"
+                          Style="{x:Null}">
+                <StackPanel Margin="20,20,20,10">
+
+                    <!-- ── SECCIÓN: MODELO ORIGEN ── -->
+                    <TextBlock Text="MODELO ORIGEN"
+                               Style="{StaticResource SectionLabelStyle}"/>
+                    <ComboBox Style="{StaticResource DarkComboBoxStyle}"
+                              ItemsSource="{Binding OpenDocuments}"
+                              SelectedItem="{Binding SelectedSource}"
+                              DisplayMemberPath="Title"
+                              Margin="0,0,0,4"/>
+                    <TextBlock Text="Selecciona el documento del que copiarás los templates."
+                               Foreground="#55557A"
+                               FontSize="11"
+                               Margin="0,0,0,18"/>
+
+                    <!-- ── SECCIÓN: MODELO DESTINO ── -->
+                    <TextBlock Text="MODELO DESTINO"
+                               Style="{StaticResource SectionLabelStyle}"/>
+                    <ComboBox Style="{StaticResource DarkComboBoxStyle}"
+                              ItemsSource="{Binding OpenDocuments}"
+                              SelectedItem="{Binding SelectedTarget}"
+                              DisplayMemberPath="Title"
+                              Margin="0,0,0,4"/>
+                    <TextBlock Text="Selecciona el documento de destino donde se copiará el template."
+                               Foreground="#55557A"
+                               FontSize="11"
+                               Margin="0,0,0,18"/>
+
+                    <!-- ── SECCIÓN: VIEW TEMPLATES ── -->
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   Text="VIEW TEMPLATES"
+                                   Style="{StaticResource SectionLabelStyle}"
+                                   VerticalAlignment="Center"/>
+                        <!-- Contador dinámico -->
+                        <Border Grid.Column="1"
+                                Background="#3498db"
+                                CornerRadius="10"
+                                Padding="8,2">
+                            <TextBlock Foreground="White"
+                                       FontSize="11"
+                                       FontWeight="SemiBold">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} templates">
+                                        <Binding Path="FilteredTemplates.Count" FallbackValue="0"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Border>
+                    </Grid>
+
+                    <!-- Buscador con placeholder -->
+                    <Grid Margin="0,0,0,8">
+                        <TextBox Style="{StaticResource InlineSearchStyle}"
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="Buscar template por nombre..."
+                                   Foreground="#55557A"
+                                   FontSize="13"
+                                   Margin="36,0,10,0"
+                                   VerticalAlignment="Center"
+                                   IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SearchText}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding SearchText}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+
+                    <!-- Lista de templates -->
+                    <Border BorderBrush="#4B4B7A"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Height="220">
+                        <ListBox Background="Transparent"
+                                 BorderThickness="0"
+                                 ItemsSource="{Binding FilteredTemplates}"
+                                 SelectedItem="{Binding SelectedTemplate}"
+                                 DisplayMemberPath="Name"
+                                 ItemContainerStyle="{StaticResource TemplateListBoxItemStyle}"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 VirtualizingPanel.IsVirtualizing="True"/>
+                    </Border>
+
+                    <!-- Mensaje de selección actual -->
+                    <Border Margin="0,10,0,0"
+                            Background="#1E1E42"
+                            CornerRadius="4"
+                            Padding="12,8"
+                            Visibility="{Binding SelectedTemplate, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal">
+                            <Rectangle Width="3" Height="32" RadiusX="2" RadiusY="2"
+                                       Fill="#3498db" Margin="0,0,10,0"/>
+                            <StackPanel>
+                                <TextBlock Text="Template seleccionado"
+                                           Foreground="#7A7AAA"
+                                           FontSize="10"/>
+                                <TextBlock Text="{Binding SelectedTemplate.Name}"
+                                           Foreground="White"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- ══════════════════════════════════════════ -->
+            <!-- FOOTER CON BOTÓN                           -->
+            <!-- ══════════════════════════════════════════ -->
+            <Border Grid.Row="3"
+                    Background="#23234A"
+                    CornerRadius="0,0,10,10"
+                    Padding="20,14">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Info de estado -->
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Foreground="#55557A" FontSize="11">
+                            <Run Text="Origen: "/>
+                            <Run Text="{Binding SelectedSource.Title, FallbackValue='—'}" Foreground="#3498db"/>
+                        </TextBlock>
+                        <TextBlock Foreground="#55557A" FontSize="11">
+                            <Run Text="Destino: "/>
+                            <Run Text="{Binding SelectedTarget.Title, FallbackValue='—'}" Foreground="#3498db"/>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <!-- Botón principal -->
+                    <Button Grid.Column="1"
+                            Command="{Binding CopyCommand}"
+                            Height="38"
+                            Padding="20,0"
+                            Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="#3498db"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="FontSize" Value="13"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    CornerRadius="6"
+                                                    Padding="{TemplateBinding Padding}">
+                                                <StackPanel Orientation="Horizontal"
+                                                            VerticalAlignment="Center">
+                                                    <Path Data="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                                                          Fill="White"
+                                                          Width="14" Height="14"
+                                                          Stretch="Uniform"
+                                                          Margin="0,0,8,0"/>
+                                                    <ContentPresenter VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#2980b9"/>
+                                                </Trigger>
+                                                <Trigger Property="IsPressed" Value="True">
+                                                    <Setter Property="Background" Value="#1f6fa3"/>
+                                                </Trigger>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Background" Value="#4B4B7A"/>
+                                                    <Setter Property="Foreground" Value="#7A7AAA"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                        <TextBlock Text="Copiar Template" VerticalAlignment="Center"/>
+                    </Button>
+
+                </Grid>
+            </Border>
+
+        </Grid>
+    </Border>
+
+
+</Window>

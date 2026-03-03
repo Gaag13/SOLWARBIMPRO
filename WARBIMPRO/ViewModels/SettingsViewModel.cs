@@ -61,9 +61,9 @@ namespace WARBIMPRO.ViewModels
         {
             _uidoc = uidoc;
 
-            BrowserPathCommand = new RelayCommand(BrowsePath);
-            LoadNowCommand = new RelayCommand(LoadNow);
-            LoadBasicCommand = new RelayCommand(LoadBasicFamilies);
+            BrowserPathCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(BrowsePath);
+            LoadNowCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(LoadNow);
+            LoadBasicCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(LoadBasicFamilies);
 
             // Cargar configuración guardada
             LoadConfiguration();
