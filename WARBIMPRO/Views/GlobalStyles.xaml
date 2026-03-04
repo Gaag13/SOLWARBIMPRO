@@ -409,6 +409,144 @@
         </Setter>
     </Style>
 
+    <!-- ComboBox oscuro SIMPLE y funcional -->
+    <Style x:Key="DarkComboBoxStyle" TargetType="ComboBox">
+
+        <!-- Colores base -->
+        <Setter Property="Background" Value="#1E1E42"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderBrush" Value="#4B4B7A"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Height" Value="35"/>
+
+        <!-- Dropdown oscuro -->
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style TargetType="ComboBoxItem">
+                    <Setter Property="Background" Value="#2C2C54"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Padding" Value="8,4"/>
+
+                    <Style.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter Property="Background" Value="#3498db"/>
+                        </Trigger>
+
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#2980b6"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Setter.Value>
+        </Setter>
+
+    </Style>
+
+    <!-- Estilo SearchBox -->
+    <Style x:Key="InlineSearchStyle" TargetType="TextBox">
+        <Setter Property="Background"               Value="#1E1E42"/>
+        <Setter Property="Foreground"               Value="White"/>
+        <Setter Property="CaretBrush"               Value="White"/>
+        <Setter Property="SelectionBrush"           Value="#3498db"/>
+        <Setter Property="BorderBrush"              Value="#4B4B7A"/>
+        <Setter Property="BorderThickness"          Value="0,0,0,1"/>
+        <Setter Property="Padding"                  Value="20,0,0,0"/>
+        <Setter Property="FontSize"                 Value="13"/>
+        <Setter Property="Height"                   Value="38"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="4"
+                        TextElement.Foreground="White">
+                        <Grid>
+                            <!-- Ícono de búsqueda -->
+                            <Path Data="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                              Fill="#3498db"
+                              Width="14" Height="14"
+                              Stretch="Uniform"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center"
+                              Margin="10,0,0,0"/>
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                  Margin="{TemplateBinding Padding}"
+                                  VerticalAlignment="Center"
+                                  TextElement.Foreground="White"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="BorderBrush" Value="#3498db"/>
+                        </Trigger>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter TargetName="border" Property="BorderBrush" Value="#3498db"/>
+                            <Setter TargetName="border" Property="BorderThickness" Value="0,0,0,2"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!-- ListBox items estilo -->
+    <Style x:Key="TemplateListBoxItemStyle" TargetType="ListBoxItem">
+        <Setter Property="Foreground" Value="#CCCCEE"/>
+        <Setter Property="Padding" Value="12,10"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="BorderBrush" Value="#3A3A60"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <!-- Indicador de selección -->
+                            <Rectangle x:Name="SelectionIndicator"
+                                               Grid.Column="0"
+                                               Width="3" Height="16"
+                                               RadiusX="2" RadiusY="2"
+                                               Fill="Transparent"
+                                               HorizontalAlignment="Left"
+                                               VerticalAlignment="Center"/>
+                            <ContentPresenter Grid.Column="1"
+                                                      VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#353560"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#2A3A5A"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter TargetName="SelectionIndicator" Property="Fill" Value="#3498db"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Label section style -->
+    <Style x:Key="SectionLabelStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="#7A7AAA"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Margin" Value="0,0,0,5"/>
+    </Style>
+
 
 
 </ResourceDictionary>

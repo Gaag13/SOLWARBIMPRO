@@ -1,5 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -8,33 +10,20 @@ using System.Windows.Input;
 using WARBIMPRO.Utils;
 using RelayCommand = WARBIMPRO.Utils.RelayCommand;
 
-
 namespace WARBIMPRO.ViewModels
 {
-    
     public class TransferViewTemplateViewModel : ObservableObject
     {
         private readonly UIApplication _uiapp;
         private string _searchText = string.Empty;
 
-        public string SearchText
-        {
-            get => _searchText;
-            set
-            {
-                _searchText = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(FilteredTemplates)); // refresca la lista
-            }
-        }
-        public IEnumerable<View> FilteredTemplates =>
-    string.IsNullOrWhiteSpace(SearchText)
-        ? ViewTemplates
-        : ViewTemplates.Where(v =>
-            v.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
-
         public ObservableCollection<Document> OpenDocuments { get; set; }
-        public ObservableCollection<View> ViewTemplates { get; set; }
+
+        // Colección fuente (todos los templates del doc origen)
+        private ObservableCollection<View> ViewTemplates { get; set; }
+
+        // Colección que ve el ListBox (filtrada)
+        public ObservableCollection<View> FilteredTemplates { get; private set; }
 
         private Document _selectedSource;
         public Document SelectedSource
@@ -70,6 +59,17 @@ namespace WARBIMPRO.ViewModels
             }
         }
 
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                _searchText = value;
+                OnPropertyChanged();
+                ApplyFilter(); // reconstruye FilteredTemplates
+            }
+        }
+
         public ICommand CopyCommand { get; }
 
         public TransferViewTemplateViewModel(UIApplication uiapp)
@@ -79,11 +79,10 @@ namespace WARBIMPRO.ViewModels
             OpenDocuments = new ObservableCollection<Document>(
                 uiapp.Application.Documents
                     .Cast<Document>()
-                    .Where(d => !d.IsFamilyDocument &&
-                    !d.IsLinked &&
-                    !d.IsModifiable));
+                    .Where(d => !d.IsFamilyDocument && !d.IsLinked && !d.IsModifiable));
 
             ViewTemplates = new ObservableCollection<View>();
+            FilteredTemplates = new ObservableCollection<View>();
 
             CopyCommand = new RelayCommand(CopyTemplate);
         }
@@ -91,40 +90,62 @@ namespace WARBIMPRO.ViewModels
         private void LoadViewTemplates()
         {
             ViewTemplates.Clear();
+            SelectedTemplate = null;
 
             if (SelectedSource == null)
+            {
+                ApplyFilter();
                 return;
+            }
 
             var templates = new FilteredElementCollector(SelectedSource)
                 .OfClass(typeof(View))
                 .Cast<View>()
                 .Where(v => v.IsTemplate)
+                .OrderBy(v => v.Name)
                 .ToList();
 
             foreach (var t in templates)
                 ViewTemplates.Add(t);
 
-            OnPropertyChanged(nameof(FilteredTemplates)); 
+            // Resetear búsqueda al cambiar de documento
+            _searchText = string.Empty;
+            OnPropertyChanged(nameof(SearchText));
+
+            ApplyFilter();
+        }
+        private void SelectAll() => FilteredTemplates.ToList().ForEach(v => v.IsSelected = true);
+        private void SelectNone() => FilteredTemplates.ToList().ForEach(v => v.IsSelected = false);
+
+
+        // Único método que toca FilteredTemplates
+        private void ApplyFilter()
+        {
+            FilteredTemplates.Clear();
+
+            var source = string.IsNullOrWhiteSpace(SearchText)
+                ? ViewTemplates
+                : (IEnumerable<View>)ViewTemplates.Where(v =>
+                    v.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0);
+
+            foreach (var v in source)
+                FilteredTemplates.Add(v);
         }
 
         private void CopyTemplate(object obj)
         {
-            if (SelectedSource == null ||
-                SelectedTarget == null ||
-                SelectedTemplate == null)
+            if (SelectedSource == null || SelectedTarget == null || SelectedTemplate == null)
                 return;
 
             using (var t = new Transaction(SelectedTarget, "Copy View Template"))
             {
                 t.Start();
-
                 ElementTransformUtils.CopyElements(
                     SelectedSource,
                     new List<ElementId> { SelectedTemplate.Id },
                     SelectedTarget,
                     Transform.Identity,
                     new CopyPasteOptions());
-
                 t.Commit();
             }
         }
