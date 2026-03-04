@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using WARBIMPRO.Models;
 using WARBIMPRO.Utils;
 using RelayCommand = WARBIMPRO.Utils.RelayCommand;
 
@@ -20,10 +21,10 @@ namespace WARBIMPRO.ViewModels
         public ObservableCollection<Document> OpenDocuments { get; set; }
 
         // Colección fuente (todos los templates del doc origen)
-        private ObservableCollection<View> ViewTemplates { get; set; }
+        private ObservableCollection<ViewItem> ViewTemplates { get; set; }
 
         // Colección que ve el ListBox (filtrada)
-        public ObservableCollection<View> FilteredTemplates { get; private set; }
+        public ObservableCollection<ViewItem> FilteredTemplates { get; private set; }
 
         private Document _selectedSource;
         public Document SelectedSource
@@ -48,8 +49,8 @@ namespace WARBIMPRO.ViewModels
             }
         }
 
-        private View _selectedTemplate;
-        public View SelectedTemplate
+        private ViewItem _selectedTemplate;
+        public ViewItem SelectedTemplate
         {
             get => _selectedTemplate;
             set
@@ -71,6 +72,9 @@ namespace WARBIMPRO.ViewModels
         }
 
         public ICommand CopyCommand { get; }
+        public ICommand SelectAllCommand { get; }
+        public ICommand SelectNoneCommand { get; }
+
 
         public TransferViewTemplateViewModel(UIApplication uiapp)
         {
@@ -81,8 +85,12 @@ namespace WARBIMPRO.ViewModels
                     .Cast<Document>()
                     .Where(d => !d.IsFamilyDocument && !d.IsLinked && !d.IsModifiable));
 
-            ViewTemplates = new ObservableCollection<View>();
-            FilteredTemplates = new ObservableCollection<View>();
+            ViewTemplates = new ObservableCollection<ViewItem>();
+            FilteredTemplates = new ObservableCollection<ViewItem>();
+
+            // En el constructor:
+            SelectAllCommand = new RelayCommand(_ => FilteredTemplates.ToList().ForEach(v => v.IsSelected = true));
+            SelectNoneCommand = new RelayCommand(_ => FilteredTemplates.ToList().ForEach(v => v.IsSelected = false));
 
             CopyCommand = new RelayCommand(CopyTemplate);
         }
@@ -106,7 +114,7 @@ namespace WARBIMPRO.ViewModels
                 .ToList();
 
             foreach (var t in templates)
-                ViewTemplates.Add(t);
+                ViewTemplates.Add(new ViewItem(t));
 
             // Resetear búsqueda al cambiar de documento
             _searchText = string.Empty;
@@ -114,8 +122,8 @@ namespace WARBIMPRO.ViewModels
 
             ApplyFilter();
         }
-        private void SelectAll() => FilteredTemplates.ToList().ForEach(v => v.IsSelected = true);
-        private void SelectNone() => FilteredTemplates.ToList().ForEach(v => v.IsSelected = false);
+        //private void SelectAll() => FilteredTemplates.ToList().ForEach(v => v.IsSelected = true);
+        //private void SelectNone() => FilteredTemplates.ToList().ForEach(v => v.IsSelected = false);
 
 
         // Único método que toca FilteredTemplates
@@ -125,7 +133,7 @@ namespace WARBIMPRO.ViewModels
 
             var source = string.IsNullOrWhiteSpace(SearchText)
                 ? ViewTemplates
-                : (IEnumerable<View>)ViewTemplates.Where(v =>
+                : (IEnumerable<ViewItem>)ViewTemplates.Where(v =>
                     v.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0);
 
             foreach (var v in source)
@@ -134,15 +142,21 @@ namespace WARBIMPRO.ViewModels
 
         private void CopyTemplate(object obj)
         {
-            if (SelectedSource == null || SelectedTarget == null || SelectedTemplate == null)
-                return;
+            if (SelectedSource == null || SelectedTarget == null) return;
 
-            using (var t = new Transaction(SelectedTarget, "Copy View Template"))
+            var selectedIds = FilteredTemplates
+                .Where(v => v.IsSelected)
+                .Select(v => v.Id)
+                .ToList();
+
+            if (!selectedIds.Any()) return;
+
+            using (var t = new Transaction(SelectedTarget, "Copy View Templates"))
             {
                 t.Start();
                 ElementTransformUtils.CopyElements(
                     SelectedSource,
-                    new List<ElementId> { SelectedTemplate.Id },
+                    selectedIds,
                     SelectedTarget,
                     Transform.Identity,
                     new CopyPasteOptions());

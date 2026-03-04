@@ -8,7 +8,7 @@
       Height="700" Width="350"
       WindowStartupLocation="CenterScreen"
       WindowStyle="None"
-       AllowsTransparency="True"
+      AllowsTransparency="True"
       Title="TranferTemplatesView">
 
     <Window.Resources>
@@ -16,30 +16,20 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="GlobalStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-
-            
-            
-
-
         </ResourceDictionary>
     </Window.Resources>
 
     <!-- Sombra exterior -->
-    <Border CornerRadius="10"
-            Background="#2C2C54">
+    <Border CornerRadius="10" Background="#2C2C54">
         <Border.Effect>
             <DropShadowEffect BlurRadius="30" ShadowDepth="0" Color="#000000" Opacity="0.6"/>
         </Border.Effect>
 
         <Grid>
             <Grid.RowDefinitions>
-                <!-- Barra de título personalizada -->
                 <RowDefinition Height="48"/>
-                <!-- Separador -->
                 <RowDefinition Height="1"/>
-                <!-- Contenido -->
                 <RowDefinition Height="*"/>
-                <!-- Footer con botón -->
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
@@ -57,9 +47,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Ícono + Título -->
                     <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                        <!-- Ícono SVG path (flecha de transferencia) -->
                         <Border Width="28" Height="28"
                                 Background="#3498db"
                                 CornerRadius="6"
@@ -82,9 +70,8 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <!-- Botones de ventana -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button Content="&#xE949;"  
+                        <Button Content="&#xE949;"
                                 Style="{StaticResource WindowButtonStyle}"
                                 Click="MinimizeWindow_Click"
                                 ToolTip="Minimizar"/>
@@ -124,20 +111,20 @@
                           Style="{x:Null}">
                 <StackPanel Margin="20,20,20,10">
 
-                    <!-- ── SECCIÓN: MODELO ORIGEN ── -->
+                    <!-- ── MODELO ORIGEN ── -->
                     <TextBlock Text="MODELO ORIGEN"
                                Style="{StaticResource SectionLabelStyle}"/>
                     <ComboBox Style="{StaticResource DarkComboBoxStyle}"
                               ItemsSource="{Binding OpenDocuments}"
                               SelectedItem="{Binding SelectedSource}"
-                              DisplayMemberPath="Title" 
+                              DisplayMemberPath="Title"
                               Margin="0,0,0,4"/>
                     <TextBlock Text="Selecciona el documento del que copiarás los templates."
-                               Foreground="white"
+                               Foreground="White"
                                FontSize="11"
                                Margin="0,0,0,18"/>
 
-                    <!-- ── SECCIÓN: MODELO DESTINO ── -->
+                    <!-- ── MODELO DESTINO ── -->
                     <TextBlock Text="MODELO DESTINO"
                                Style="{StaticResource SectionLabelStyle}"/>
                     <ComboBox Style="{StaticResource DarkComboBoxStyle}"
@@ -150,7 +137,7 @@
                                FontSize="11"
                                Margin="0,0,0,18"/>
 
-                    <!-- ── SECCIÓN: VIEW TEMPLATES ── -->
+                    <!-- ── VIEW TEMPLATES: header con contador ── -->
                     <Grid Margin="0,0,0,8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -160,7 +147,6 @@
                                    Text="VIEW TEMPLATES"
                                    Style="{StaticResource SectionLabelStyle}"
                                    VerticalAlignment="Center"/>
-                        <!-- Contador dinámico -->
                         <Border Grid.Column="1"
                                 Background="#3498db"
                                 CornerRadius="10"
@@ -177,35 +163,63 @@
                         </Border>
                     </Grid>
 
-                    <!-- Buscador con placeholder -->
+                    <!-- ── Buscador ── -->
                     <Grid Margin="0,0,0,8">
                         <TextBox Style="{StaticResource InlineSearchStyle}"
                                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
-                       
                     </Grid>
 
-                    <!-- Lista de templates -->
+                    <!-- ── Lista de templates con CheckBox ── -->
                     <Border BorderBrush="#4B4B7A"
                             BorderThickness="1"
                             CornerRadius="6"
-                            Height="220">
+                            Height="280">
                         <ListBox Background="Transparent"
                                  BorderThickness="0"
                                  ItemsSource="{Binding FilteredTemplates}"
-                                 SelectedItem="{Binding SelectedTemplate}"
-                                 DisplayMemberPath="Name"
-                                 ItemContainerStyle="{StaticResource TemplateListBoxItemStyle}"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                 VirtualizingPanel.IsVirtualizing="True"/>
+                                 VirtualizingPanel.IsVirtualizing="True">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Margin" Value="0"/>
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                    <Setter Property="BorderBrush" Value="#3A3A60"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}">
+                                                    <ContentPresenter/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="#353560"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                              Content="{Binding Name}"
+                                              Style="{StaticResource CheckBoxStyle}"
+                                              Padding="8,10"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
                     </Border>
-
-                   
 
                 </StackPanel>
             </ScrollViewer>
 
             <!-- ══════════════════════════════════════════ -->
-            <!-- FOOTER CON BOTÓN                           -->
+            <!-- FOOTER CON BOTONES                         -->
             <!-- ══════════════════════════════════════════ -->
             <Border Grid.Row="3"
                     Background="#23234A"
@@ -213,15 +227,120 @@
                     Padding="20,14">
                 <Grid>
                     <Grid.ColumnDefinitions>
+                        <!-- Botones selección -->
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <!-- Spacer -->
                         <ColumnDefinition Width="*"/>
+                        <!-- Botón copiar -->
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                 
-                    <!-- Botón principal -->
+
+                    <!-- Seleccionar todos -->
+                    <Button Grid.Column="0"
+                            Command="{Binding SelectAllCommand}"
+                            Height="34"
+                            Padding="12,0"
+                            Width="100"
+                            Margin="0,0,0,0"
+                            Cursor="Hand"
+                            ToolTip="Seleccionar todos">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="#3A3A5C"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="BorderBrush" Value="#4B4B7A"/>
+                                <Setter Property="FontSize" Value="12"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="6"
+                                                    Padding="{TemplateBinding Padding}">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <!-- Ícono check-all -->
+                                                    <Path Data="M2 7h14v2H2zm0 4h14v2H2zm0 4h14v2H2z"
+                                                          Fill="#3498db"
+                                                          Width="12" Height="12"
+                                                          Stretch="Uniform"
+                                                          Margin="0,0,6,0"/>
+                                                    <ContentPresenter VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#4B4B7A"/>
+                                                </Trigger>
+                                                <Trigger Property="IsPressed" Value="True">
+                                                    <Setter Property="Background" Value="#2C2C54"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                        <TextBlock Text="Todos" VerticalAlignment="Center"/>
+                    </Button>
+
+                    <!-- Limpiar selección -->
                     <Button Grid.Column="1"
+                            Command="{Binding SelectNoneCommand}"
+                            Height="34"
+                            Padding="12,0"
+                            Width="100"
+                            Cursor="Hand"
+                            ToolTip="Limpiar selección" Grid.ColumnSpan="2" >
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="#3A3A5C"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="BorderBrush" Value="#4B4B7A"/>
+                                <Setter Property="FontSize" Value="12"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="6"
+                                                    Padding="{TemplateBinding Padding}">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <!-- Ícono clear -->
+                                                    <Path Data="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                                                          Fill="#E74C3C"
+                                                          Width="12" Height="12"
+                                                          Stretch="Uniform"
+                                                          Margin="0,0,6,0"/>
+                                                    <ContentPresenter VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#4B4B7A"/>
+                                                </Trigger>
+                                                <Trigger Property="IsPressed" Value="True">
+                                                    <Setter Property="Background" Value="#2C2C54"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                        <TextBlock Text="Ninguno" VerticalAlignment="Center"/>
+                    </Button>
+
+                    <!-- Botón Copiar -->
+                    <Button Grid.Column="3"
                             Command="{Binding CopyCommand}"
-                            Height="38"
-                            Padding="20,0"
+                            Height="34"
+                            Width="100"
+                            Padding="18,0"
                             Cursor="Hand">
                         <Button.Style>
                             <Style TargetType="Button">
@@ -236,8 +355,7 @@
                                             <Border Background="{TemplateBinding Background}"
                                                     CornerRadius="6"
                                                     Padding="{TemplateBinding Padding}">
-                                                <StackPanel Orientation="Horizontal"
-                                                            VerticalAlignment="Center">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                                     <Path Data="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
                                                           Fill="White"
                                                           Width="14" Height="14"
@@ -271,6 +389,5 @@
 
         </Grid>
     </Border>
-
 
 </Window>

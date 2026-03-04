@@ -79,6 +79,12 @@ namespace WARBIMPRO
                .SetLongDescription("Duplica elementos estructurales en tu proyecto de Revit de manera rápida y sencilla, permitiéndote seleccionar un elemento estructural existente y crear una copia exacta en la misma ubicación o en " +
                "una ubicación diferente, facilitando la creación de elementos repetitivos y mejorando la eficiencia de tu modelado.");
                
+            panelFamilys.AddSeparator();
+            panelFamilys.AddPushButton<CmdTranferViewTemplate>("Transfer View Template")
+               .SetAvailabilityController<AvailabilityButton>()
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/transfer20x20_dark.png")
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/transfer20x20_light.png")
+               .SetLongDescription("Transfiere plantillas de vista entre proyectos de Revit de manera rápida y sencilla, permitiéndote seleccionar una plantilla de vista en un proyecto de origen y aplicarla a vistas en un proyecto de destino, facilitando la estandarización y consistencia visual en tus proyectos.");
         }
     }
 }
