@@ -1,0 +1,56 @@
+﻿<Window x:Class="WARBIMPRO.Views.ViewExportFamilies"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WARBIMPRO.Views"
+        mc:Ignorable="d"
+        Title="ViewExportFamilies" Height="450" Width="800">
+    <Grid Margin="10">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ListView ItemsSource="{Binding Families}">
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+
+                    <StackPanel Orientation="Horizontal">
+
+                        <CheckBox IsChecked="{Binding IsChecked}" Margin="5"/>
+
+                        <TextBlock Text="{Binding DisplayName}" Margin="5"/>
+
+                        <TextBlock Text="{Binding Category}" Margin="5"/>
+
+                    </StackPanel>
+
+                </DataTemplate>
+            </ListView.ItemTemplate>
+
+        </ListView>
+
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="10">
+
+            <Button Content="Select All"
+                    Command="{Binding SelectAllCommand}"
+                    Margin="5"/>
+
+            <Button Content="Deselect All"
+                    Command="{Binding DeselectAllCommand}"
+                    Margin="5"/>
+
+            <Button Content="Export"
+                    Command="{Binding ExportCommand}"
+                    Margin="5"/>
+
+        </StackPanel>
+
+    </Grid>
+</Window>

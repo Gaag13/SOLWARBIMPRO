@@ -63,5 +63,14 @@ namespace WARBIMPRO.Utils
             }
             TaskDialog.Show("Elementos ", sb.ToString());
         }
+
+        //public static List<Family> GetFamilies(Document doc)
+        //{
+        //    var familyCollector = new FilteredElementCollector(doc)
+        //        .OfClass(typeof(Family))
+        //        .Cast<Family>()
+        //        .OrderBy(f => f.Name)
+        //        .ToList();
+        //}
     }
 }

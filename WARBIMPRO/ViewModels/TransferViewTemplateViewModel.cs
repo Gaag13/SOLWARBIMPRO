@@ -122,9 +122,7 @@ namespace WARBIMPRO.ViewModels
 
             ApplyFilter();
         }
-        //private void SelectAll() => FilteredTemplates.ToList().ForEach(v => v.IsSelected = true);
-        //private void SelectNone() => FilteredTemplates.ToList().ForEach(v => v.IsSelected = false);
-
+       
 
         // Único método que toca FilteredTemplates
         private void ApplyFilter()
