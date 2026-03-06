@@ -37,7 +37,7 @@
 	<!-- https://github.com/Nice3point/Revit.Build.Tasks -->
 	<PropertyGroup>
 		<IsRepackable>false</IsRepackable>
-		<DeployRevitAddin>false</DeployRevitAddin>
+		<DeployRevitAddin>true</DeployRevitAddin>
 	</PropertyGroup>
 
     <ItemGroup>
