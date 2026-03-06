@@ -4,10 +4,11 @@ using System.IO;
 using System.Windows.Input;
 using WARBIMPRO.Services;
 using WARBIMPRO.Utils;
+using WARBIMPRO.Views;
 
 namespace WARBIMPRO.ViewModels
 {
-    public class SettingsViewModel : ObservableObject
+    public class LoadFamiliesViewModel : ObservableObject
     {
         private readonly UIDocument _uidoc;
 
@@ -21,7 +22,7 @@ namespace WARBIMPRO.ViewModels
             set
             {
                 SetProperty(ref _loadBasicOnStartup, value);
-                SaveConfiguration(); // Guardar automáticamente al cambiar
+                SaveConfiguration();
             }
         }
 
@@ -32,20 +33,15 @@ namespace WARBIMPRO.ViewModels
             set
             {
                 SetProperty(ref _customLibraryPath, value);
-                SaveConfiguration(); // Guardar automáticamente al cambiar
+                SaveConfiguration();
             }
         }
 
-        //private bool _autoLoadOnOpen;
-        //public bool AutoLoadOnOpen
-        //{
-        //    get => _autoLoadOnOpen;
-        //    set
-        //    {
-        //        SetProperty(ref _autoLoadOnOpen, value);
-        //        SaveConfiguration(); // Guardar automáticamente al cambiar
-        //    }
-        //}
+        // ================================
+        // ACCIONES para minimizar/restaurar la ventana padre
+        // ================================
+        public Action OnLoadStarted { get; set; }
+        public Action OnLoadFinished { get; set; }
 
         // ================================
         // COMANDOS
@@ -57,7 +53,7 @@ namespace WARBIMPRO.ViewModels
         // ================================
         // CONSTRUCTOR
         // ================================
-        public SettingsViewModel(UIDocument uidoc)
+        public LoadFamiliesViewModel(UIDocument uidoc)
         {
             _uidoc = uidoc;
 
@@ -65,14 +61,10 @@ namespace WARBIMPRO.ViewModels
             LoadNowCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(LoadNow);
             LoadBasicCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(LoadBasicFamilies);
 
-            // Cargar configuración guardada
             LoadConfiguration();
 
-            // Si está activado "Load basic on startup", cargar familias básicas
-            if (LoadBasicOnStartup )
-            {
+            if (LoadBasicOnStartup)
                 LoadBasicFamilies();
-            }
         }
 
         // ================================
@@ -89,12 +81,8 @@ namespace WARBIMPRO.ViewModels
                 Filter = "Family Files|*.rfa"
             };
 
-            bool? result = dialog.ShowDialog();
-
-            if (result == true)
-            {
+            if (dialog.ShowDialog() == true)
                 CustomLibraryPath = System.IO.Path.GetDirectoryName(dialog.FileName);
-            }
         }
 
         private void LoadNow()
@@ -111,32 +99,61 @@ namespace WARBIMPRO.ViewModels
                 return;
             }
 
-            Document doc = _uidoc.Document;
-            var result = FamilyLoader.LoadFamiliesFromPath(doc, CustomLibraryPath);
-
-            TaskDialog.Show("Load Results", result.ToString());
+            RunWithProgress(CustomLibraryPath);
         }
 
         private void LoadBasicFamilies()
         {
-    
-            string rutaC = CustomLibraryPath;
-
-            if (string.IsNullOrEmpty(rutaC))
+            if (string.IsNullOrEmpty(CustomLibraryPath))
             {
-                TaskDialog.Show("Info",
-                    "La ruta de familias básicas no está configurada.");
+                TaskDialog.Show("Info", "La ruta de familias básicas no está configurada.");
                 return;
             }
-            if (!Directory.Exists(rutaC))
+
+            if (!Directory.Exists(CustomLibraryPath))
             {
                 TaskDialog.Show("Error", "No existe la ruta");
                 return;
             }
 
-            Document doc = _uidoc.Document;
-            var familiasCargadas = FamilyLoader.LoadFamiliesFromPath(doc, rutaC);
+            RunWithProgress(CustomLibraryPath);
+        }
 
+        /// <summary>
+        /// Método central que abre el progress window y ejecuta la carga.
+        /// </summary>
+        private void RunWithProgress(string path)
+        {
+            Document doc = _uidoc.Document;
+
+            // Abrir ventana de progreso
+            var progressWindow = new ExportProgressWindow();
+            progressWindow.Closed += (s, e) => OnLoadFinished?.Invoke();
+            progressWindow.Show();
+
+            // Minimizar la ventana padre
+            OnLoadStarted?.Invoke();
+
+            // Ejecutar carga reportando progreso
+            var log = FamilyLoader.LoadFamiliesFromPath(doc, path, (percent, name) =>
+            {
+                progressWindow.ProgressViewModel.Report(percent, name);
+                System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(() => { },
+                    System.Windows.Threading.DispatcherPriority.Render);
+            });
+
+            // Contar resultados
+            string logText = log.ToString();
+            int cargadas = logText.Split('\n').Count(l => l.Contains("✔ Familia cargada"));
+            int yaExistian = logText.Split('\n').Count(l => l.Contains("✔ Ya cargada"));
+            int errores = logText.Split('\n').Count(l => l.Contains("❌ No se pudo"));
+
+            // Mostrar solo si hay errores
+            if (errores > 0)
+                TaskDialog.Show("Load Results",
+                    $"✔ Cargadas: {cargadas}\n" +
+                    $"↩ Ya existían: {yaExistian}\n" +
+                    $"❌ Errores: {errores}");
         }
 
         // ================================
@@ -163,27 +180,18 @@ namespace WARBIMPRO.ViewModels
                     switch (parts[0])
                     {
                         case "LoadBasicOnStartup":
-                            // Usar el campo privado para no triggear SaveConfiguration
                             _loadBasicOnStartup = bool.Parse(parts[1]);
                             break;
                         case "CustomLibraryPath":
                             _customLibraryPath = parts[1];
                             break;
-                        //case "AutoLoadOnOpen":
-                        //    _autoLoadOnOpen = bool.Parse(parts[1]);
-                        //    break;
                     }
                 }
 
-                // Notificar cambios después de cargar todo
                 OnPropertyChanged(nameof(LoadBasicOnStartup));
                 OnPropertyChanged(nameof(CustomLibraryPath));
-                //OnPropertyChanged(nameof(AutoLoadOnOpen));
             }
-            catch
-            {
-                // Si falla no explota Revit
-            }
+            catch { }
         }
 
         private void SaveConfiguration()
@@ -192,19 +200,13 @@ namespace WARBIMPRO.ViewModels
             {
                 var directory = Path.GetDirectoryName(_configPath);
                 if (!Directory.Exists(directory))
-                {
                     Directory.CreateDirectory(directory);
-                }
 
                 using var sw = new StreamWriter(_configPath, false);
                 sw.WriteLine($"LoadBasicOnStartup={LoadBasicOnStartup}");
                 sw.WriteLine($"CustomLibraryPath={CustomLibraryPath}");
-                //sw.WriteLine($"AutoLoadOnOpen={AutoLoadOnOpen}");
             }
-            catch
-            {
-                // silencioso para no joder al usuario en medio de Revit
-            }
+            catch { }
         }
     }
 }

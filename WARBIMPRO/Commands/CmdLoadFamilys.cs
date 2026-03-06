@@ -15,8 +15,8 @@ namespace WARBIMPRO.Commands
             var uidoc= UiDocument;
             var uiapp= UiApplication;
 
-            var viewModel = new SettingsViewModel(uidoc);
-            var window = new ViewSettings(viewModel)
+            var viewModel = new LoadFamiliesViewModel(uidoc);
+            var window = new ViewLoadFamilies(viewModel)
             {
                 DataContext = viewModel,                
             };

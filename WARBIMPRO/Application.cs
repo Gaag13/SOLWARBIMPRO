@@ -38,7 +38,7 @@ namespace WARBIMPRO
             // Crea un nuevo panel en la pestaña "WARBIMPRO" para la sección de "FAMILIAS"
             var panelFamilys = Application.CreatePanel("FAMILIAS", "WARBIMPRO");
 
-            panelFamilys.AddPushButton<CmdLoadFamilys>("Cargar\nFamilia")
+            panelFamilys.AddPushButton<CmdLoadFamilys>("Importar\nFamilia")
                .SetAvailabilityController<AvailabilityButton>()
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/load20x20_dark.png")
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/load20x20_light.png")
@@ -50,9 +50,15 @@ namespace WARBIMPRO
               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/lista20x20_light.png")
               .SetLongDescription("Accede a un navegador de familias " +
               "integrado en Revit que te permite explorar, filtrar y " +
-              "seleccionar familias de tu proyecto de manera eficiente, facilitando la gestión y organización de tus recursos de modelado.");         
-
+              "seleccionar familias de tu proyecto de manera eficiente, facilitando la gestión y organización de tus recursos de modelado.");      
             
+            panelFamilys.AddPushButton<CmdExportFamilies>("Exportar\nFamilias")
+               .SetAvailabilityController<AvailabilityButton>()
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/export20x20_dark.png")
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/export20x20_light.png")
+               .SetLongDescription("Exporta familias de Revit a archivos individuales de manera rápida y sencilla, permitiéndote seleccionar las familias que deseas exportar y guardarlas en una ubicación de tu elección para su uso en otros proyectos o para compartir con otros usuarios.");
+
+
 
             //
             var panelViews = Application.CreatePanel("VISTAS", "WARBIMPRO");

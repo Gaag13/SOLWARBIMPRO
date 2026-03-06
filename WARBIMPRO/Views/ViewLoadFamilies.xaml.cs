@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Autodesk.Revit.UI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,25 +11,25 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WARBIMPRO.ViewModels;
 
 namespace WARBIMPRO.Views
 {
     /// <summary>
-    /// Lógica de interacción para ViewExportFamilies.xaml
+    /// Lógica de interacción para ViewSettings.xaml
     /// </summary>
-    public partial class ViewExportFamilies : Window
+    public partial class ViewLoadFamilies : Window
     {
-        public ViewExportFamilies(Document doc)
+        public ViewLoadFamilies(LoadFamiliesViewModel viewModel)
         {
             InitializeComponent();
-            var vm = new ExportFamiliesViewModel(doc);
 
-            vm.OnExportStarted = () => this.WindowState = WindowState.Minimized;
-            vm.OnExportFinished = () => this.WindowState = WindowState.Normal;
+            viewModel.OnLoadStarted = () => this.WindowState = WindowState.Minimized;
+            viewModel.OnLoadFinished = () => this.WindowState = WindowState.Normal;
 
-            DataContext = vm;
+            DataContext = viewModel;
         }
         private void CloseWindow_Click(object sender, RoutedEventArgs e)
         {
