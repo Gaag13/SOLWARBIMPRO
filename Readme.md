@@ -166,8 +166,9 @@ BIM Developer
 
 GitHub:  
 https://github.com/Gaag13
-Instagram
-[Instagram WARBIMPRO](https://www.instagram.com/warbimpro/)
+
+Instagram:
+[WARBIMPRO](https://www.instagram.com/warbimpro/)
 ---
 
 # Contribuciones
