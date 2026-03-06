@@ -25,5 +25,18 @@ namespace WARBIMPRO.Views
             InitializeComponent();
             DataContext = new ExportFamiliesViewModel(doc);
         }
+        private void CloseWindow_Click(object sender, RoutedEventArgs e)
+        {
+
+            Close();
+        }
+        private void MinimizeWindow_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
     }
 }
