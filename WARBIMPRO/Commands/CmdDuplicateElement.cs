@@ -28,6 +28,8 @@ namespace WARBIMPRO.Commands
             // Validadicon estructural
             var cat = element.Category;
 
+#if REVIT2024_OR_GREATER
+
             if (cat == null ||
                 (cat.Id.Value != (int)BuiltInCategory.OST_StructuralColumns &&
                 cat.Id.Value != (int)BuiltInCategory.OST_StructuralFraming &&
@@ -38,6 +40,21 @@ namespace WARBIMPRO.Commands
                  TaskDialog.Show("WARBIMPRO", "Selecciona un elemento estructural (columna, viga, losa, cimentación o muro).");
                 return;
             }
+
+#else
+
+            if (cat == null ||
+                (cat.Id.IntegerValue != (int)BuiltInCategory.OST_StructuralColumns &&
+                cat.Id.IntegerValue != (int)BuiltInCategory.OST_StructuralFraming &&
+                cat.Id.IntegerValue != (int)BuiltInCategory.OST_Floors &&
+                cat.Id.IntegerValue != (int)BuiltInCategory.OST_StructuralFoundation &&
+                cat.Id.IntegerValue != (int)BuiltInCategory.OST_Walls))
+            {
+                TaskDialog.Show("WARBIMPRO", "Selecciona un elemento estructural (columna, viga, losa, cimentación o muro).");
+                return;
+            }
+#endif
+
             var viewModel = new DuplicateElementViewModel(doc, element);
             var view = new ViewDuplicateElement(viewModel);
 

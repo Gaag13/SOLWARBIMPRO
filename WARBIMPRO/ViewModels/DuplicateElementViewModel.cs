@@ -38,7 +38,12 @@ namespace WARBIMPRO.ViewModels
             
             CategoryName= selectedElement.Category?.Name ?? "Sin categoría";
 
+#if REVIT2024_OR_GREATER
+
             var bic = (BuiltInCategory)selectedElement.Category?.Id.Value;
+#else
+            var bic = (BuiltInCategory)selectedElement.Category?.Id.IntegerValue;
+#endif
 
             IsFramingOrColumn =
                 bic == BuiltInCategory.OST_StructuralColumns ||

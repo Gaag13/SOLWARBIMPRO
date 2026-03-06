@@ -67,9 +67,16 @@ namespace WARBIMPRO.Services
 
                 double v1 = Utils.Tools.m_to_Feet(value1);
                 double v2 = Utils.Tools.m_to_Feet(value2);
-                double v3 = Utils.Tools.m_to_Feet(value3); 
+                double v3 = Utils.Tools.m_to_Feet(value3);
 
-                BuiltInCategory bic = (BuiltInCategory)type.Category.Id.Value;
+#if REVIT2024_OR_GREATER
+
+              BuiltInCategory bic = (BuiltInCategory)type.Category.Id.Value;
+#else
+                BuiltInCategory bic = (BuiltInCategory)type.Category.Id.IntegerValue;
+#endif
+
+
 
                 if (bic == BuiltInCategory.OST_Walls)
 
