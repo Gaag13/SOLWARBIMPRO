@@ -275,7 +275,7 @@
                                 </Setter>
                             </Style>
                         </Button.Style>
-                        <TextBlock Text="Load Now" VerticalAlignment="Center"/>
+                        <TextBlock Text="Load" VerticalAlignment="Center"/>
                     </Button>
                 </Grid>
             </Border>

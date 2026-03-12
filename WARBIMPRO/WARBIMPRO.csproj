@@ -9,7 +9,8 @@
 		<EnableDynamicLoading>true</EnableDynamicLoading>	
         <Configurations>Debug R23;Debug R24;Debug R25;Debug R26</Configurations>
         <Configurations>$(Configurations);Release R23;Release R24;Release R25;Release R26</Configurations>
-    </PropertyGroup>    
+    </PropertyGroup> 
+	
     <PropertyGroup Condition="$(Configuration.Contains('R23'))">
         <RevitVersion>2023</RevitVersion>
         <TargetFramework>net48</TargetFramework>
@@ -37,7 +38,7 @@
 	<!-- https://github.com/Nice3point/Revit.Build.Tasks -->
 	<PropertyGroup>
 		<IsRepackable>false</IsRepackable>
-		<DeployRevitAddin>true</DeployRevitAddin>
+		<DeployRevitAddin>false</DeployRevitAddin>
 	</PropertyGroup>
 
     <ItemGroup>

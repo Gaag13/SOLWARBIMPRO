@@ -1,5 +1,9 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:WARBIMPRO.Views.Converters">
+
+    <!-- ── Converter ────────────────────────────────────────────── -->
+    <converters:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
 
     <!-- Estilos de los textos -->
     <Style x:Key="TextBlockStyle" TargetType="TextBlock">
@@ -23,8 +27,12 @@
             <Setter.Value>
                 <ControlTemplate TargetType="CheckBox">
                     <StackPanel Orientation="Horizontal">
-                        <Border x:Name="checkBoxBorder" Width="18" Height="18" BorderThickness="2" BorderBrush="#3498db" CornerRadius="3">
-                            <Path x:Name="checkMark" Width="10" Height="10" Stretch="Uniform" Fill="#3498db" Data="M2.5,7.5 L5.5,10.5 L11.5,4.5" Visibility="Collapsed"/>
+                        <Border x:Name="checkBoxBorder" Width="18" Height="18"
+                                BorderThickness="2" BorderBrush="#3498db" CornerRadius="3">
+                            <Path x:Name="checkMark" Width="10" Height="10"
+                                  Stretch="Uniform" Fill="#3498db"
+                                  Data="M2.5,7.5 L5.5,10.5 L11.5,4.5"
+                                  Visibility="Collapsed"/>
                         </Border>
                         <ContentPresenter Margin="10,0,0,0" VerticalAlignment="Center"/>
                     </StackPanel>
@@ -45,8 +53,7 @@
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontSize" Value="14"/>
     </Style>
-
-    <!-- Estilos de GridViewColumnHeaderStyl -->
+    <!-- Estilos de GridViewColumnHeaderStyle -->
     <Style x:Key="GridViewColumnHeaderStyle" TargetType="GridViewColumnHeader">
         <Setter Property="Background" Value="#4B4B7A"/>
         <Setter Property="Foreground" Value="White"/>
@@ -112,43 +119,47 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-    <!-- Estilo para los ítems del ComboBox -->
+
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+    <!-- Estilo para los ítems del ComboBox -->
     <Style x:Key="ComboBoxItemStyle" TargetType="ComboBoxItem">
-        <Setter Property="Foreground" Value="White" />
-        <Setter Property="FontSize" Value="12" />
-        <Setter Property="Padding" Value="8" />
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Padding" Value="8"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBoxItem">
                     <Grid Background="SkyBlue">
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="SelectionStates">
-                                <VisualState x:Name="Unselected" />
+                                <VisualState x:Name="Unselected"/>
                                 <VisualState x:Name="Selected">
                                     <Storyboard>
-                                        <ColorAnimation Storyboard.TargetName="BackgroundRectangle" Storyboard.TargetProperty="(Rectangle.Fill).(SolidColorBrush.Color)" To="#3498DB" Duration="0:0:0.2" />
+                                        <ColorAnimation Storyboard.TargetName="BackgroundRectangle"
+                                                        Storyboard.TargetProperty="(Rectangle.Fill).(SolidColorBrush.Color)"
+                                                        To="#3498DB" Duration="0:0:0.2"/>
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <Rectangle x:Name="BackgroundRectangle" Fill="Red" />
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <Rectangle x:Name="BackgroundRectangle" Fill="Red"/>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsHighlighted" Value="True">
-                            <Setter TargetName="BackgroundRectangle" Property="Fill" Value="#E6E6E6" />
+                            <Setter TargetName="BackgroundRectangle" Property="Fill" Value="#E6E6E6"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="Foreground" Value="White"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-    <!-- Estilo para el contenedor de ítems del ComboBox -->
-    <Style TargetType="ComboBoxItem" BasedOn="{StaticResource ComboBoxItemStyle}" />
+    <Style TargetType="ComboBoxItem" BasedOn="{StaticResource ComboBoxItemStyle}"/>
+
     <!-- Estilo para el contenedor de ítems del ListBox -->
     <Style x:Key="ListBoxStyle" TargetType="ListBox">
         <Setter Property="Background" Value="#2C2C54"/>
@@ -156,6 +167,7 @@
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Foreground" Value="Yellow"/>
     </Style>
+
     <!-- TreeView Style -->
     <Style x:Key="TreeViewStyle" TargetType="TreeView">
         <Setter Property="Background" Value="#2C2C54"/>
@@ -163,7 +175,6 @@
         <Setter Property="BorderBrush" Value="#4B4B7A"/>
         <Setter Property="BorderThickness" Value="1"/>
     </Style>
-
     <!-- TreeViewItem Style -->
     <Style x:Key="TreeViewItemStyle" TargetType="TreeViewItem">
         <Setter Property="Foreground" Value="White"/>
@@ -176,8 +187,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <ToggleButton x:Name="Expander" 
-                                      ClickMode="Press" 
+                        <ToggleButton x:Name="Expander" ClickMode="Press"
                                       IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}">
                             <ToggleButton.Style>
                                 <Style TargetType="ToggleButton">
@@ -200,9 +210,7 @@
                                 </Style>
                             </ToggleButton.Style>
                         </ToggleButton>
-                        <ContentPresenter x:Name="PART_Header" 
-                                          Grid.Column="1" 
-                                          ContentSource="Header"/>
+                        <ContentPresenter x:Name="PART_Header" Grid.Column="1" ContentSource="Header"/>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
@@ -228,7 +236,6 @@
         <Setter Property="HorizontalGridLinesBrush" Value="#4B4B7A"/>
         <Setter Property="VerticalGridLinesBrush" Value="#4B4B7A"/>
     </Style>
-
     <!-- DataGridColumnHeader Style -->
     <Style x:Key="DataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="#4B4B7A"/>
@@ -239,26 +246,22 @@
             <Setter.Value>
                 <ControlTemplate TargetType="DataGridColumnHeader">
                     <Grid>
-                        <Border x:Name="BackgroundBorder" 
-                                BorderThickness="0,0,1,1" 
-                                BorderBrush="#3A3A5C" 
+                        <Border x:Name="BackgroundBorder"
+                                BorderThickness="0,0,1,1" BorderBrush="#3A3A5C"
                                 Background="{TemplateBinding Background}">
-                            <ContentPresenter Margin="{TemplateBinding Padding}" 
-                                              VerticalAlignment="Center"/>
+                            <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="Center"/>
                         </Border>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-
     <!-- DataGridCell Style -->
     <Style x:Key="DataGridCellStyle" TargetType="DataGridCell">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="DataGridCell">
-                    <Border Padding="5" 
-                            BorderThickness="0" 
+                    <Border Padding="5" BorderThickness="0"
                             Background="{TemplateBinding Background}">
                         <ContentPresenter VerticalAlignment="Center"/>
                     </Border>
@@ -301,7 +304,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <!-- Otros estilos... -->
 
     <Style x:Key="PinkTreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
         <Setter Property="Foreground" Value="YellowGreen"/>
@@ -321,9 +323,9 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <ToggleButton x:Name="Expander" 
-                                              IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" 
-                                              ClickMode="Press">
+                        <ToggleButton x:Name="Expander"
+                                      IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                      ClickMode="Press">
                             <ToggleButton.Style>
                                 <Style TargetType="ToggleButton">
                                     <Setter Property="Foreground" Value="Pink"/>
@@ -331,7 +333,8 @@
                                         <Setter.Value>
                                             <ControlTemplate TargetType="ToggleButton">
                                                 <Border Width="16" Height="16" Background="Transparent">
-                                                    <Path x:Name="ExpandPath" Stroke="Pink" Fill="Transparent" StrokeThickness="1">
+                                                    <Path x:Name="ExpandPath" Stroke="Pink"
+                                                          Fill="Transparent" StrokeThickness="1">
                                                         <Path.Data>
                                                             <PathGeometry Figures="M 4 0 L 8 4 L 4 8 Z"/>
                                                         </Path.Data>
@@ -352,14 +355,13 @@
                                 </Style>
                             </ToggleButton.Style>
                         </ToggleButton>
-                        <Border x:Name="Bd" Grid.Column="1" 
-                                        Background="{TemplateBinding Background}" 
-                                        BorderBrush="{TemplateBinding BorderBrush}" 
-                                        BorderThickness="{TemplateBinding BorderThickness}" 
-                                        Padding="{TemplateBinding Padding}">
-                            <ContentPresenter x:Name="PART_Header" 
-                                                      ContentSource="Header" 
-                                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        <Border x:Name="Bd" Grid.Column="1"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter x:Name="PART_Header" ContentSource="Header"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
                         </Border>
                         <ItemsPresenter x:Name="ItemsHost" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"/>
                     </Grid>
@@ -375,6 +377,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+
     <Style x:Key="PasswordBoxStyle" TargetType="PasswordBox">
         <Setter Property="Background" Value="#2C2C54"/>
         <Setter Property="Foreground" Value="White"/>
@@ -390,9 +393,8 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
-                        <ScrollViewer x:Name="PART_ContentHost" 
-                                      Focusable="false" 
-                                      HorizontalScrollBarVisibility="Hidden" 
+                        <ScrollViewer x:Name="PART_ContentHost" Focusable="false"
+                                      HorizontalScrollBarVisibility="Hidden"
                                       VerticalScrollBarVisibility="Hidden"/>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -409,10 +411,8 @@
         </Setter>
     </Style>
 
-    <!-- ComboBox oscuro SIMPLE y funcional -->
+    <!-- ComboBox oscuro -->
     <Style x:Key="DarkComboBoxStyle" TargetType="ComboBox">
-
-        <!-- Colores base -->
         <Setter Property="Background" Value="#1E1E42"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="BorderBrush" Value="#4B4B7A"/>
@@ -420,20 +420,16 @@
         <Setter Property="Padding" Value="8,4"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="Height" Value="35"/>
-
-        <!-- Dropdown oscuro -->
         <Setter Property="ItemContainerStyle">
             <Setter.Value>
                 <Style TargetType="ComboBoxItem">
                     <Setter Property="Background" Value="#2C2C54"/>
                     <Setter Property="Foreground" Value="White"/>
                     <Setter Property="Padding" Value="8,4"/>
-
                     <Style.Triggers>
                         <Trigger Property="IsHighlighted" Value="True">
                             <Setter Property="Background" Value="#3498db"/>
                         </Trigger>
-
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Background" Value="#2980b6"/>
                         </Trigger>
@@ -441,10 +437,9 @@
                 </Style>
             </Setter.Value>
         </Setter>
-
     </Style>
 
-    <!-- Estilo SearchBox -->
+    <!-- InlineSearchStyle -->
     <Style x:Key="InlineSearchStyle" TargetType="TextBox">
         <Setter Property="Background"               Value="#1E1E42"/>
         <Setter Property="Foreground"               Value="White"/>
@@ -460,24 +455,19 @@
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
                     <Border x:Name="border"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="4"
-                        TextElement.Foreground="White">
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4"
+                            TextElement.Foreground="White">
                         <Grid>
-                            <!-- Ícono de búsqueda -->
                             <Path Data="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
-                              Fill="#3498db"
-                              Width="14" Height="14"
-                              Stretch="Uniform"
-                              HorizontalAlignment="Left"
-                              VerticalAlignment="Center"
-                              Margin="10,0,0,0"/>
+                                  Fill="#3498db" Width="14" Height="14" Stretch="Uniform"
+                                  HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
                             <ScrollViewer x:Name="PART_ContentHost"
-                                  Margin="{TemplateBinding Padding}"
-                                  VerticalAlignment="Center"
-                                  TextElement.Foreground="White"/>
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center"
+                                          TextElement.Foreground="White"/>
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -493,6 +483,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+
     <!-- ListBox items estilo -->
     <Style x:Key="TemplateListBoxItemStyle" TargetType="ListBoxItem">
         <Setter Property="Foreground" Value="#CCCCEE"/>
@@ -504,24 +495,19 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
                     <Border Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    Padding="{TemplateBinding Padding}">
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="20"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <!-- Indicador de selección -->
-                            <Rectangle x:Name="SelectionIndicator"
-                                               Grid.Column="0"
-                                               Width="3" Height="16"
-                                               RadiusX="2" RadiusY="2"
-                                               Fill="Transparent"
-                                               HorizontalAlignment="Left"
-                                               VerticalAlignment="Center"/>
-                            <ContentPresenter Grid.Column="1"
-                                                      VerticalAlignment="Center"/>
+                            <Rectangle x:Name="SelectionIndicator" Grid.Column="0"
+                                       Width="3" Height="16" RadiusX="2" RadiusY="2"
+                                       Fill="Transparent" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"/>
+                            <ContentPresenter Grid.Column="1" VerticalAlignment="Center"/>
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -547,6 +533,171 @@
         <Setter Property="Margin" Value="0,0,0,5"/>
     </Style>
 
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!--  ESTILOS FILTRO ELEMENTOS                                  -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
 
+    <!-- Botón primario (Aplicar Color) -->
+    <Style x:Key="BtnPrimary" TargetType="Button">
+        <Setter Property="Foreground"      Value="White"/>
+        <Setter Property="FontWeight"      Value="Bold"/>
+        <Setter Property="FontSize"        Value="12"/>
+        <Setter Property="Cursor"          Value="Hand"/>
+        <Setter Property="Padding"         Value="16,8"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" CornerRadius="5" Background="#3498DB"
+                            Padding="{TemplateBinding Padding}">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="12" ShadowDepth="0"
+                                              Opacity="0.4" Color="#3498DB"/>
+                        </Border.Effect>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#2980B9"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#1F6FA0"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Botón Aislar -->
+    <Style x:Key="BtnSecondary" TargetType="Button">
+        <Setter Property="Foreground"  Value="#F97316"/>
+        <Setter Property="FontWeight"  Value="Bold"/>
+        <Setter Property="FontSize"    Value="12"/>
+        <Setter Property="Cursor"      Value="Hand"/>
+        <Setter Property="Padding"     Value="14,8"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" CornerRadius="5" Background="#2C2C54"
+                            BorderBrush="#4D2C0E" BorderThickness="1"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="#F97316"/>
+                            <Setter TargetName="Bd" Property="Background"  Value="#3A2010"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Botón Reset -->
+    <Style x:Key="BtnReset" TargetType="Button">
+        <Setter Property="Foreground"  Value="#7A7AAA"/>
+        <Setter Property="FontWeight"  Value="Bold"/>
+        <Setter Property="FontSize"    Value="12"/>
+        <Setter Property="Cursor"      Value="Hand"/>
+        <Setter Property="Padding"     Value="12,8"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" CornerRadius="5" Background="#2C2C54"
+                            BorderBrush="#4B4B7A" BorderThickness="1"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="#EF4444"/>
+                            <Setter Property="Foreground" Value="#EF4444"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Agrega esto en GlobalStyles.xaml después del ScrollBarStyle -->
+
+    <!-- ScrollViewer estilo oscuro -->
+    <Style x:Key="DarkScrollViewer" TargetType="ScrollViewer">
+        <Setter Property="Background"                Value="Transparent"/>
+        <Setter Property="BorderThickness"           Value="0"/>
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+        <Setter Property="VerticalScrollBarVisibility"   Value="Auto"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollViewer">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Contenido -->
+                        <ScrollContentPresenter Grid.Column="0"
+                                            CanContentScroll="{TemplateBinding CanContentScroll}"/>
+
+                        <!-- ScrollBar vertical personalizado -->
+                        <ScrollBar x:Name="PART_VerticalScrollBar"
+                               Grid.Column="1"
+                               Orientation="Vertical"
+                               Width="6"
+                               Margin="2,4,2,4"
+                               Background="Transparent"
+                               Value="{TemplateBinding VerticalOffset}"
+                               Maximum="{TemplateBinding ScrollableHeight}"
+                               ViewportSize="{TemplateBinding ViewportHeight}"
+                               Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}">
+                            <ScrollBar.Template>
+                                <ControlTemplate TargetType="ScrollBar">
+                                    <Border CornerRadius="3" Background="#2C2C54"
+                                        BorderBrush="#4B4B7A" BorderThickness="1">
+                                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                                            <Track.DecreaseRepeatButton>
+                                                <RepeatButton Command="ScrollBar.LineUpCommand"
+                                                          Opacity="0" Height="0"/>
+                                            </Track.DecreaseRepeatButton>
+                                            <Track.Thumb>
+                                                <Thumb>
+                                                    <Thumb.Template>
+                                                        <ControlTemplate TargetType="Thumb">
+                                                            <Border x:Name="ThumbBd"
+                                                                CornerRadius="3"
+                                                                Background="#3498DB"
+                                                                Opacity="0.7"
+                                                                Margin="1"/>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="ThumbBd" Property="Opacity" Value="1"/>
+                                                                    <Setter TargetName="ThumbBd" Property="Background" Value="#3498DB"/>
+                                                                </Trigger>
+                                                                <Trigger Property="IsDragging" Value="True">
+                                                                    <Setter TargetName="ThumbBd" Property="Background" Value="#2980B9"/>
+                                                                    <Setter TargetName="ThumbBd" Property="Opacity" Value="1"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Thumb.Template>
+                                                </Thumb>
+                                            </Track.Thumb>
+                                            <Track.IncreaseRepeatButton>
+                                                <RepeatButton Command="ScrollBar.LineDownCommand"
+                                                          Opacity="0" Height="0"/>
+                                            </Track.IncreaseRepeatButton>
+                                        </Track>
+                                    </Border>
+                                </ControlTemplate>
+                            </ScrollBar.Template>
+                        </ScrollBar>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
 </ResourceDictionary>
