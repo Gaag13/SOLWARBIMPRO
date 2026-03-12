@@ -81,25 +81,48 @@ namespace WARBIMPRO.Services
 
 
 
-        // ─── Obtener elementos según filtro ─────────────────────────────────
+        // ─── Helper: obtiene el LevelId según el tipo de elemento ───────────────────
+        private ElementId GetElementLevelId(Element element)
+        {
+            // Muros, columnas, puertas, ventanas, losas...
+            if (element.LevelId != null && element.LevelId != ElementId.InvalidElementId)
+                return element.LevelId;
+
+            // Vigas (StructuralFraming) → usan ReferenceLevel
+            var refLevel = element.get_Parameter(BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM);
+            if (refLevel?.AsElementId() is ElementId rid && rid != ElementId.InvalidElementId)
+                return rid;
+
+            // Escaleras, rampas → Schedule Level
+            var schedLevel = element.get_Parameter(BuiltInParameter.SCHEDULE_LEVEL_PARAM);
+            if (schedLevel?.AsElementId() is ElementId sid && sid != ElementId.InvalidElementId)
+                return sid;
+
+            // Cerchas, otros estructurales → Base Level
+            var baseLevel = element.get_Parameter(BuiltInParameter.FAMILY_BASE_LEVEL_PARAM);
+            if (baseLevel?.AsElementId() is ElementId bid && bid != ElementId.InvalidElementId)
+                return bid;
+
+            return ElementId.InvalidElementId;
+        }
+
+        // ─── Obtener elementos según filtro ─────────────────────────────────────────
         public List<ElementId> GetFilteredElementIds(
             IEnumerable<LevelItem> selectedLevels,
             IEnumerable<CategoryItem> selectedCategories,
             bool allModel)
         {
 #if !REVIT2024_OR_GREATER
-         var result = new List<ElementId>();
-                    var levelIds = selectedLevels
-                        .Select(l => new ElementId(int.Parse(l.Id)))
-                        .ToList();
+    var result  = new List<ElementId>();
+    var levelIds = selectedLevels
+        .Select(l => new ElementId(int.Parse(l.Id)))
+        .ToHashSet();
 #else
-         var result = new List<ElementId>();
-                            var levelIds = selectedLevels
-                                .Select(l => new ElementId(long.Parse(l.Id)))
-                                .ToList();
+            var result = new List<ElementId>();
+            var levelIds = selectedLevels
+                .Select(l => new ElementId(long.Parse(l.Id)))
+                .ToHashSet();
 #endif
-
-
 
             foreach (var cat in selectedCategories)
             {
@@ -111,9 +134,8 @@ namespace WARBIMPRO.Services
 
                 if (!allModel && levelIds.Any())
                 {
-                    elements = collector.Where(e =>
-                        e.LevelId != null &&
-                        levelIds.Contains(e.LevelId));
+                    // ✅ Usa el helper para cubrir LevelId + ReferenceLevel + Schedule/Base Level
+                    elements = collector.Where(e => levelIds.Contains(GetElementLevelId(e)));
                 }
 
                 result.AddRange(elements.Select(e => e.Id));

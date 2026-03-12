@@ -87,6 +87,12 @@ namespace WARBIMPRO
                .SetLongDescription("Transfiere plantillas de vista entre proyectos de Revit de manera rápida y sencilla, permitiéndote seleccionar una plantilla de vista en un proyecto de origen y aplicarla a vistas en un proyecto de destino, facilitando la estandarización y consistencia visual en tus proyectos.");
 
 
+            panelViews.AddPushButton<CmdFiltroElementos>("Filtrar\nElementos")
+               .SetAvailabilityController<AvailabilityButton>()
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/filtrar32x32_dark.png")
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/filtrar32x32_light.png")
+               .SetLongDescription("Filtra elementos en tus vistas de Revit de manera rápida y sencilla, permitiéndote aplicar filtros personalizados basados en categorías, parámetros o reglas específicas para mostrar u ocultar elementos en tus vistas, mejorando la claridad y eficiencia de tu modelado.");
+
             var panelCantidades = Application.CreatePanel("MÉTRICAS", "WARBIMPRO");
 
             panelCantidades.AddPushButton<CmdCantidades>("Cuantificación")

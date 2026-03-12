@@ -38,7 +38,7 @@
 	<!-- https://github.com/Nice3point/Revit.Build.Tasks -->
 	<PropertyGroup>
 		<IsRepackable>false</IsRepackable>
-		<DeployRevitAddin>false</DeployRevitAddin>
+		<DeployRevitAddin>true</DeployRevitAddin>
 	</PropertyGroup>
 
     <ItemGroup>
@@ -49,8 +49,11 @@
       <None Remove="Resources\Icons\duplicate20x20_light.png" />
       <None Remove="Resources\Icons\export20x20_dark.png" />
       <None Remove="Resources\Icons\export20x20_light.png" />
+      <None Remove="Resources\Icons\filtrar32x32_dark.png" />
+      <None Remove="Resources\Icons\filtrar32x32_light.png" />
       <None Remove="Resources\Icons\find20x20_dark.png" />
       <None Remove="Resources\Icons\find20x20_light.png" />
+      <None Remove="Resources\Icons\find20x20__dark.png" />
       <None Remove="Resources\Icons\lista20x20_dark.png" />
       <None Remove="Resources\Icons\lista20x20_light.png" />
       <None Remove="Resources\Icons\load20x20_dark.png" />
@@ -95,8 +98,11 @@
 	  <Resource Include="Resources\Icons\duplicate20x20_light.png" />
 	  <Resource Include="Resources\Icons\export20x20_dark.png" />
 	  <Resource Include="Resources\Icons\export20x20_light.png" />
+	  <Resource Include="Resources\Icons\filtrar32x32_dark.png" />
+	  <Resource Include="Resources\Icons\filtrar32x32_light.png" />
 	  <Resource Include="Resources\Icons\find20x20_dark.png" />
 	  <Resource Include="Resources\Icons\find20x20_light.png" />
+	  <Resource Include="Resources\Icons\find20x20__dark.png" />
 	  <Resource Include="Resources\Icons\lista20x20_dark.png" />
 	  <Resource Include="Resources\Icons\lista20x20_light.png" />
 	  <Resource Include="Resources\Icons\load20x20_dark.png" />
