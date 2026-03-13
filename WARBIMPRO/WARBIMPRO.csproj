@@ -54,10 +54,15 @@
       <None Remove="Resources\Icons\find20x20_dark.png" />
       <None Remove="Resources\Icons\find20x20_light.png" />
       <None Remove="Resources\Icons\find20x20__dark.png" />
+      <None Remove="Resources\Icons\find20x20__light.png" />
       <None Remove="Resources\Icons\lista20x20_dark.png" />
       <None Remove="Resources\Icons\lista20x20_light.png" />
       <None Remove="Resources\Icons\load20x20_dark.png" />
       <None Remove="Resources\Icons\load20x20_light.png" />
+      <None Remove="Resources\Icons\rebar_hide_20x20_dark.png" />
+      <None Remove="Resources\Icons\rebar_hide_20x20_light.png" />
+      <None Remove="Resources\Icons\rebar_show_20x20_dark.png" />
+      <None Remove="Resources\Icons\rebar_show_20x20_light.png" />
       <None Remove="Resources\Icons\transfer20x20_dark.png" />
       <None Remove="Resources\Icons\transfer20x20_light.png" />
       <None Remove="Resources\Icons\User16x16.png" />
@@ -86,7 +91,6 @@
 
 	<ItemGroup>
       <Folder Include="DockablePanes\" />
-      <Folder Include="Handlers\" />
     </ItemGroup>
 
 	
@@ -103,10 +107,15 @@
 	  <Resource Include="Resources\Icons\find20x20_dark.png" />
 	  <Resource Include="Resources\Icons\find20x20_light.png" />
 	  <Resource Include="Resources\Icons\find20x20__dark.png" />
+	  <Resource Include="Resources\Icons\find20x20__light.png" />
 	  <Resource Include="Resources\Icons\lista20x20_dark.png" />
 	  <Resource Include="Resources\Icons\lista20x20_light.png" />
 	  <Resource Include="Resources\Icons\load20x20_dark.png" />
 	  <Resource Include="Resources\Icons\load20x20_light.png" />
+	  <Resource Include="Resources\Icons\rebar_hide_20x20_dark.png" />
+	  <Resource Include="Resources\Icons\rebar_hide_20x20_light.png" />
+	  <Resource Include="Resources\Icons\rebar_show_20x20_dark.png" />
+	  <Resource Include="Resources\Icons\rebar_show_20x20_light.png" />
 	  <Resource Include="Resources\Icons\transfer20x20_dark.png" />
 	  <Resource Include="Resources\Icons\transfer20x20_light.png" />
 	  <Resource Include="Resources\Icons\User20x20_dark.png" />

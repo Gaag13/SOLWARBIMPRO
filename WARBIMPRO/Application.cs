@@ -93,6 +93,20 @@ namespace WARBIMPRO
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/filtrar32x32_light.png")
                .SetLongDescription("Filtra elementos en tus vistas de Revit de manera rápida y sencilla, permitiéndote aplicar filtros personalizados basados en categorías, parámetros o reglas específicas para mostrar u ocultar elementos en tus vistas, mejorando la claridad y eficiencia de tu modelado.");
 
+            var panelRefuerzo = Application.CreatePanel("REFUERZO", "WARBIMPRO");
+
+            panelRefuerzo.AddPushButton<CmdShowRebar3D>("Ver Rebar\n3D")
+               .SetAvailabilityController<AvailabilityButton>()
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/rebar_show_20x20_dark.png")
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/rebar_show_20x20_light.png")
+               .SetLongDescription("Muestra el Structural Rebar en modo sólido 3D en la vista activa, sin necesidad de filtros manuales ni ajustes de visibilidad.");
+
+            panelRefuerzo.AddPushButton<CmdHideRebar3D>("Ocultar Rebar\n3D")
+                .SetAvailabilityController<AvailabilityButton>()
+                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/rebar_hide_20x20_dark.png")
+                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/rebar_hide_20x20_light.png")
+                .SetLongDescription("Oculta el Structural Rebar en modo sólido 3D en la vista activa, permitiéndote limpiar la visualización sin necesidad de filtros manuales ni ajustes de visibilidad.");
+
             var panelCantidades = Application.CreatePanel("MÉTRICAS", "WARBIMPRO");
 
             panelCantidades.AddPushButton<CmdCantidades>("Cuantificación")
