@@ -20,26 +20,23 @@ namespace WARBIMPRO.Commands
                 return;
             }
 
-            if (activeView.ViewType != ViewType.ThreeD)
+            if (!IsValidView(activeView))
             {
-                TaskDialog.Show("Refuerzo 3D",
-                    "Esta función solo aplica a vistas 3D.\n" +
-                    "Por favor activa una vista 3D e intenta de nuevo.");
+                TaskDialog.Show("Refuerzo 3D", "Esta vista no soporta modificación de refuerzo.");
                 return;
             }
 
-            var rebars = new FilteredElementCollector(Document).OfClass(typeof(Rebar)).ToElements();
-            var rebarSystems = new FilteredElementCollector(Document).OfClass(typeof(RebarInSystem)).ToElements();
-            var areaReinf = new FilteredElementCollector(Document).OfClass(typeof(AreaReinforcement)).ToElements();
-            var pathReinf = new FilteredElementCollector(Document).OfClass(typeof(PathReinforcement)).ToElements();
+            var rebars = new FilteredElementCollector(Document, activeView.Id)
+                .OfClass(typeof(Rebar));
 
-            if (rebars.Count == 0 && rebarSystems.Count == 0 &&
-                areaReinf.Count == 0 && pathReinf.Count == 0)
-            {
-                TaskDialog.Show("Refuerzo 3D",
-                    "No se encontró ningún elemento de refuerzo en el modelo.");
-                return;
-            }
+            var rebarSystems = new FilteredElementCollector(Document, activeView.Id)
+                .OfClass(typeof(RebarInSystem));
+
+            var areaReinf = new FilteredElementCollector(Document, activeView.Id)
+                .OfClass(typeof(AreaReinforcement));
+
+            var pathReinf = new FilteredElementCollector(Document, activeView.Id)
+                .OfClass(typeof(PathReinforcement));
 
             int contador = 0;
 
@@ -47,44 +44,59 @@ namespace WARBIMPRO.Commands
             {
                 tx.Start();
 
-                // Categoría Structural Rebar visible en la vista
-                var rebarCat = Document.Settings.Categories
-                    .get_Item(BuiltInCategory.OST_Rebar);
-                if (rebarCat != null)
+                try
                 {
-                    try { activeView.SetCategoryHidden(rebarCat.Id, false); }
-                    catch { }
+                    activeView.DetailLevel = ViewDetailLevel.Fine;
                 }
-
-                // Detail Level = Fine — activa renderizado sólido
-                try { activeView.DetailLevel = ViewDetailLevel.Fine; }
                 catch { }
 
-                foreach (Element elem in rebars)
+                try
                 {
-                    if (elem is not Rebar rebar) continue;
-                    try { rebar.SetUnobscuredInView(activeView, true); contador++; }
+                    var rebarCat = Document.Settings.Categories
+                        .get_Item(BuiltInCategory.OST_Rebar);
+
+                    if (rebarCat != null)
+                        activeView.SetCategoryHidden(rebarCat.Id, false);
+                }
+                catch { }
+
+                foreach (Rebar rebar in rebars)
+                {
+                    try
+                    {
+                        rebar.SetUnobscuredInView(activeView, true);
+                        contador++;
+                    }
                     catch { }
                 }
 
-                foreach (Element elem in rebarSystems)
+                foreach (RebarInSystem rebarSys in rebarSystems)
                 {
-                    if (elem is not RebarInSystem rebarSys) continue;
-                    try { rebarSys.SetUnobscuredInView(activeView, true); contador++; }
+                    try
+                    {
+                        rebarSys.SetUnobscuredInView(activeView, true);
+                        contador++;
+                    }
                     catch { }
                 }
 
-                foreach (Element elem in areaReinf)
+                foreach (AreaReinforcement area in areaReinf)
                 {
-                    if (elem is not AreaReinforcement area) continue;
-                    try { area.SetUnobscuredInView(activeView, true); contador++; }
+                    try
+                    {
+                        area.SetUnobscuredInView(activeView, true);
+                        contador++;
+                    }
                     catch { }
                 }
 
-                foreach (Element elem in pathReinf)
+                foreach (PathReinforcement path in pathReinf)
                 {
-                    if (elem is not PathReinforcement path) continue;
-                    try { path.SetUnobscuredInView(activeView, true); contador++; }
+                    try
+                    {
+                        path.SetUnobscuredInView(activeView, true);
+                        contador++;
+                    }
                     catch { }
                 }
 
@@ -93,13 +105,19 @@ namespace WARBIMPRO.Commands
 
             TaskDialog.Show(
                 "Refuerzo 3D ✓",
-                $"Se procesaron {contador} elemento(s) de refuerzo\n" +
-                $"en la vista: \"{activeView.Name}\"\n\n" +
-                $"• Rebar individual ✓\n" +
-                $"• Rebar en sistema ✓\n" +
-                $"• Area Reinforcement ✓\n" +
-                $"• Path Reinforcement ✓"
+                $"Se activó la visualización sólida para {contador} elemento(s)\n" +
+                $"en la vista: \"{activeView.Name}\""
             );
+        }
+
+        private bool IsValidView(View view)
+        {
+            return view.ViewType == ViewType.ThreeD ||
+                   view.ViewType == ViewType.EngineeringPlan ||
+                   view.ViewType == ViewType.FloorPlan ||
+                   view.ViewType == ViewType.Elevation ||
+                   view.ViewType == ViewType.Section ||
+                   view.ViewType == ViewType.Detail;
         }
     }
 }

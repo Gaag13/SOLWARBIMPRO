@@ -20,18 +20,23 @@ namespace WARBIMPRO.Commands
                 return;
             }
 
-            if (activeView.ViewType != ViewType.ThreeD)
+            if (!IsValidView(activeView))
             {
-                TaskDialog.Show("Refuerzo 3D",
-                    "Esta función solo aplica a vistas 3D.\n" +
-                    "Por favor activa una vista 3D e intenta de nuevo.");
+                TaskDialog.Show("Refuerzo 3D", "Esta vista no soporta modificación de refuerzo.");
                 return;
             }
 
-            var rebars = new FilteredElementCollector(Document).OfClass(typeof(Rebar)).ToElements();
-            var rebarSystems = new FilteredElementCollector(Document).OfClass(typeof(RebarInSystem)).ToElements();
-            var areaReinf = new FilteredElementCollector(Document).OfClass(typeof(AreaReinforcement)).ToElements();
-            var pathReinf = new FilteredElementCollector(Document).OfClass(typeof(PathReinforcement)).ToElements();
+            var rebars = new FilteredElementCollector(Document, activeView.Id)
+                .OfClass(typeof(Rebar));
+
+            var rebarSystems = new FilteredElementCollector(Document, activeView.Id)
+                .OfClass(typeof(RebarInSystem));
+
+            var areaReinf = new FilteredElementCollector(Document, activeView.Id)
+                .OfClass(typeof(AreaReinforcement));
+
+            var pathReinf = new FilteredElementCollector(Document, activeView.Id)
+                .OfClass(typeof(PathReinforcement));
 
             int contador = 0;
 
@@ -39,31 +44,43 @@ namespace WARBIMPRO.Commands
             {
                 tx.Start();
 
-                foreach (Element elem in rebars)
+                foreach (Rebar rebar in rebars)
                 {
-                    if (elem is not Rebar rebar) continue;
-                    try { rebar.SetUnobscuredInView(activeView, false); contador++; }
+                    try
+                    {
+                        rebar.SetUnobscuredInView(activeView, false);
+                        contador++;
+                    }
                     catch { }
                 }
 
-                foreach (Element elem in rebarSystems)
+                foreach (RebarInSystem rebarSys in rebarSystems)
                 {
-                    if (elem is not RebarInSystem rebarSys) continue;
-                    try { rebarSys.SetUnobscuredInView(activeView, false); contador++; }
+                    try
+                    {
+                        rebarSys.SetUnobscuredInView(activeView, false);
+                        contador++;
+                    }
                     catch { }
                 }
 
-                foreach (Element elem in areaReinf)
+                foreach (AreaReinforcement area in areaReinf)
                 {
-                    if (elem is not AreaReinforcement area) continue;
-                    try { area.SetUnobscuredInView(activeView, false); contador++; }
+                    try
+                    {
+                        area.SetUnobscuredInView(activeView, false);
+                        contador++;
+                    }
                     catch { }
                 }
 
-                foreach (Element elem in pathReinf)
+                foreach (PathReinforcement path in pathReinf)
                 {
-                    if (elem is not PathReinforcement path) continue;
-                    try { path.SetUnobscuredInView(activeView, false); contador++; }
+                    try
+                    {
+                        path.SetUnobscuredInView(activeView, false);
+                        contador++;
+                    }
                     catch { }
                 }
 
@@ -75,6 +92,16 @@ namespace WARBIMPRO.Commands
                 $"Se desactivó la vista sólida para {contador} elemento(s)\n" +
                 $"en la vista: \"{activeView.Name}\""
             );
+        }
+
+        private bool IsValidView(View view)
+        {
+            return view.ViewType == ViewType.ThreeD ||
+                   view.ViewType == ViewType.EngineeringPlan ||
+                   view.ViewType == ViewType.FloorPlan ||
+                   view.ViewType == ViewType.Elevation ||
+                   view.ViewType == ViewType.Section ||
+                   view.ViewType == ViewType.Detail;
         }
     }
 }

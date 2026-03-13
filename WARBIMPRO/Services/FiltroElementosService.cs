@@ -62,7 +62,7 @@ namespace WARBIMPRO.Services
             {
                 // ESTRUCTURA
                 new CategoryItem { Name = "Muros",       Icon = "🧱", TapGroup = "Estructura",   BuiltInCategory = BuiltInCategory.OST_Walls,               SupportTypes = false },
-                new CategoryItem { Name = "Muros Comp.", Icon = "🧱", TapGroup = "Estructura",   BuiltInCategory = BuiltInCategory.OST_StackedWalls,        SupportTypes = false },
+                new CategoryItem { Name = "Muros Comp.", Icon = "▓", TapGroup = "Estructura",   BuiltInCategory = BuiltInCategory.OST_StackedWalls,        SupportTypes = false },
                 new CategoryItem { Name = "Columnas",    Icon = "🏛",  TapGroup = "Estructura",   BuiltInCategory = BuiltInCategory.OST_StructuralColumns,   SupportTypes = true  },
                 new CategoryItem { Name = "Vigas",       Icon = "━",  TapGroup = "Estructura",   BuiltInCategory = BuiltInCategory.OST_StructuralFraming,   SupportTypes = true  },
                 new CategoryItem { Name = "Losas",       Icon = "⬜", TapGroup = "Estructura",   BuiltInCategory = BuiltInCategory.OST_Floors,              SupportTypes = true  },
@@ -78,6 +78,7 @@ namespace WARBIMPRO.Services
                  //MEP
                 new CategoryItem { Name = "Ductos",      Icon = "💨", TapGroup = "MEP",          BuiltInCategory = BuiltInCategory.OST_DuctCurves,          SupportTypes = true  },
                 new CategoryItem { Name = "Tuberías",    Icon = "🔵", TapGroup = "MEP",          BuiltInCategory = BuiltInCategory.OST_PipeCurves,          SupportTypes = true  },
+                new CategoryItem { Name = "Accesorios\nTuberia",   Icon = "⚡", TapGroup = "MEP",BuiltInCategory = BuiltInCategory.OST_PipeFitting,            SupportTypes = true  },
                 new CategoryItem { Name = "Bandejas",    Icon = "📦", TapGroup = "MEP",          BuiltInCategory = BuiltInCategory.OST_CableTray,           SupportTypes = true  },
                 new CategoryItem { Name = "Eq. Mecánico",Icon = "⚙",  TapGroup = "MEP",          BuiltInCategory = BuiltInCategory.OST_MechanicalEquipment, SupportTypes = true  },
                 new CategoryItem { Name = "Luminarias",  Icon = "💡", TapGroup = "MEP",          BuiltInCategory = BuiltInCategory.OST_LightingFixtures,    SupportTypes = true  },

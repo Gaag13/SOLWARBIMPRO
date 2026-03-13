@@ -42,6 +42,8 @@
 	</PropertyGroup>
 
     <ItemGroup>
+      <None Remove="Resources\Icons\burbuja20x20_dark.png" />
+      <None Remove="Resources\Icons\burbuja20x20_light.png" />
       <None Remove="Resources\Icons\Cantidades20x20_dark.png" />
       <None Remove="Resources\Icons\Cantidades20x20_light.png" />
       <None Remove="Resources\Icons\Contar16x16.png" />
@@ -96,6 +98,8 @@
 	
 
 	<ItemGroup>
+	  <Resource Include="Resources\Icons\burbuja20x20_dark.png" />
+	  <Resource Include="Resources\Icons\burbuja20x20_light.png" />
 	  <Resource Include="Resources\Icons\Cantidades20x20_dark.png" />
 	  <Resource Include="Resources\Icons\Cantidades20x20_light.png" />
 	  <Resource Include="Resources\Icons\duplicate20x20_dark.png" />

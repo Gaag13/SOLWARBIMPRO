@@ -57,10 +57,14 @@ namespace WARBIMPRO
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/export20x20_dark.png")
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/export20x20_light.png")
                .SetLongDescription("Exporta familias de Revit a archivos individuales de manera rápida y sencilla, permitiéndote seleccionar las familias que deseas exportar y guardarlas en una ubicación de tu elección para su uso en otros proyectos o para compartir con otros usuarios.");
+            
+            panelFamilys.AddPushButton<CmdGrids3D>("Rejillas 3D\n2D")
+               .SetAvailabilityController<AvailabilityButton>()
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/burbuja20x20_dark.png")
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/burbuja20x20_light.png")
+               .SetLongDescription("Activa o desactiva la visualización de rejillas en modo 3D en tu proyecto de Revit de manera rápida y sencilla, permitiéndote alternar entre la visualización tradicional en 2D y una visualización más inmersiva en 3D para mejorar la comprensión espacial y la coordinación de tu modelo.");
 
 
-
-            //
             var panelViews = Application.CreatePanel("VISTAS", "WARBIMPRO");
 
             panelViews.AddPushButton<CmdFindReplaceView>("Buscar en\nVistas")
