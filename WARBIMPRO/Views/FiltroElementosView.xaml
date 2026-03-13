@@ -3,10 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewmodels="clr-namespace:WARBIMPRO.ViewModels"        
+        xmlns:viewmodels="clr-namespace:WARBIMPRO.ViewModels"
+        xmlns:converters="clr-namespace:WARBIMPRO.Views.Converters"
+        d:DataContext="{d:DesignInstance Type=viewmodels:FiltroElementosViewModel}"
+        mc:Ignorable="d"
         Title="Element Filter &amp; Color — WARBIMPRO"
-        Width="860" Height="640"
-        MinWidth="700" MinHeight="540"
+        Width="900" Height="660"
+        MinWidth="720" MinHeight="560"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize"
         Background="#1E1E42"
@@ -19,13 +22,16 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="GlobalStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <converters:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
         </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="44"/>
+            <RowDefinition Height="38"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -34,9 +40,10 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- ══ TITLEBAR ══════════════════════════════════════════ -->
-        <Border Grid.Row="0" Grid.ColumnSpan="2" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
-                Background="#16163A" BorderBrush="#4B4B7A" BorderThickness="0,0,0,1" >
+        <!-- ══ TITLEBAR ══════════════════════════════════════════════════════ -->
+        <Border Grid.Row="0" Grid.ColumnSpan="2"
+                Background="#16163A" BorderBrush="#4B4B7A" BorderThickness="0,0,0,1"
+                MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
             <Grid Margin="14,0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
                     <Border Width="26" Height="26" CornerRadius="5" Margin="0,0,10,0">
@@ -47,90 +54,106 @@
                             </LinearGradientBrush>
                         </Border.Background>
                         <TextBlock Text="R" Foreground="White" FontWeight="Black"
-                                   FontSize="13" HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"/>
+                                   FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <TextBlock Text="Element Filter &amp; Color Tool"
                                Style="{StaticResource TextBlockStyle}"
-                               FontWeight="SemiBold" FontSize="13"
-                               VerticalAlignment="Center" Margin="0"/>
+                               FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" Margin="0"/>
                     <Border Margin="10,0,0,0" CornerRadius="10"
-                            Background="#1E2847" BorderBrush="#3498DB"
-                            BorderThickness="1" Padding="7,2">
-                        <TextBlock Text="REVIT API" Foreground="#3498DB"
-                                   FontSize="9" FontWeight="Bold" FontFamily="Consolas"/>
+                            Background="#1E2847" BorderBrush="#3498DB" BorderThickness="1" Padding="7,2">
+                        <TextBlock Text="REVIT API" Foreground="#3498DB" FontSize="9" FontWeight="Bold" FontFamily="Consolas"/>
                     </Border>
                 </StackPanel>
                 <Border HorizontalAlignment="Center" CornerRadius="10"
-                        Background="#1A2A1A" BorderBrush="#2A5A2A"
-                        BorderThickness="1" Padding="8,3">
-                    <TextBlock Text="{Binding SelectionSummary}"
-                               Foreground="#22C55E" FontSize="9"
-                               FontFamily="Consolas" FontWeight="Bold"/>
+                        Background="#1A2A1A" BorderBrush="#2A5A2A" BorderThickness="1" Padding="8,3">
+                    <TextBlock Text="{Binding SelectionSummary}" Foreground="#22C55E"
+                               FontSize="9" FontFamily="Consolas" FontWeight="Bold"/>
                 </Border>
-
-                <Button Content="&#xE106;"
-                    Style="{StaticResource WindowButtonStyle}" Click="CloseButton_Click"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
-                    Margin="0,0,5,0"/>
-
-                <Button Content="&#xE949;"
-                    Style="{StaticResource WindowButtonStyle}" Click="MinimizeButton_Click" 
-                    HorizontalAlignment="Right"
-                    Margin="0,0,40,0" />
+                <Button Content="&#xE106;" Style="{StaticResource WindowButtonStyle}"
+                        Click="CloseButton_Click" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <Button Content="&#xE949;" Style="{StaticResource WindowButtonStyle}"
+                        Click="MinimizeButton_Click" HorizontalAlignment="Right" Margin="0,0,40,0"/>
             </Grid>
         </Border>
 
-        <!-- ══ PANEL IZQUIERDO — NIVELES ═════════════════════════ -->
-        <Border Grid.Row="1" Grid.Column="0" Grid.RowSpan="2"
+        <!-- ══ TAB STRIP ════════════════════════════════════════════════════ -->
+        <!-- Fondo izquierdo (niveles no tiene tabs) -->
+        <Border Grid.Row="1" Grid.Column="0"
+                Background="#16163A" BorderBrush="#4B4B7A" BorderThickness="0,0,1,1"/>
+
+        <!-- Tabs panel derecho -->
+        <Border Grid.Row="1" Grid.Column="1"
+                Background="#16163A" BorderBrush="#4B4B7A" BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                <Border Padding="18,0" Height="38" Cursor="Hand"
+                        Tag="Estructura" MouseLeftButtonDown="Tab_Click"
+                        Background="{Binding IsTabEstructura, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='#1E1E42|Transparent'}">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Bottom" Height="2"
+                                Background="{Binding IsTabEstructura, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='#3498DB|Transparent'}"/>
+                        <TextBlock Text="Estructura" FontSize="12" FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Foreground="{Binding IsTabEstructura, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='White|#7A7AAA'}"/>
+                    </DockPanel>
+                </Border>
+                <Border Padding="18,0" Height="38" Cursor="Hand"
+                        Tag="Arquitectura" MouseLeftButtonDown="Tab_Click"
+                        Background="{Binding IsTabArquitectura, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='#1E1E42|Transparent'}">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Bottom" Height="2"
+                                Background="{Binding IsTabArquitectura, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='#3498DB|Transparent'}"/>
+                        <TextBlock Text="Arquitectura" FontSize="12" FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Foreground="{Binding IsTabArquitectura, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='White|#7A7AAA'}"/>
+                    </DockPanel>
+                </Border>
+                <Border Padding="18,0" Height="38" Cursor="Hand"
+                        Tag="MEP" MouseLeftButtonDown="Tab_Click"
+                        Background="{Binding IsTabMEP, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='#1E1E42|Transparent'}">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Bottom" Height="2"
+                                Background="{Binding IsTabMEP, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='#3498DB|Transparent'}"/>
+                        <TextBlock Text="MEP" FontSize="12" FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Foreground="{Binding IsTabMEP, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='White|#7A7AAA'}"/>
+                    </DockPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <!-- ══ PANEL IZQUIERDO — NIVELES ══════════════════════════════════════ -->
+        <Border Grid.Row="2" Grid.Column="0" Grid.RowSpan="3"
                 Background="#2C2C54" BorderBrush="#4B4B7A" BorderThickness="0,0,1,0">
             <DockPanel>
-
-                <!-- Header -->
-                <Border DockPanel.Dock="Top"
-                        BorderBrush="#4B4B7A" BorderThickness="0,0,0,1" Padding="14,10">
+                <Border DockPanel.Dock="Top" BorderBrush="#4B4B7A" BorderThickness="0,0,0,1" Padding="14,10">
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Width="7" Height="7" Fill="#3498DB" Margin="0,0,7,0"/>
-                        <TextBlock Text="NIVELES DEL MODELO"
-                                   Style="{StaticResource SectionLabelStyle}"
-                                   Margin="0" VerticalAlignment="Center"/>
+                        <TextBlock Text="NIVELES DEL MODELO" Style="{StaticResource SectionLabelStyle}" Margin="0" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Border>
-
-                <!-- Toggle Por Nivel / Todo el Modelo -->
-                <Border DockPanel.Dock="Top" Margin="12,10,12,4"
-                        CornerRadius="5" Background="#1E1E42"
-                        BorderBrush="#4B4B7A" BorderThickness="1">
+                <Border DockPanel.Dock="Top" Margin="12,10,12,4" CornerRadius="5"
+                        Background="#1E1E42" BorderBrush="#4B4B7A" BorderThickness="1">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <Border x:Name="BtnPorNivel" Grid.Column="0"
-                                CornerRadius="4,0,0,4" Cursor="Hand" Padding="6,7"
+                        <Border x:Name="BtnPorNivel" Grid.Column="0" CornerRadius="4,0,0,4" Cursor="Hand" Padding="6,7"
                                 Background="{Binding IsLevelMode, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='#3498DB|Transparent'}"
                                 MouseLeftButtonDown="BtnPorNivel_Click">
-                            <TextBlock Text="Por Nivel" FontSize="11" FontWeight="SemiBold"
-                                       HorizontalAlignment="Center"
+                            <TextBlock Text="Por Nivel" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center"
                                        Foreground="{Binding IsLevelMode, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='White|#7A7AAA'}"/>
                         </Border>
-                        <Border x:Name="BtnTodoModelo" Grid.Column="1"
-                                CornerRadius="0,4,4,0" Cursor="Hand" Padding="6,7"
+                        <Border x:Name="BtnTodoModelo" Grid.Column="1" CornerRadius="0,4,4,0" Cursor="Hand" Padding="6,7"
                                 Background="{Binding IsAllModelMode, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='#3498DB|Transparent'}"
                                 MouseLeftButtonDown="BtnTodoModelo_Click">
-                            <TextBlock Text="Todo el Modelo" FontSize="11" FontWeight="SemiBold"
-                                       HorizontalAlignment="Center"
+                            <TextBlock Text="Todo el Modelo" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center"
                                        Foreground="{Binding IsAllModelMode, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='White|#7A7AAA'}"/>
                         </Border>
                     </Grid>
                 </Border>
-
-                <!-- Select All -->
-                <Border DockPanel.Dock="Bottom"
-                        BorderBrush="#4B4B7A" BorderThickness="0,1,0,0"
-                        Padding="14,9" Cursor="Hand"
-                        MouseLeftButtonDown="SelectAllLevels_Click">
+                <Border DockPanel.Dock="Bottom" BorderBrush="#4B4B7A" BorderThickness="0,1,0,0"
+                        Padding="14,9" Cursor="Hand" MouseLeftButtonDown="SelectAllLevels_Click">
                     <Border.Style>
                         <Style TargetType="Border">
                             <Setter Property="Background" Value="Transparent"/>
@@ -148,14 +171,11 @@
                         Seleccionar Todos
                     </CheckBox>
                 </Border>
-
-                <!-- Lista niveles -->
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Style="{StaticResource DarkScrollViewer}">
                     <ItemsControl ItemsSource="{Binding Levels}" IsEnabled="{Binding IsLevelMode}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border BorderThickness="3,0,0,0" Padding="12,8"
-                                        Cursor="Hand" MouseLeftButtonDown="LevelItem_Click">
+                                <Border BorderThickness="3,0,0,0" Padding="12,8" Cursor="Hand" MouseLeftButtonDown="LevelItem_Click">
                                     <Border.Style>
                                         <Style TargetType="Border">
                                             <Setter Property="Background"  Value="Transparent"/>
@@ -177,102 +197,149 @@
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <CheckBox Grid.Column="0"
-                                                  Style="{StaticResource CheckBoxStyle}"
-                                                  IsChecked="{Binding IsSelected}"
-                                                  Margin="0,0,8,0" FontSize="12"/>
+                                        <CheckBox Grid.Column="0" Style="{StaticResource CheckBoxStyle}"
+                                                  IsChecked="{Binding IsSelected}" Margin="0,0,8,0" FontSize="12"/>
                                         <TextBlock Grid.Column="1" Text="{Binding Name}"
                                                    Style="{StaticResource TextBlockStyle}"
-                                                   FontSize="12" FontWeight="SemiBold"
-                                                   Margin="0" VerticalAlignment="Center"/>
+                                                   FontSize="12" FontWeight="SemiBold" Margin="0" VerticalAlignment="Center"/>
                                         <TextBlock Grid.Column="2" Text="{Binding ElevationLabel}"
-                                                   Foreground="#7A7AAA" FontSize="10"
-                                                   FontFamily="Consolas" VerticalAlignment="Center"/>
+                                                   Foreground="#7A7AAA" FontSize="10" FontFamily="Consolas" VerticalAlignment="Center"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
-
             </DockPanel>
         </Border>
 
-        <!-- ══ PANEL DERECHO — CATEGORÍAS ════════════════════════ -->
-        <Border Grid.Row="1" Grid.Column="1" Background="#1E1E42">
-            <DockPanel>
-                <Border DockPanel.Dock="Top"
-                        BorderBrush="#4B4B7A" BorderThickness="0,0,0,1" Padding="14,10">
-                    <StackPanel Orientation="Horizontal">
-                        <Ellipse Width="7" Height="7" Fill="#3498DB" Margin="0,0,7,0"/>
-                        <TextBlock Text="CATEGORÍAS DE ELEMENTOS"
-                                   Style="{StaticResource SectionLabelStyle}"
-                                   Margin="0" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Border>
+        <!-- ══ PANEL DERECHO — CATEGORÍAS ════════════════════════════════════ -->
+        <Border Grid.Row="2" Grid.Column="1" Background="#1E1E42">
+            <ScrollViewer Style="{StaticResource DarkScrollViewer}" Padding="10,8">
+                <ItemsControl ItemsSource="{Binding CategoriesInTab}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="118" Height="66" CornerRadius="6"
+                                    Margin="4" Padding="10,8" Cursor="Hand"
+                                    MouseLeftButtonDown="CategoryCard_Click">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background"      Value="#2C2C54"/>
+                                        <Setter Property="BorderBrush"     Value="#4B4B7A"/>
+                                        <Setter Property="BorderThickness" Value="1"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="BorderBrush" Value="#3498DB"/>
+                                                <Setter Property="Background"  Value="#1A2A4A"/>
+                                            </DataTrigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="BorderBrush" Value="#5A8AB0"/>
+                                                <Setter Property="Background"  Value="#353560"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <TextBlock Text="{Binding Icon}" FontSize="18" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                        <Border HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                CornerRadius="8" Background="#16163A" BorderBrush="#4B4B7A" BorderThickness="1" Padding="5,1">
+                                            <TextBlock Text="{Binding ElementCount}" Foreground="#7A7AAA" FontSize="9" FontFamily="Consolas"/>
+                                        </Border>
+                                    </Grid>
+                                    <TextBlock Grid.Row="1" Text="{Binding Name}"
+                                               Style="{StaticResource TextBlockStyle}"
+                                               FontSize="11" FontWeight="SemiBold" Margin="0"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
 
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10,8" Style="{StaticResource DarkScrollViewer}" >
-                    <ItemsControl ItemsSource="{Binding GroupedCategories}">
+        <!-- ══ PANEL DE TIPOS ════════════════════════════════════════════════ -->
+        <Border Grid.Row="3" Grid.Column="1"
+                Background="#2C2C54" BorderBrush="#3498DB" BorderThickness="0,1,0,0"
+                Padding="12,10"
+                Visibility="{Binding HasAvailableTypes, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                    <Ellipse Width="7" Height="7" Fill="#3498DB" Margin="0,0,7,0"/>
+                    <TextBlock Text="{Binding TypePanelTitle}"
+                               Style="{StaticResource SectionLabelStyle}" Margin="0" VerticalAlignment="Center"/>
+                    <Border Margin="10,0,0,0" CornerRadius="8"
+                            Background="#0E3A20" BorderBrush="#22C55E" BorderThickness="1" Padding="6,1">
+                        <TextBlock Text="NUEVO" Foreground="#22C55E" FontSize="8" FontWeight="Bold" FontFamily="Consolas"/>
+                    </Border>
+                </StackPanel>
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" MaxHeight="90">
+                    <ItemsControl ItemsSource="{Binding AvailableTypes}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Margin="0,0,0,14">
-                                    <TextBlock Text="{Binding Key}"
-                                               Style="{StaticResource SectionLabelStyle}"
-                                               Margin="4,0,0,6"/>
-                                    <ItemsControl ItemsSource="{Binding}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <WrapPanel/>
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Border Width="118" Height="66" CornerRadius="6"
-                                                        Margin="4" Padding="10,8" Cursor="Hand"
-                                                        MouseLeftButtonDown="CategoryCard_Click">
-                                                    <Border.Style>
-                                                        <Style TargetType="Border">
-                                                            <Setter Property="Background"      Value="#2C2C54"/>
-                                                            <Setter Property="BorderBrush"     Value="#4B4B7A"/>
-                                                            <Setter Property="BorderThickness" Value="1"/>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                    <Setter Property="BorderBrush" Value="#3498DB"/>
-                                                                    <Setter Property="Background"  Value="#1A2A4A"/>
-                                                                </DataTrigger>
-                                                                <Trigger Property="IsMouseOver" Value="True">
-                                                                    <Setter Property="BorderBrush" Value="#5A8AB0"/>
-                                                                    <Setter Property="Background"  Value="#353560"/>
-                                                                </Trigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Border.Style>
-                                                    <Grid>
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="*"/>
-                                                            <RowDefinition Height="Auto"/>
-                                                        </Grid.RowDefinitions>
-                                                        <Grid Grid.Row="0">
-                                                            <TextBlock Text="{Binding Icon}"
-                                                                       FontSize="18" HorizontalAlignment="Left"
-                                                                       VerticalAlignment="Center"/>
-                                                            <Border HorizontalAlignment="Right" VerticalAlignment="Top"
-                                                                    CornerRadius="8" Background="#16163A"
-                                                                    BorderBrush="#4B4B7A" BorderThickness="1" Padding="5,1">
-                                                                <TextBlock Text="{Binding ElementCount}"
-                                                                           Foreground="#7A7AAA" FontSize="9"
-                                                                           FontFamily="Consolas"/>
-                                                            </Border>
-                                                        </Grid>
-                                                        <TextBlock Grid.Row="1" Text="{Binding Name}"
-                                                                   Style="{StaticResource TextBlockStyle}"
-                                                                   FontSize="11" FontWeight="SemiBold" Margin="0"/>
-                                                    </Grid>
-                                                </Border>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </StackPanel>
+                                <Border Margin="3,2" Padding="10,5" CornerRadius="12"
+                                        Cursor="Hand" MouseLeftButtonDown="TypePill_Click">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background"      Value="#1E1E42"/>
+                                            <Setter Property="BorderBrush"     Value="#4B4B7A"/>
+                                            <Setter Property="BorderThickness" Value="1"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                    <Setter Property="Background"  Value="#1A2A4A"/>
+                                                    <Setter Property="BorderBrush" Value="#3498DB"/>
+                                                </DataTrigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#353560"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Width="7" Height="7" Margin="0,0,6,0" VerticalAlignment="Center">
+                                            <Ellipse.Style>
+                                                <Style TargetType="Ellipse">
+                                                    <Setter Property="Fill" Value="#4B4B7A"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                            <Setter Property="Fill" Value="#3498DB"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Ellipse.Style>
+                                        </Ellipse>
+                                        <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="#CCCCEE"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                            <Setter Property="Foreground" Value="White"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <Border Margin="6,0,0,0" CornerRadius="8"
+                                                Background="#16163A" BorderBrush="#4B4B7A" BorderThickness="1" Padding="4,1">
+                                            <TextBlock Text="{Binding ElementCount}" Foreground="#7A7AAA" FontSize="9" FontFamily="Consolas"/>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -280,8 +347,8 @@
             </DockPanel>
         </Border>
 
-        <!-- ══ SELECTOR DE COLOR ══════════════════════════════════ -->
-        <Border Grid.Row="2" Grid.Column="1"
+        <!-- ══ SELECTOR DE COLOR ════════════════════════════════════════════ -->
+        <Border Grid.Row="4" Grid.Column="1"
                 Background="#2C2C54" BorderBrush="#4B4B7A" BorderThickness="0,1,0,1"
                 Padding="14,12">
             <Grid>
@@ -290,42 +357,32 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-
-                <!-- Header -->
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
                     <Ellipse Width="8" Height="8" Margin="0,0,8,0">
                         <Ellipse.Fill>
                             <SolidColorBrush Color="{Binding SelectedColor}"/>
                         </Ellipse.Fill>
                     </Ellipse>
-                    <TextBlock Text="COLOR DE SOBREPOSICIÓN"
-                               Style="{StaticResource SectionLabelStyle}"
-                               Margin="0" VerticalAlignment="Center"/>
+                    <TextBlock Text="COLOR DE SOBREPOSICIÓN" Style="{StaticResource SectionLabelStyle}" Margin="0" VerticalAlignment="Center"/>
                 </StackPanel>
-
-                <!-- Preview + Sliders HSL -->
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="54"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Border Grid.Column="0" Width="42" Height="42" CornerRadius="6"
-                            Margin="0,0,12,0" BorderBrush="#4B4B7A" BorderThickness="1">
+                    <Border Grid.Column="0" Width="42" Height="42" CornerRadius="6" Margin="0,0,12,0" BorderBrush="#4B4B7A" BorderThickness="1">
                         <Border.Background>
                             <SolidColorBrush Color="{Binding SelectedColor}"/>
                         </Border.Background>
                     </Border>
                     <StackPanel Grid.Column="1">
-                        <!-- H -->
                         <Grid Margin="0,0,0,5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="20"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="H" Foreground="#7A7AAA" FontSize="9"
-                                       FontFamily="Consolas" VerticalAlignment="Center"/>
-                            <Border Grid.Column="1" CornerRadius="4" Height="14"
-                                    BorderBrush="#4B4B7A" BorderThickness="1" ClipToBounds="True">
+                            <TextBlock Text="H" Foreground="#7A7AAA" FontSize="9" FontFamily="Consolas" VerticalAlignment="Center"/>
+                            <Border Grid.Column="1" CornerRadius="4" Height="14" BorderBrush="#4B4B7A" BorderThickness="1" ClipToBounds="True">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                         <GradientStop Color="#FF0000" Offset="0.000"/>
@@ -337,40 +394,32 @@
                                         <GradientStop Color="#FF00FF" Offset="1.000"/>
                                     </LinearGradientBrush>
                                 </Border.Background>
-                                <Slider Minimum="0" Maximum="360" Value="{Binding Hue}"
-                                        Background="Transparent" BorderThickness="0"/>
+                                <Slider Minimum="0" Maximum="360" Value="{Binding Hue}" Background="Transparent" BorderThickness="0"/>
                             </Border>
                         </Grid>
-                        <!-- S -->
                         <Grid Margin="0,0,0,5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="20"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="S" Foreground="#7A7AAA" FontSize="9"
-                                       FontFamily="Consolas" VerticalAlignment="Center"/>
-                            <Border Grid.Column="1" CornerRadius="4" Height="14"
-                                    BorderBrush="#4B4B7A" BorderThickness="1" ClipToBounds="True">
+                            <TextBlock Text="S" Foreground="#7A7AAA" FontSize="9" FontFamily="Consolas" VerticalAlignment="Center"/>
+                            <Border Grid.Column="1" CornerRadius="4" Height="14" BorderBrush="#4B4B7A" BorderThickness="1" ClipToBounds="True">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                         <GradientStop Color="#888888" Offset="0"/>
                                         <GradientStop Color="{Binding SelectedColor}" Offset="1"/>
                                     </LinearGradientBrush>
                                 </Border.Background>
-                                <Slider Minimum="0" Maximum="100" Value="{Binding Saturation}"
-                                        Background="Transparent" BorderThickness="0"/>
+                                <Slider Minimum="0" Maximum="100" Value="{Binding Saturation}" Background="Transparent" BorderThickness="0"/>
                             </Border>
                         </Grid>
-                        <!-- L -->
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="20"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="L" Foreground="#7A7AAA" FontSize="9"
-                                       FontFamily="Consolas" VerticalAlignment="Center"/>
-                            <Border Grid.Column="1" CornerRadius="4" Height="14"
-                                    BorderBrush="#4B4B7A" BorderThickness="1" ClipToBounds="True">
+                            <TextBlock Text="L" Foreground="#7A7AAA" FontSize="9" FontFamily="Consolas" VerticalAlignment="Center"/>
+                            <Border Grid.Column="1" CornerRadius="4" Height="14" BorderBrush="#4B4B7A" BorderThickness="1" ClipToBounds="True">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                         <GradientStop Color="#000000" Offset="0"/>
@@ -378,14 +427,11 @@
                                         <GradientStop Color="#FFFFFF" Offset="1"/>
                                     </LinearGradientBrush>
                                 </Border.Background>
-                                <Slider Minimum="0" Maximum="100" Value="{Binding Lightness}"
-                                        Background="Transparent" BorderThickness="0"/>
+                                <Slider Minimum="0" Maximum="100" Value="{Binding Lightness}" Background="Transparent" BorderThickness="0"/>
                             </Border>
                         </Grid>
                     </StackPanel>
                 </Grid>
-
-                <!-- Presets + HEX + Opacidad -->
                 <Grid Grid.Row="2" Margin="0,10,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -394,26 +440,17 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,14,0">
-                        <Border Width="22" Height="22" CornerRadius="11" Margin="3,0" Cursor="Hand"
-                                Background="#3498DB" MouseLeftButtonDown="Preset_Click" Tag="#3498DB"/>
-                        <Border Width="22" Height="22" CornerRadius="11" Margin="3,0" Cursor="Hand"
-                                Background="#22C55E" MouseLeftButtonDown="Preset_Click" Tag="#22C55E"/>
-                        <Border Width="22" Height="22" CornerRadius="11" Margin="3,0" Cursor="Hand"
-                                Background="#EF4444" MouseLeftButtonDown="Preset_Click" Tag="#EF4444"/>
-                        <Border Width="22" Height="22" CornerRadius="11" Margin="3,0" Cursor="Hand"
-                                Background="#F97316" MouseLeftButtonDown="Preset_Click" Tag="#F97316"/>
-                        <Border Width="22" Height="22" CornerRadius="11" Margin="3,0" Cursor="Hand"
-                                Background="#A855F7" MouseLeftButtonDown="Preset_Click" Tag="#A855F7"/>
-                        <Border Width="22" Height="22" CornerRadius="11" Margin="3,0" Cursor="Hand"
-                                Background="#FACC15" MouseLeftButtonDown="Preset_Click" Tag="#FACC15"/>
-                        <Border Width="22" Height="22" CornerRadius="11" Margin="3,0" Cursor="Hand"
-                                Background="#06B6D4" MouseLeftButtonDown="Preset_Click" Tag="#06B6D4"/>
+                        <Border Width="22" Height="22" CornerRadius="11" Margin="3,0" Cursor="Hand" Background="#3498DB" MouseLeftButtonDown="Preset_Click" Tag="#3498DB"/>
+                        <Border Width="22" Height="22" CornerRadius="11" Margin="3,0" Cursor="Hand" Background="#22C55E" MouseLeftButtonDown="Preset_Click" Tag="#22C55E"/>
+                        <Border Width="22" Height="22" CornerRadius="11" Margin="3,0" Cursor="Hand" Background="#EF4444" MouseLeftButtonDown="Preset_Click" Tag="#EF4444"/>
+                        <Border Width="22" Height="22" CornerRadius="11" Margin="3,0" Cursor="Hand" Background="#F97316" MouseLeftButtonDown="Preset_Click" Tag="#F97316"/>
+                        <Border Width="22" Height="22" CornerRadius="11" Margin="3,0" Cursor="Hand" Background="#A855F7" MouseLeftButtonDown="Preset_Click" Tag="#A855F7"/>
+                        <Border Width="22" Height="22" CornerRadius="11" Margin="3,0" Cursor="Hand" Background="#FACC15" MouseLeftButtonDown="Preset_Click" Tag="#FACC15"/>
+                        <Border Width="22" Height="22" CornerRadius="11" Margin="3,0" Cursor="Hand" Background="#06B6D4" MouseLeftButtonDown="Preset_Click" Tag="#06B6D4"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="HEX" Foreground="#7A7AAA" FontSize="9"
-                                   FontFamily="Consolas" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                        <Border CornerRadius="4" Background="#1E1E42"
-                                BorderBrush="#4B4B7A" BorderThickness="1" Padding="6,3">
+                        <TextBlock Text="HEX" Foreground="#7A7AAA" FontSize="9" FontFamily="Consolas" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <Border CornerRadius="4" Background="#1E1E42" BorderBrush="#4B4B7A" BorderThickness="1" Padding="6,3">
                             <TextBox Text="{Binding HexColor, UpdateSourceTrigger=PropertyChanged}"
                                      Foreground="White" Background="Transparent"
                                      BorderThickness="0" FontFamily="Consolas"
@@ -422,10 +459,8 @@
                     </StackPanel>
                     <Grid Grid.Column="2"/>
                     <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="OPACITY" Foreground="#7A7AAA" FontSize="9"
-                                   FontFamily="Consolas" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                        <Slider Minimum="0" Maximum="100" Value="{Binding Opacity}"
-                                Width="70" VerticalAlignment="Center"/>
+                        <TextBlock Text="OPACITY" Foreground="#7A7AAA" FontSize="9" FontFamily="Consolas" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <Slider Minimum="0" Maximum="100" Value="{Binding Opacity}" Width="70" VerticalAlignment="Center"/>
                         <TextBlock Text="{Binding OpacityLabel}" Foreground="#3498DB"
                                    FontSize="10" FontFamily="Consolas" FontWeight="Bold"
                                    VerticalAlignment="Center" Margin="8,0,0,0" MinWidth="34"/>
@@ -434,8 +469,8 @@
             </Grid>
         </Border>
 
-        <!-- ══ ACTION BAR ════════════════════════════════════════ -->
-        <Border Grid.Row="3" Grid.ColumnSpan="2"
+        <!-- ══ ACTION BAR ════════════════════════════════════════════════════ -->
+        <Border Grid.Row="5" Grid.ColumnSpan="2"
                 Background="#16163A" BorderBrush="#4B4B7A" BorderThickness="0,1,0,0"
                 Padding="12,10">
             <Grid>
@@ -446,31 +481,24 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Border Grid.Column="0" CornerRadius="20" Background="#2C2C54"
-                        BorderBrush="#4B4B7A" BorderThickness="1"
-                        Padding="12,5" Margin="0,0,8,0">
+                        BorderBrush="#4B4B7A" BorderThickness="1" Padding="12,5" Margin="0,0,8,0">
                     <TextBlock Text="{Binding StatusText}" Foreground="#7A7AAA"
                                FontSize="11" FontFamily="Consolas"
                                TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
                 </Border>
-                <Button Grid.Column="1" Margin="0,0,6,0"
-                        Style="{StaticResource BtnReset}"
-                        Command="{Binding ResetCommand}">
+                <Button Grid.Column="1" Margin="0,0,6,0" Style="{StaticResource BtnReset}" Command="{Binding ResetCommand}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="↺" FontSize="13" Margin="0,0,5,0"/>
                         <TextBlock Text="Reset"/>
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="2" Margin="0,0,6,0"
-                        Style="{StaticResource BtnSecondary}"
-                        Command="{Binding IsolateCommand}">
+                <Button Grid.Column="2" Margin="0,0,6,0" Style="{StaticResource BtnSecondary}" Command="{Binding IsolateCommand}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="⬡" FontSize="13" Margin="0,0,5,0"/>
                         <TextBlock Text="Aislar"/>
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="3"
-                        Style="{StaticResource BtnPrimary}"
-                        Command="{Binding ApplyColorCommand}">
+                <Button Grid.Column="3" Style="{StaticResource BtnPrimary}" Command="{Binding ApplyColorCommand}">
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Width="9" Height="9" Margin="0,0,7,0">
                             <Ellipse.Fill>

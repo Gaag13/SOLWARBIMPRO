@@ -9,7 +9,7 @@ namespace WARBIMPRO.Models
 
         public string Name { get; set; }
         public string Icon { get; set; }
-        public string GroupName { get; set; }
+        public string TapGroup { get; set; }
         public int ElementCount { get; set; }
         public Autodesk.Revit.DB.BuiltInCategory BuiltInCategory { get; set; }
 
@@ -31,23 +31,23 @@ namespace WARBIMPRO.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 
-    // ─── Modelo para cada tipo de familia ───────────────────────────────────
-    public class TypeItem : INotifyPropertyChanged
-    {
-        private bool _isSelected;
+    //// ─── Modelo para cada tipo de familia ───────────────────────────────────
+    //public class TypeItem : INotifyPropertyChanged
+    //{
+    //    private bool _isSelected;
 
-        public string Name { get; set; }
-        public Autodesk.Revit.DB.ElementId TypeId { get; set; }
-        public int ElementCount { get; set; }
+    //    public string Name { get; set; }
+    //    public Autodesk.Revit.DB.ElementId TypeId { get; set; }
+    //    public int ElementCount { get; set; }
 
-        public bool IsSelected
-        {
-            get => _isSelected;
-            set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); }
-        }
+    //    public bool IsSelected
+    //    {
+    //        get => _isSelected;
+    //        set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); }
+    //    }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(string name) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-    }
+    //    public event PropertyChangedEventHandler PropertyChanged;
+    //    protected void OnPropertyChanged(string name) =>
+    //        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    //}
 }

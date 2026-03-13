@@ -20,7 +20,6 @@ namespace WARBIMPRO.Services
         }
 
 #if REVIT2024_OR_GREATER
-
         // ─── Cargar niveles del modelo ───────────────────────────────────────
         public List<LevelItem> GetLevels()
         {
@@ -38,8 +37,7 @@ namespace WARBIMPRO.Services
                 .ToList();
         }
 #else
-
- // ─── Cargar niveles del modelo ───────────────────────────────────────
+        // ─── Cargar niveles del modelo ───────────────────────────────────────
         public List<LevelItem> GetLevels()
         {
             return new FilteredElementCollector(_doc)
@@ -63,42 +61,78 @@ namespace WARBIMPRO.Services
             return new List<CategoryItem>
             {
                 // ESTRUCTURA
-                new CategoryItem { Name = "Muros",       Icon = "🧱", GroupName = "Estructura",   BuiltInCategory = BuiltInCategory.OST_Walls } ,
-                new CategoryItem { Name = "Muros",       Icon = "🧱", GroupName = "Estructura",   BuiltInCategory = BuiltInCategory.OST_StackedWalls },
-                new CategoryItem { Name = "Columnas",    Icon = "🏛",  GroupName = "Estructura",   BuiltInCategory = BuiltInCategory.OST_StructuralColumns },
-                new CategoryItem { Name = "Vigas",       Icon = "━",  GroupName = "Estructura",   BuiltInCategory = BuiltInCategory.OST_StructuralFraming },
-                new CategoryItem { Name = "Losas",       Icon = "⬜", GroupName = "Estructura",   BuiltInCategory = BuiltInCategory.OST_Floors },
-                new CategoryItem { Name = "Fundaciones", Icon = "🔷", GroupName = "Estructura",   BuiltInCategory = BuiltInCategory.OST_StructuralFoundation },
+                new CategoryItem { Name = "Muros",       Icon = "🧱", TapGroup = "Estructura",   BuiltInCategory = BuiltInCategory.OST_Walls,               SupportTypes = false },
+                new CategoryItem { Name = "Muros Comp.", Icon = "🧱", TapGroup = "Estructura",   BuiltInCategory = BuiltInCategory.OST_StackedWalls,        SupportTypes = false },
+                new CategoryItem { Name = "Columnas",    Icon = "🏛",  TapGroup = "Estructura",   BuiltInCategory = BuiltInCategory.OST_StructuralColumns,   SupportTypes = true  },
+                new CategoryItem { Name = "Vigas",       Icon = "━",  TapGroup = "Estructura",   BuiltInCategory = BuiltInCategory.OST_StructuralFraming,   SupportTypes = true  },
+                new CategoryItem { Name = "Losas",       Icon = "⬜", TapGroup = "Estructura",   BuiltInCategory = BuiltInCategory.OST_Floors,              SupportTypes = true  },
+                new CategoryItem { Name = "Fundaciones", Icon = "🔷", TapGroup = "Estructura",   BuiltInCategory = BuiltInCategory.OST_StructuralFoundation,SupportTypes = true  },
+                new CategoryItem { Name = "Refuerzo",    Icon = "⬡",  TapGroup = "Estructura",   BuiltInCategory = BuiltInCategory.OST_Rebar,               SupportTypes = true  },
                 // ARQUITECTURA
-                new CategoryItem { Name = "Puertas",     Icon = "🚪", GroupName = "Arquitectura", BuiltInCategory = BuiltInCategory.OST_Doors },
-                new CategoryItem { Name = "Ventanas",    Icon = "🪟", GroupName = "Arquitectura", BuiltInCategory = BuiltInCategory.OST_Windows },
-                new CategoryItem { Name = "Escaleras",   Icon = "🪜", GroupName = "Arquitectura", BuiltInCategory = BuiltInCategory.OST_Stairs },
-                new CategoryItem { Name = "Techos",      Icon = "🏠", GroupName = "Arquitectura", BuiltInCategory = BuiltInCategory.OST_Roofs },
-                new CategoryItem { Name = "Mobiliario",  Icon = "🛋",  GroupName = "Arquitectura", BuiltInCategory = BuiltInCategory.OST_Furniture },
-                new CategoryItem { Name = "Rampas",      Icon = "📐", GroupName = "Arquitectura", BuiltInCategory = BuiltInCategory.OST_Ramps },
+                new CategoryItem { Name = "Puertas",     Icon = "🚪", TapGroup = "Arquitectura", BuiltInCategory = BuiltInCategory.OST_Doors,               SupportTypes = true  },
+                new CategoryItem { Name = "Ventanas",    Icon = "🪟", TapGroup = "Arquitectura", BuiltInCategory = BuiltInCategory.OST_Windows,             SupportTypes = true  },
+                new CategoryItem { Name = "Escaleras",   Icon = "🪜", TapGroup = "Arquitectura", BuiltInCategory = BuiltInCategory.OST_Stairs,              SupportTypes = false },
+                new CategoryItem { Name = "Techos",      Icon = "🏠", TapGroup = "Arquitectura", BuiltInCategory = BuiltInCategory.OST_Roofs,               SupportTypes = true  },
+                new CategoryItem { Name = "Mobiliario",  Icon = "🛋",  TapGroup = "Arquitectura", BuiltInCategory = BuiltInCategory.OST_Furniture,           SupportTypes = true  },
+                new CategoryItem { Name = "Rampas",      Icon = "📐", TapGroup = "Arquitectura", BuiltInCategory = BuiltInCategory.OST_Ramps,               SupportTypes = false },
+                 //MEP
+                new CategoryItem { Name = "Ductos",      Icon = "💨", TapGroup = "MEP",          BuiltInCategory = BuiltInCategory.OST_DuctCurves,          SupportTypes = true  },
+                new CategoryItem { Name = "Tuberías",    Icon = "🔵", TapGroup = "MEP",          BuiltInCategory = BuiltInCategory.OST_PipeCurves,          SupportTypes = true  },
+                new CategoryItem { Name = "Bandejas",    Icon = "📦", TapGroup = "MEP",          BuiltInCategory = BuiltInCategory.OST_CableTray,           SupportTypes = true  },
+                new CategoryItem { Name = "Eq. Mecánico",Icon = "⚙",  TapGroup = "MEP",          BuiltInCategory = BuiltInCategory.OST_MechanicalEquipment, SupportTypes = true  },
+                new CategoryItem { Name = "Luminarias",  Icon = "💡", TapGroup = "MEP",          BuiltInCategory = BuiltInCategory.OST_LightingFixtures,    SupportTypes = true  },
+                new CategoryItem { Name = "Plomeria",    Icon = "⚔", TapGroup = "MEP",          BuiltInCategory = BuiltInCategory.OST_PlumbingFixtures,    SupportTypes = true  },
             };
         }
 
+        // ─── Obtener tipos de familia para una categoría ─────────────────────
+        public List<TypeItem> GetTypesForCategory(BuiltInCategory category)
+        {
+            var typeIds = new FilteredElementCollector(_doc)
+                .OfCategory(category)
+                .WhereElementIsNotElementType()
+                .ToElements()
+                .Select(e => e.GetTypeId())
+                .Where(id => id != null && id != ElementId.InvalidElementId)
+                .Distinct()
+                .ToList();
 
+            var result = new List<TypeItem>();
+            foreach (var typeId in typeIds)
+            {
+                var typeElem = _doc.GetElement(typeId);
+                if (typeElem == null) continue;
 
-        // ─── Helper: obtiene el LevelId según el tipo de elemento ───────────────────
+                var count = new FilteredElementCollector(_doc)
+                    .OfCategory(category)
+                    .WhereElementIsNotElementType()
+                    .Count(e => e.GetTypeId() == typeId);
+
+                result.Add(new TypeItem
+                {
+                    Name = typeElem.Name,
+                    TypeId = typeId,
+                    ElementCount = count
+                });
+            }
+
+            return result.OrderBy(t => t.Name).ToList();
+        }
+
+        // ─── Helper: obtiene el LevelId según el tipo de elemento ────────────
         private ElementId GetElementLevelId(Element element)
         {
-            // Muros, columnas, puertas, ventanas, losas...
             if (element.LevelId != null && element.LevelId != ElementId.InvalidElementId)
                 return element.LevelId;
 
-            // Vigas (StructuralFraming) → usan ReferenceLevel
             var refLevel = element.get_Parameter(BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM);
             if (refLevel?.AsElementId() is ElementId rid && rid != ElementId.InvalidElementId)
                 return rid;
 
-            // Escaleras, rampas → Schedule Level
             var schedLevel = element.get_Parameter(BuiltInParameter.SCHEDULE_LEVEL_PARAM);
             if (schedLevel?.AsElementId() is ElementId sid && sid != ElementId.InvalidElementId)
                 return sid;
 
-            // Cerchas, otros estructurales → Base Level
             var baseLevel = element.get_Parameter(BuiltInParameter.FAMILY_BASE_LEVEL_PARAM);
             if (baseLevel?.AsElementId() is ElementId bid && bid != ElementId.InvalidElementId)
                 return bid;
@@ -106,23 +140,26 @@ namespace WARBIMPRO.Services
             return ElementId.InvalidElementId;
         }
 
-        // ─── Obtener elementos según filtro ─────────────────────────────────────────
+        // ─── Obtener elementos según filtro ──────────────────────────────────
         public List<ElementId> GetFilteredElementIds(
             IEnumerable<LevelItem> selectedLevels,
             IEnumerable<CategoryItem> selectedCategories,
-            bool allModel)
+            bool allModel,
+            IEnumerable<ElementId> selectedTypeIds = null)
         {
 #if !REVIT2024_OR_GREATER
-    var result  = new List<ElementId>();
-    var levelIds = selectedLevels
-        .Select(l => new ElementId(int.Parse(l.Id)))
-        .ToHashSet();
+            var result   = new List<ElementId>();
+            var levelIds = selectedLevels
+                .Select(l => new ElementId(int.Parse(l.Id)))
+                .ToHashSet();
 #else
             var result = new List<ElementId>();
             var levelIds = selectedLevels
                 .Select(l => new ElementId(long.Parse(l.Id)))
                 .ToHashSet();
 #endif
+            var typeIdSet = selectedTypeIds?.ToHashSet();
+            bool filterByType = typeIdSet != null && typeIdSet.Any();
 
             foreach (var cat in selectedCategories)
             {
@@ -132,11 +169,13 @@ namespace WARBIMPRO.Services
 
                 IEnumerable<Element> elements = collector;
 
+                // Filtro por nivel
                 if (!allModel && levelIds.Any())
-                {
-                    // ✅ Usa el helper para cubrir LevelId + ReferenceLevel + Schedule/Base Level
-                    elements = collector.Where(e => levelIds.Contains(GetElementLevelId(e)));
-                }
+                    elements = elements.Where(e => levelIds.Contains(GetElementLevelId(e)));
+
+                // Filtro por tipo (opcional)
+                if (filterByType)
+                    elements = elements.Where(e => typeIdSet.Contains(e.GetTypeId()));
 
                 result.AddRange(elements.Select(e => e.Id));
             }
@@ -144,13 +183,11 @@ namespace WARBIMPRO.Services
             return result.Distinct().ToList();
         }
 
-
-
-
+        // ─── Aplicar color ───────────────────────────────────────────────────
         public void ApplyColor(
-             List<ElementId> elementIds,
-             System.Windows.Media.Color wpfColor,
-             int opacityPercent)
+            List<ElementId> elementIds,
+            System.Windows.Media.Color wpfColor,
+            int opacityPercent)
         {
             if (!elementIds.Any()) return;
 
@@ -162,7 +199,6 @@ namespace WARBIMPRO.Services
 
             var ogs = new OverrideGraphicSettings();
 
-            // ── Superficie ────────────────────────────────────────────────
             ogs.SetSurfaceForegroundPatternColor(revitColor);
             ogs.SetSurfaceForegroundPatternId(solidPatternId);
             ogs.SetSurfaceForegroundPatternVisible(true);
@@ -171,7 +207,6 @@ namespace WARBIMPRO.Services
             ogs.SetSurfaceBackgroundPatternId(solidPatternId);
             ogs.SetSurfaceBackgroundPatternVisible(true);
 
-            // ── Corte (cuando el elemento se corta en planta/sección) ─────
             ogs.SetCutForegroundPatternColor(revitColor);
             ogs.SetCutForegroundPatternId(solidPatternId);
             ogs.SetCutForegroundPatternVisible(true);
@@ -180,11 +215,8 @@ namespace WARBIMPRO.Services
             ogs.SetCutBackgroundPatternId(solidPatternId);
             ogs.SetCutBackgroundPatternVisible(true);
 
-            // ── Líneas ────────────────────────────────────────────────────
             ogs.SetProjectionLineColor(revitColor);
             ogs.SetCutLineColor(revitColor);
-
-            // ── Transparencia ─────────────────────────────────────────────
             ogs.SetSurfaceTransparency(transparency);
 
             using (var tx = new Transaction(_doc, "Aplicar Color - FiltroElementos"))
@@ -196,7 +228,6 @@ namespace WARBIMPRO.Services
             }
         }
 
-        // Busca el patrón sólido que Revit trae por defecto
         private ElementId GetSolidFillPatternId()
         {
             var solidPattern = new FilteredElementCollector(_doc)
@@ -204,18 +235,14 @@ namespace WARBIMPRO.Services
                 .Cast<FillPatternElement>()
                 .FirstOrDefault(fp => fp.GetFillPattern().IsSolidFill);
 
-            // Si no encuentra ninguno (raro pero posible), retorna InvalidElementId
-            // y Revit usará el patrón por defecto
             return solidPattern?.Id ?? ElementId.InvalidElementId;
         }
 
-        // ─── Aislar elementos en vista activa ────────────────────────────────
+        // ─── Aislar elementos ────────────────────────────────────────────────
         public void IsolateElements(List<ElementId> elementIds)
         {
             if (!elementIds.Any()) return;
-
             var view = _uiApp.ActiveUIDocument.ActiveView;
-
             using (var tx = new Transaction(_doc, "Aislar Elementos - FiltroElementos"))
             {
                 tx.Start();
@@ -224,27 +251,22 @@ namespace WARBIMPRO.Services
             }
         }
 
-        // ─── Resetear overrides de la vista ─────────────────────────────────
+        // ─── Resetear overrides ──────────────────────────────────────────────
         public void ResetOverrides()
         {
             var uidoc = _uiApp.ActiveUIDocument;
             var view = uidoc.ActiveView;
-
             using (var tx = new Transaction(_doc, "Reset Overrides - FiltroElementos"))
             {
                 tx.Start();
-
-                // Quitar aislamiento si está activo
                 if (view.IsInTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate))
                     view.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
 
-                // Quitar overrides a todos los elementos de la vista
                 var collector = new FilteredElementCollector(_doc, view.Id)
                     .WhereElementIsNotElementType();
                 var emptyOgs = new OverrideGraphicSettings();
                 foreach (var el in collector)
                     view.SetElementOverrides(el.Id, emptyOgs);
-
                 tx.Commit();
             }
         }

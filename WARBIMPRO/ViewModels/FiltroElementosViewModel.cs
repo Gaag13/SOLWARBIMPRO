@@ -19,7 +19,7 @@ namespace WARBIMPRO.ViewModels
         private readonly FiltroElementosService _service;
         private readonly UIApplication _uiApp;
 
-        // ─── Propiedades Niveles ─────────────────────────────────────────────
+        // ─── Niveles ─────────────────────────────────────────────────────────
         public ObservableCollection<LevelItem> Levels { get; } = new();
 
         private bool _allLevelsSelected;
@@ -35,7 +35,7 @@ namespace WARBIMPRO.ViewModels
             }
         }
 
-        // ─── Modo de alcance ─────────────────────────────────────────────────
+        // ─── Modo alcance ─────────────────────────────────────────────────────
         private bool _isAllModelMode;
         public bool IsAllModelMode
         {
@@ -50,33 +50,61 @@ namespace WARBIMPRO.ViewModels
         }
         public bool IsLevelMode => !_isAllModelMode;
 
-        // ─── Propiedades Categorías ──────────────────────────────────────────
+        // ─── Categorías ───────────────────────────────────────────────────────
         public ObservableCollection<CategoryItem> Categories { get; } = new();
 
-        public IEnumerable<IGrouping<string, CategoryItem>> GroupedCategories =>
-            Categories.GroupBy(c => c.GroupName);
+        // Tab activo
+        private string _activeTab = "Estructura";
+        public string ActiveTab
+        {
+            get => _activeTab;
+            set
+            {
+                _activeTab = value;
+                OnPropertyChanged(nameof(ActiveTab));
+                OnPropertyChanged(nameof(IsTabEstructura));
+                OnPropertyChanged(nameof(IsTabArquitectura));
+                OnPropertyChanged(nameof(IsTabMEP));
+                OnPropertyChanged(nameof(CategoriesInTab));
+                RefreshAvailableTypes();
+            }
+        }
 
-        // ─── Color ───────────────────────────────────────────────────────────
+        public bool IsTabEstructura => _activeTab == "Estructura";
+        public bool IsTabArquitectura => _activeTab == "Arquitectura";
+        public bool IsTabMEP => _activeTab == "MEP";
+
+        // Categorías visibles según tab activo
+        public IEnumerable<CategoryItem> CategoriesInTab =>
+            Categories.Where(c => c.TapGroup == _activeTab);
+
+        // ─── Tipos ────────────────────────────────────────────────────────────
+        public ObservableCollection<TypeItem> AvailableTypes { get; } = new();
+
+        private bool _hasAvailableTypes;
+        public bool HasAvailableTypes
+        {
+            get => _hasAvailableTypes;
+            set { _hasAvailableTypes = value; OnPropertyChanged(nameof(HasAvailableTypes)); }
+        }
+
+        private string _typePanelTitle = "TIPOS";
+        public string TypePanelTitle
+        {
+            get => _typePanelTitle;
+            set { _typePanelTitle = value; OnPropertyChanged(nameof(TypePanelTitle)); }
+        }
+
+        // ─── Color ────────────────────────────────────────────────────────────
         private double _hue = 210;
         private double _saturation = 85;
         private double _lightness = 55;
         private int _opacity = 100;
 
-        public double Hue
-        {
-            get => _hue;
-            set { _hue = value; OnPropertyChanged(nameof(Hue)); UpdatePreviewColor(); }
-        }
-        public double Saturation
-        {
-            get => _saturation;
-            set { _saturation = value; OnPropertyChanged(nameof(Saturation)); UpdatePreviewColor(); }
-        }
-        public double Lightness
-        {
-            get => _lightness;
-            set { _lightness = value; OnPropertyChanged(nameof(Lightness)); UpdatePreviewColor(); }
-        }
+        public double Hue { get => _hue; set { _hue = value; OnPropertyChanged(nameof(Hue)); UpdatePreviewColor(); } }
+        public double Saturation { get => _saturation; set { _saturation = value; OnPropertyChanged(nameof(Saturation)); UpdatePreviewColor(); } }
+        public double Lightness { get => _lightness; set { _lightness = value; OnPropertyChanged(nameof(Lightness)); UpdatePreviewColor(); } }
+
         public int Opacity
         {
             get => _opacity;
@@ -84,35 +112,22 @@ namespace WARBIMPRO.ViewModels
         }
         public string OpacityLabel => $"{_opacity}%";
 
-        private Color _selectedColor = Color.FromRgb(79, 142, 247);
+        private Color _selectedColor = Color.FromRgb(52, 152, 219);
         public Color SelectedColor
         {
             get => _selectedColor;
-            set
-            {
-                _selectedColor = value;
-                OnPropertyChanged(nameof(SelectedColor));
-                OnPropertyChanged(nameof(PreviewBrush));
-                OnPropertyChanged(nameof(HexColor));
-            }
+            set { _selectedColor = value; OnPropertyChanged(nameof(SelectedColor)); OnPropertyChanged(nameof(PreviewBrush)); OnPropertyChanged(nameof(HexColor)); }
         }
+        public SolidColorBrush PreviewBrush => new SolidColorBrush(SelectedColor);
 
-        public SolidColorBrush PreviewBrush =>
-            new SolidColorBrush(SelectedColor);
-
-        private string _hexColor = "#4F8EF7";
+        private string _hexColor = "#3498DB";
         public string HexColor
         {
             get => _hexColor;
-            set
-            {
-                _hexColor = value;
-                OnPropertyChanged(nameof(HexColor));
-                TrySetColorFromHex(value);
-            }
+            set { _hexColor = value; OnPropertyChanged(nameof(HexColor)); TrySetColorFromHex(value); }
         }
 
-        // ─── Status ──────────────────────────────────────────────────────────
+        // ─── Status ───────────────────────────────────────────────────────────
         private string _statusText = "Sin selección activa";
         public string StatusText
         {
@@ -126,22 +141,23 @@ namespace WARBIMPRO.ViewModels
             get => _selectedElementCount;
             set { _selectedElementCount = value; OnPropertyChanged(nameof(SelectedElementCount)); OnPropertyChanged(nameof(SelectionSummary)); }
         }
+
         public string SelectionSummary =>
             $"{Categories.Count(c => c.IsSelected)} categ. · " +
             $"{Levels.Count(l => l.IsSelected)} niveles · " +
             $"~{_selectedElementCount} elementos";
 
-        // ─── Comandos ────────────────────────────────────────────────────────
+        // ─── Comandos ─────────────────────────────────────────────────────────
         public ICommand ApplyColorCommand { get; }
         public ICommand IsolateCommand { get; }
         public ICommand ResetCommand { get; }
         public ICommand SetPresetCommand { get; }
         public ICommand CloseCommand { get; }
+        public ICommand SetTabCommand { get; }
 
-        // Acción de cierre (asignada desde el code-behind)
         public Action CloseAction { get; set; }
 
-        // ─── Constructor ─────────────────────────────────────────────────────
+        // ─── Constructor ──────────────────────────────────────────────────────
         public FiltroElementosViewModel(UIApplication uiApp)
         {
             _uiApp = uiApp;
@@ -152,28 +168,31 @@ namespace WARBIMPRO.ViewModels
             ResetCommand = new RelayCommand(_ => ExecuteReset());
             SetPresetCommand = new RelayCommand(param => SetPresetColor(param as string));
             CloseCommand = new RelayCommand(_ => CloseAction?.Invoke());
+            SetTabCommand = new RelayCommand(param => { if (param is string tab) ActiveTab = tab; });
 
             LoadData();
         }
 
-        // ─── Carga de datos ──────────────────────────────────────────────────
+        // ─── Carga de datos ───────────────────────────────────────────────────
         private void LoadData()
         {
-            // Niveles
-            var levels = _service.GetLevels();
-            foreach (var l in levels)
+            foreach (var l in _service.GetLevels())
             {
                 l.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(LevelItem.IsSelected)) UpdateStatus(); };
                 Levels.Add(l);
             }
 
-            // Categorías
-            var cats = _service.GetAvailableCategories();
-            foreach (var c in cats)
+            foreach (var c in _service.GetAvailableCategories())
             {
-                // Contar elementos en modelo
                 c.ElementCount = _service.CountElements(c.BuiltInCategory);
-                c.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(CategoryItem.IsSelected)) UpdateStatus(); };
+                c.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(CategoryItem.IsSelected))
+                    {
+                        RefreshAvailableTypes();
+                        UpdateStatus();
+                    }
+                };
                 Categories.Add(c);
             }
 
@@ -181,24 +200,50 @@ namespace WARBIMPRO.ViewModels
             UpdateStatus();
         }
 
-        // ─── Lógica de comandos ──────────────────────────────────────────────
+        // ─── Refrescar panel de tipos ─────────────────────────────────────────
+        private void RefreshAvailableTypes()
+        {
+            AvailableTypes.Clear();
+
+            var selCat = Categories
+                .Where(c => c.IsSelected && c.SupportTypes && c.TapGroup == _activeTab)
+                .ToList();
+
+            if (!selCat.Any()) { HasAvailableTypes = false; return; }
+
+            // Con múltiples categorías seleccionadas no cargamos tipos
+            if (selCat.Count > 1)
+            {
+                TypePanelTitle = "TIPOS — múltiples categorías";
+                HasAvailableTypes = false;
+                return;
+            }
+
+            var cat = selCat[0];
+            var types = _service.GetTypesForCategory(cat.BuiltInCategory);
+
+            if (!types.Any()) { HasAvailableTypes = false; return; }
+
+            TypePanelTitle = $"TIPOS — {cat.Name.ToUpper()}";
+            foreach (var t in types)
+            {
+                t.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(TypeItem.IsSelected)) UpdateStatus(); };
+                AvailableTypes.Add(t);
+            }
+            HasAvailableTypes = true;
+        }
+
+        // ─── Ejecutar comandos ────────────────────────────────────────────────
         private void ExecuteApplyColor()
         {
             try
             {
                 var ids = GetCurrentElementIds();
-                if (!ids.Any())
-                {
-                    StatusText = "⚠ Selecciona al menos una categoría";
-                    return;
-                }
+                if (!ids.Any()) { StatusText = "⚠ Selecciona al menos una categoría"; return; }
                 _service.ApplyColor(ids, SelectedColor, Opacity);
                 StatusText = $"✓ Color aplicado a {ids.Count} elementos";
             }
-            catch (Exception ex)
-            {
-                StatusText = $"✗ Error: {ex.Message}";
-            }
+            catch (Exception ex) { StatusText = $"✗ Error: {ex.Message}"; }
         }
 
         private void ExecuteIsolate()
@@ -206,18 +251,11 @@ namespace WARBIMPRO.ViewModels
             try
             {
                 var ids = GetCurrentElementIds();
-                if (!ids.Any())
-                {
-                    StatusText = "⚠ Selecciona al menos una categoría";
-                    return;
-                }
+                if (!ids.Any()) { StatusText = "⚠ Selecciona al menos una categoría"; return; }
                 _service.IsolateElements(ids);
                 StatusText = $"⬡ {ids.Count} elementos aislados en vista";
             }
-            catch (Exception ex)
-            {
-                StatusText = $"✗ Error: {ex.Message}";
-            }
+            catch (Exception ex) { StatusText = $"✗ Error: {ex.Message}"; }
         }
 
         private void ExecuteReset()
@@ -227,21 +265,30 @@ namespace WARBIMPRO.ViewModels
                 _service.ResetOverrides();
                 foreach (var l in Levels) l.IsSelected = false;
                 foreach (var c in Categories) c.IsSelected = false;
+                foreach (var t in AvailableTypes) t.IsSelected = false;
                 AllLevelsSelected = false;
+                AvailableTypes.Clear();
+                HasAvailableTypes = false;
                 StatusText = "↺ Filtros y overrides restablecidos";
             }
-            catch (Exception ex)
-            {
-                StatusText = $"✗ Error: {ex.Message}";
-            }
+            catch (Exception ex) { StatusText = $"✗ Error: {ex.Message}"; }
         }
 
-        // ─── Helpers ─────────────────────────────────────────────────────────
+        // ─── Helpers ──────────────────────────────────────────────────────────
+
         private List<Autodesk.Revit.DB.ElementId> GetCurrentElementIds()
         {
             var selCats = Categories.Where(c => c.IsSelected).ToList();
             var selLevels = Levels.Where(l => l.IsSelected).ToList();
-            return _service.GetFilteredElementIds(selLevels, selCats, IsAllModelMode);
+
+            // Proyectamos directamente los IDs de los tipos seleccionados
+            var selTypeIds = AvailableTypes.Where(t => t.IsSelected).Select(t => t.TypeId).ToList();
+
+            return _service.GetFilteredElementIds(
+                selLevels,
+                selCats,
+                IsAllModelMode,
+                selTypeIds.Any() ? selTypeIds : null);
         }
 
         private void UpdateStatus()
@@ -249,26 +296,19 @@ namespace WARBIMPRO.ViewModels
             var selCats = Categories.Where(c => c.IsSelected).ToList();
             var selLevels = Levels.Where(l => l.IsSelected).ToList();
 
-            if (!selCats.Any())
-            {
-                StatusText = "Sin selección activa";
-                SelectedElementCount = 0;
-                return;
-            }
+            if (!selCats.Any()) { StatusText = "Sin selección activa"; SelectedElementCount = 0; return; }
 
-            var catNames = string.Join(" + ", selCats.Select(c => c.Name));
-            var levelScope = IsAllModelMode
-                ? "Todo el Modelo"
-                : selLevels.Any()
-                    ? string.Join(", ", selLevels.Select(l => l.Name))
-                    : "Sin nivel";
-
+            var scope = IsAllModelMode ? "Todo el Modelo"
+                         : selLevels.Any() ? string.Join(", ", selLevels.Select(l => l.Name))
+                         : "Sin nivel";
+            var selTypes = AvailableTypes.Where(t => t.IsSelected).ToList();
+            var typeStr = selTypes.Any() ? $" [{string.Join(", ", selTypes.Select(t => t.Name))}]" : "";
             var ids = GetCurrentElementIds();
             SelectedElementCount = ids.Count;
-            StatusText = $"{levelScope}  ·  {catNames}  ·  {ids.Count} elementos";
+            StatusText = $"{scope}  ·  {string.Join(" + ", selCats.Select(c => c.Name))}{typeStr}  ·  {ids.Count} elem.";
         }
 
-        // ─── Color ───────────────────────────────────────────────────────────
+        // ─── Color ────────────────────────────────────────────────────────────
         private void UpdatePreviewColor()
         {
             var color = HslToRgb(_hue, _saturation / 100.0, _lightness / 100.0);
@@ -280,20 +320,12 @@ namespace WARBIMPRO.ViewModels
         private void TrySetColorFromHex(string hex)
         {
             if (hex?.Length == 7 && hex.StartsWith("#"))
-            {
-                try
-                {
-                    var c = (Color)ColorConverter.ConvertFromString(hex);
-                    SelectedColor = c;
-                }
-                catch { /* hex incompleto, ignorar */ }
-            }
+                try { SelectedColor = (Color)ColorConverter.ConvertFromString(hex); } catch { }
         }
 
         public void SetPresetColor(string hex)
         {
-            if (string.IsNullOrEmpty(hex)) return;
-            HexColor = hex;
+            if (!string.IsNullOrEmpty(hex)) HexColor = hex;
         }
 
         private static Color HslToRgb(double h, double s, double l)
@@ -314,7 +346,6 @@ namespace WARBIMPRO.ViewModels
                 (byte)((b1 + m) * 255));
         }
 
-        // ─── INotifyPropertyChanged ──────────────────────────────────────────
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
