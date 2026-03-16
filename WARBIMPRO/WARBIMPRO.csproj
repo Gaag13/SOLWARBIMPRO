@@ -89,11 +89,7 @@
     </ItemGroup>
 	<ItemGroup Condition="$(Configuration.Contains('R25')) OR $(Configuration.Contains('R26'))">
 		<PackageReference Include="System.Drawing.Common" Version="8.0.0" />
-	</ItemGroup>	
-
-	<ItemGroup>
-      <Folder Include="DockablePanes\" />
-    </ItemGroup>
+	</ItemGroup>
 
 	
 
