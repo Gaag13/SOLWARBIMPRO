@@ -6,10 +6,6 @@ using System.Linq;
 
 namespace WARBIMPRO.Services
 {
-    /// <summary>
-    /// Calcula los puntos de la vía a partir del eje y la sección tipo,
-    /// luego crea la subdivisión dentro del Toposolid base.
-    /// </summary>
     public class RoadSectionService
     {
         private readonly Document _doc;
@@ -20,12 +16,6 @@ namespace WARBIMPRO.Services
             _doc = doc;
         }
 
-        /// <summary>
-        /// Genera la subdivisión de vía dentro del Toposolid base.
-        /// </summary>
-        /// <param name="hostToposolid">Toposolid del terreno existente</param>
-        /// <param name="axisPoints">Puntos del eje en unidades internas de Revit (pies)</param>
-        /// <param name="p">Parámetros de la sección tipo</param>
         public ElementId CreateRoadSubdivision(
             Toposolid hostToposolid,
             List<XYZ> axisPoints,
@@ -36,86 +26,83 @@ namespace WARBIMPRO.Services
             try
             {
                 double halfWidth = (p.RoadWidthMeters / 2.0) * M2F;
-                double slope = p.CrossSlopePercent / 100.0;
+                double crossSlope = p.CrossSlopePercent / 100.0;
+                double longSlope = p.LongSlopePercent / 100.0;
                 double spacing = p.StationSpacingMeters * M2F;
+                double startZ = p.StartElevationMeters * M2F;
 
-                // 1. Construir segmentos del eje
                 var segments = BuildSegments(axisPoints);
                 double totalLen = segments.Sum(s => s.Length);
 
-                // 2. Generar puntos de la vía en cada estación
-                var leftPoints = new List<XYZ>();
-                var rightPoints = new List<XYZ>();
-
+                var stations = new List<StationData>();
                 for (double d = 0; d <= totalLen + 0.001; d += spacing)
                 {
                     double dist = Math.Min(d, totalLen);
                     GetPoseAtDistance(segments, dist, out XYZ origin, out XYZ axisDir);
 
-                    // Perpendicular al eje en plano horizontal
+                    double axisZ = startZ - (dist * longSlope);
+                    double borderZ = axisZ - halfWidth * crossSlope;
                     XYZ perp = new XYZ(-axisDir.Y, axisDir.X, 0).Normalize();
 
-                    // Cota del eje — proyectar sobre el terreno existente o usar Z del punto
-                    double axisZ = origin.Z;
-
-                    // Borde izquierdo: sube halfWidth * slope
-                    double leftZ = axisZ + halfWidth * slope;
-                    // Borde derecho: sube halfWidth * slope (vía a dos aguas desde el centro)
-                    double rightZ = axisZ + halfWidth * slope;
-
-                    XYZ leftPt = new XYZ(
-                        origin.X + perp.X * halfWidth,
-                        origin.Y + perp.Y * halfWidth,
-                        leftZ);
-
-                    XYZ rightPt = new XYZ(
-                        origin.X - perp.X * halfWidth,
-                        origin.Y - perp.Y * halfWidth,
-                        rightZ);
-
-                    leftPoints.Add(leftPt);
-                    rightPoints.Add(rightPt);
+                    stations.Add(new StationData
+                    {
+                        AxisPt = new XYZ(origin.X, origin.Y, axisZ),
+                        LeftPt = new XYZ(origin.X + perp.X * halfWidth,
+                                          origin.Y + perp.Y * halfWidth, borderZ),
+                        RightPt = new XYZ(origin.X - perp.X * halfWidth,
+                                          origin.Y - perp.Y * halfWidth, borderZ)
+                    });
                 }
 
-                // 3. Construir la lista de puntos de la vía:
-                //    borde izquierdo de inicio a fin + borde derecho de fin a inicio
-                var roadPoints = new List<XYZ>();
-                roadPoints.AddRange(leftPoints);
-                rightPoints.Reverse();
-                roadPoints.AddRange(rightPoints);
+                // Contorno para subdivisión
+                var roadBorder = new List<XYZ>();
+                roadBorder.AddRange(stations.Select(s => s.LeftPt));
+                roadBorder.AddRange(stations.Select(s => s.RightPt).Reverse());
+                var loop = BuildCurveLoop(roadBorder, startZ);
 
-                // 4. Construir el CurveLoop del contorno
-                var loop = BuildCurveLoop(roadPoints);
-
-                // 5. Crear la subdivisión
                 using (var trans = new Transaction(_doc, "WARBIMPRO: Crear Vía"))
                 {
                     trans.Start();
                     try
                     {
+                        var editor = hostToposolid.GetSlabShapeEditor();
+                        if (editor == null)
+                            throw new InvalidOperationException("No se pudo obtener el editor del Toposolid.");
+
+                        editor.Enable();
+
+                        // Primero crear todos los vértices con DrawPoint
+                        // DrawPoint devuelve SlabShapeVertex que se usa en DrawSplitLine
+                        var leftVerts = stations.Select(s => editor.DrawPoint(s.LeftPt)).ToList();
+                        var rightVerts = stations.Select(s => editor.DrawPoint(s.RightPt)).ToList();
+                        var axisVerts = stations.Select(s => editor.DrawPoint(s.AxisPt)).ToList();
+
+                        // Split lines LONGITUDINALES — borde izquierdo
+                        for (int i = 0; i < stations.Count - 1; i++)
+                            editor.DrawSplitLine(leftVerts[i], leftVerts[i + 1]);
+
+                        // Split lines LONGITUDINALES — borde derecho
+                        for (int i = 0; i < stations.Count - 1; i++)
+                            editor.DrawSplitLine(rightVerts[i], rightVerts[i + 1]);
+
+                        // Split lines LONGITUDINALES — eje central
+                        for (int i = 0; i < stations.Count - 1; i++)
+                            editor.DrawSplitLine(axisVerts[i], axisVerts[i + 1]);
+
+                        // Split lines TRANSVERSALES — una por estación
+                        for (int i = 0; i < stations.Count; i++)
+                            editor.DrawSplitLine(leftVerts[i], rightVerts[i]);
+
+                        // Subdivisión encima para material
                         var subdivision = hostToposolid.CreateSubDivision(
-                                 _doc,
-                                 new List<CurveLoop> { loop });
-
-                        // Aplicar cotas a los puntos del eje y bordes
-                        var editor = subdivision.GetSlabShapeEditor();
-                        if (editor != null)
-                        {
-                            editor.Enable();
-
-                            // Puntos del eje con su Z
-                            foreach (var pt in axisPoints)
-                                editor.DrawPoint(pt);
-
-                            // Puntos de los bordes
-                            foreach (var pt in leftPoints)
-                                editor.DrawPoint(pt);
-                            foreach (var pt in rightPoints)
-                                editor.DrawPoint(pt);
-                        }
+                            _doc,
+                            new List<CurveLoop> { loop });
 
                         trans.Commit();
-                        message = $"Vía creada: {leftPoints.Count} estaciones, ancho {p.RoadWidthMeters}m, pendiente {p.CrossSlopePercent}%.";
+                        message = $"Vía creada: {stations.Count} estaciones, " +
+                                  $"ancho {p.RoadWidthMeters}m, " +
+                                  $"pendiente {p.LongSlopePercent}%, " +
+                                  $"bombeo {p.CrossSlopePercent}%.";
                         return subdivision.Id;
                     }
                     catch { trans.RollBack(); throw; }
@@ -130,18 +117,20 @@ namespace WARBIMPRO.Services
 
         // ── Helpers ──────────────────────────────────────────────────────────
 
+        private class StationData
+        {
+            public XYZ AxisPt { get; set; }
+            public XYZ LeftPt { get; set; }
+            public XYZ RightPt { get; set; }
+        }
+
         private class Segment
         {
             public XYZ Start { get; }
             public XYZ Dir { get; }
             public double Length { get; }
-
             public Segment(XYZ start, XYZ dir, double length)
-            {
-                Start = start;
-                Dir = dir;
-                Length = length;
-            }
+            { Start = start; Dir = dir; Length = length; }
         }
 
         private List<Segment> BuildSegments(List<XYZ> pts)
@@ -151,12 +140,16 @@ namespace WARBIMPRO.Services
             {
                 double len = pts[i].DistanceTo(pts[i + 1]);
                 if (len > 0.001)
-                    segs.Add(new Segment(pts[i], (pts[i + 1] - pts[i]).Normalize(), len));
+                    segs.Add(new Segment(
+                        pts[i],
+                        (pts[i + 1] - pts[i]).Normalize(),
+                        len));
             }
             return segs;
         }
 
-        private void GetPoseAtDistance(List<Segment> segs, double dist, out XYZ pt, out XYZ dir)
+        private void GetPoseAtDistance(List<Segment> segs, double dist,
+            out XYZ pt, out XYZ dir)
         {
             double acc = 0;
             foreach (var s in segs)
@@ -174,12 +167,9 @@ namespace WARBIMPRO.Services
             dir = last.Dir;
         }
 
-        private CurveLoop BuildCurveLoop(List<XYZ> pts)
+        private CurveLoop BuildCurveLoop(List<XYZ> pts, double baseZ)
         {
-            // Proyectar a Z base para el contorno plano
-            double baseZ = pts[0].Z;
             var loop = new CurveLoop();
-
             for (int i = 0; i < pts.Count; i++)
             {
                 var a = new XYZ(pts[i].X, pts[i].Y, baseZ);

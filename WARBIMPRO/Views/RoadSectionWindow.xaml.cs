@@ -15,34 +15,27 @@ namespace WARBIMPRO.Views
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
-            if (!TryParseDouble(TxtWidth.Text, out double width) || width <= 0)
-            {
-                MessageBox.Show("Ancho de vía inválido.", "Error",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                TxtWidth.Focus();
-                return;
-            }
+            if (!TryParse(TxtWidth.Text, out double width) || width <= 0)
+            { MessageBox.Show("Ancho de vía inválido.", "Error"); TxtWidth.Focus(); return; }
 
-            if (!TryParseDouble(TxtSlope.Text, out double slope))
-            {
-                MessageBox.Show("Pendiente transversal inválida.", "Error",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                TxtSlope.Focus();
-                return;
-            }
+            if (!TryParse(TxtCrossSlope.Text, out double crossSlope))
+            { MessageBox.Show("Pendiente transversal inválida.", "Error"); TxtCrossSlope.Focus(); return; }
 
-            if (!TryParseDouble(TxtSpacing.Text, out double spacing) || spacing <= 0)
-            {
-                MessageBox.Show("Espaciado de estaciones inválido.", "Error",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                TxtSpacing.Focus();
-                return;
-            }
+            if (!TryParse(TxtStartElev.Text, out double startElev))
+            { MessageBox.Show("Cota de inicio inválida.", "Error"); TxtStartElev.Focus(); return; }
+
+            if (!TryParse(TxtLongSlope.Text, out double longSlope))
+            { MessageBox.Show("Pendiente longitudinal inválida.", "Error"); TxtLongSlope.Focus(); return; }
+
+            if (!TryParse(TxtSpacing.Text, out double spacing) || spacing <= 0)
+            { MessageBox.Show("Espaciado inválido.", "Error"); TxtSpacing.Focus(); return; }
 
             Params = new RoadSectionParams
             {
                 RoadWidthMeters = width,
-                CrossSlopePercent = slope,
+                CrossSlopePercent = crossSlope,
+                StartElevationMeters = startElev,
+                LongSlopePercent = longSlope,
                 StationSpacingMeters = spacing
             };
 
@@ -56,11 +49,8 @@ namespace WARBIMPRO.Views
             Close();
         }
 
-        private bool TryParseDouble(string text, out double value) =>
-            double.TryParse(
-                text.Trim().Replace(',', '.'),
-                NumberStyles.Any,
-                CultureInfo.InvariantCulture,
-                out value);
+        private bool TryParse(string text, out double value) =>
+            double.TryParse(text.Trim().Replace(',', '.'),
+                NumberStyles.Any, CultureInfo.InvariantCulture, out value);
     }
 }

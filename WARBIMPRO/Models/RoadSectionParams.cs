@@ -1,24 +1,20 @@
 ﻿namespace WARBIMPRO.Models
 {
-    /// <summary>
-    /// Parámetros de la sección tipo de vía.
-    /// Por ahora solo vía — andenes se agregan en siguiente fase.
-    /// </summary>
     public class RoadSectionParams
     {
         /// <summary>Ancho total de la vía en metros.</summary>
         public double RoadWidthMeters { get; set; } = 6.0;
 
-        /// <summary>
-        /// Pendiente transversal de la vía en porcentaje.
-        /// Ej: 2.0 = 2% — la vía baja del centro hacia los bordes.
-        /// </summary>
+        /// <summary>Pendiente transversal en % — baja del centro al borde.</summary>
         public double CrossSlopePercent { get; set; } = 2.0;
 
-        /// <summary>
-        /// Espaciado entre estaciones transversales en metros.
-        /// Cada N metros el addin calcula una fila de puntos.
-        /// </summary>
+        /// <summary>Pendiente longitudinal en % — a lo largo del eje.</summary>
+        public double LongSlopePercent { get; set; } = 5.0;
+
+        /// <summary>Cota Z del inicio del eje en metros.</summary>
+        public double StartElevationMeters { get; set; } = 0.0;
+
+        /// <summary>Espaciado entre estaciones en metros.</summary>
         public double StationSpacingMeters { get; set; } = 5.0;
     }
 }
