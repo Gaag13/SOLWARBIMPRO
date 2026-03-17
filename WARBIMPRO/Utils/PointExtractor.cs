@@ -11,10 +11,6 @@ namespace WARBIMPRO.Utils
     {
         private const double MetersToFeet = 3.28083989501;
 
-        /// <summary>
-        /// El usuario selecciona líneas de modelo en Revit.
-        /// Extrae los vértices únicos de cada línea.
-        /// </summary>
         public static List<XYZ> FromModelLines(UIDocument uidoc, out string message)
         {
             message = string.Empty;
@@ -47,10 +43,6 @@ namespace WARBIMPRO.Utils
             return points;
         }
 
-        /// <summary>
-        /// Lee puntos desde un CSV con formato X,Y,Z por línea.
-        /// Acepta tanto punto como coma decimal.
-        /// </summary>
         public static List<XYZ> FromCsv(string filePath, bool convertFromMeters, out string message)
         {
             message = string.Empty;
@@ -88,8 +80,6 @@ namespace WARBIMPRO.Utils
             return points;
         }
 
-        // ── Helpers ──────────────────────────────────────────────────────────
-
         private static void AddUnique(List<XYZ> list, XYZ p, double tol = 0.01)
         {
             if (!list.Any(q => Math.Abs(q.X - p.X) < tol && Math.Abs(q.Y - p.Y) < tol))
@@ -102,10 +92,18 @@ namespace WARBIMPRO.Utils
                 System.Globalization.CultureInfo.InvariantCulture, out v);
     }
 
+    /// <summary>Solo permite seleccionar líneas de modelo.</summary>
     public class LineFilter : ISelectionFilter
     {
         public bool AllowElement(Element e) =>
             e is ModelLine || e is ModelCurve || e is DetailLine;
+        public bool AllowReference(Reference r, XYZ p) => true;
+    }
+
+    /// <summary>Solo permite seleccionar Toposolids.</summary>
+    public class ToposolidFilter : ISelectionFilter
+    {
+        public bool AllowElement(Element e) => e is Toposolid;
         public bool AllowReference(Reference r, XYZ p) => true;
     }
 }

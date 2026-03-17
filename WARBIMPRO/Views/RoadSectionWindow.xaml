@@ -1,0 +1,71 @@
+﻿<Window x:Class="WARBIMPRO.Views.RoadSectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sección Tipo — Vía"
+        Width="360" Height="240"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
+
+    <StackPanel Margin="16">
+
+        <TextBlock Text="Parámetros de la vía"
+                   FontSize="14"
+                   FontWeight="SemiBold"
+                   Margin="0,0,0,16"/>
+
+        <!-- Ancho de vía -->
+        <DockPanel Margin="0,0,0,8">
+            <TextBlock Text="Ancho de vía (m):"
+                       Width="200"
+                       VerticalAlignment="Center"/>
+            <TextBox x:Name="TxtWidth"
+                     Text="6.0"
+                     Height="26"
+                     Padding="4,0"
+                     VerticalContentAlignment="Center"/>
+        </DockPanel>
+
+        <!-- Pendiente transversal -->
+        <DockPanel Margin="0,0,0,8">
+            <TextBlock Text="Pendiente transversal (%):"
+                       Width="200"
+                       VerticalAlignment="Center"/>
+            <TextBox x:Name="TxtSlope"
+                     Text="2.0"
+                     Height="26"
+                     Padding="4,0"
+                     VerticalContentAlignment="Center"/>
+        </DockPanel>
+
+        <!-- Espaciado de estaciones -->
+        <DockPanel Margin="0,0,0,0">
+            <TextBlock Text="Espaciado estaciones (m):"
+                       Width="200"
+                       VerticalAlignment="Center"/>
+            <TextBox x:Name="TxtSpacing"
+                     Text="5.0"
+                     Height="26"
+                     Padding="4,0"
+                     VerticalContentAlignment="Center"/>
+        </DockPanel>
+
+        <!-- Botones -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,20,0,0">
+
+            <Button Content="Cancelar"
+                    Width="80" Height="30"
+                    Margin="0,0,8,0"
+                    Click="BtnCancel_Click"/>
+
+            <Button x:Name="BtnOk"
+                    Content="Crear Vía"
+                    Width="100" Height="30"
+                    IsDefault="True"
+                    Click="BtnOk_Click"/>
+
+        </StackPanel>
+
+    </StackPanel>
+</Window>
