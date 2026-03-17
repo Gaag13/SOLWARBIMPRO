@@ -14,33 +14,124 @@ namespace WARBIMPRO.Utils
         public static List<XYZ> FromModelLines(UIDocument uidoc, out string message)
         {
             message = string.Empty;
-            var points = new List<XYZ>();
+            var segments = new List<List<XYZ>>();
 
             try
             {
                 var refs = uidoc.Selection.PickObjects(
                     ObjectType.Element,
                     new LineFilter(),
-                    "Selecciona las líneas del borde — Enter para confirmar");
+                    "Selecciona las líneas del eje — Enter para confirmar");
 
                 foreach (var r in refs)
                 {
                     var elem = uidoc.Document.GetElement(r);
                     if (elem?.Location is LocationCurve lc)
                     {
-                        AddUnique(points, lc.Curve.GetEndPoint(0));
-                        AddUnique(points, lc.Curve.GetEndPoint(1));
+                        var curve = lc.Curve;
+                        var segPts = new List<XYZ>();
+
+                        if (curve is Line)
+                        {
+                            // Línea recta — solo extremos
+                            segPts.Add(curve.GetEndPoint(0));
+                            segPts.Add(curve.GetEndPoint(1));
+                        }
+                        else
+                        {
+                            // Curva — usar parámetros reales cada 0.5m
+                            segPts.AddRange(GetPointsAlongCurve(curve, 0.5 * MetersToFeet));
+
+                            // Asegurar que los extremos estén incluidos
+                            if (segPts.Count == 0 || segPts.First().DistanceTo(curve.GetEndPoint(0)) > 0.01)
+                                segPts.Insert(0, curve.GetEndPoint(0));
+                            if (segPts.Last().DistanceTo(curve.GetEndPoint(1)) > 0.01)
+                                segPts.Add(curve.GetEndPoint(1));
+                        }
+
+                        segments.Add(segPts);
                     }
                 }
 
-                message = $"{points.Count} puntos extraídos de {refs.Count} líneas.";
+                var ordered = OrderSegments(segments);
+                message = $"{ordered.Count} puntos extraídos de {refs.Count} líneas.";
+                return ordered;
             }
             catch (Autodesk.Revit.Exceptions.OperationCanceledException)
             {
                 message = "Selección cancelada.";
+                return new List<XYZ>();
+            }
+        }
+
+        /// <summary>
+        /// Genera puntos a lo largo de una curva usando sus parámetros reales.
+        /// Más preciso que dividir por índice — respeta la parametrización de la curva.
+        /// </summary>
+        private static List<XYZ> GetPointsAlongCurve(Curve curve, double step = 0.3)
+        {
+            double pt0 = curve.GetEndParameter(0);
+            double pt1 = curve.GetEndParameter(1);
+            var pts = new List<XYZ>();
+            int n = 1;
+
+            while (true)
+            {
+                double dist = step * n;
+                n++;
+                if (dist > curve.Length) break;
+
+                double paramCalc = pt0 + ((pt1 - pt0) * dist / curve.Length);
+                if (curve.IsInside(paramCalc))
+                {
+                    double normParam = curve.ComputeNormalizedParameter(paramCalc);
+                    pts.Add(curve.Evaluate(normParam, true));
+                }
             }
 
-            return points;
+            return pts;
+        }
+
+        /// <summary>
+        /// Ordena los segmentos en cadena continua.
+        /// Cada segmento se conecta al extremo más cercano del anterior.
+        /// </summary>
+        private static List<XYZ> OrderSegments(List<List<XYZ>> segments)
+        {
+            if (!segments.Any()) return new List<XYZ>();
+            if (segments.Count == 1) return segments[0];
+
+            var result = new List<XYZ>();
+            var pending = new List<List<XYZ>>(segments);
+
+            result.AddRange(pending[0]);
+            pending.RemoveAt(0);
+
+            while (pending.Any())
+            {
+                XYZ lastPt = result.Last();
+                double minDist = double.MaxValue;
+                int bestIdx = 0;
+                bool bestReverse = false;
+
+                for (int i = 0; i < pending.Count; i++)
+                {
+                    double dStart = lastPt.DistanceTo(pending[i].First());
+                    double dEnd = lastPt.DistanceTo(pending[i].Last());
+
+                    if (dStart < minDist) { minDist = dStart; bestIdx = i; bestReverse = false; }
+                    if (dEnd < minDist) { minDist = dEnd; bestIdx = i; bestReverse = true; }
+                }
+
+                var next = pending[bestIdx];
+                pending.RemoveAt(bestIdx);
+
+                if (bestReverse) next = next.AsEnumerable().Reverse().ToList();
+
+                result.AddRange(next.Skip(1));
+            }
+
+            return result;
         }
 
         public static List<XYZ> FromCsv(string filePath, bool convertFromMeters, out string message)
@@ -92,15 +183,17 @@ namespace WARBIMPRO.Utils
                 System.Globalization.CultureInfo.InvariantCulture, out v);
     }
 
-    /// <summary>Solo permite seleccionar líneas de modelo.</summary>
     public class LineFilter : ISelectionFilter
     {
         public bool AllowElement(Element e) =>
-            e is ModelLine || e is ModelCurve || e is DetailLine;
+            e is ModelLine ||
+            e is ModelCurve ||
+            e is DetailLine ||
+            e is DetailCurve ||
+            e?.Location is LocationCurve;
         public bool AllowReference(Reference r, XYZ p) => true;
     }
 
-    /// <summary>Solo permite seleccionar Toposolids.</summary>
     public class ToposolidFilter : ISelectionFilter
     {
         public bool AllowElement(Element e) => e is Toposolid;

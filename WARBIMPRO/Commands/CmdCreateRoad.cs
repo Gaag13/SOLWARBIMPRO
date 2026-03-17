@@ -19,49 +19,41 @@ namespace WARBIMPRO.Commands
 
             try
             {
-                // 1. Mostrar ventana de parámetros
                 var window = new RoadSectionWindow();
                 if (window.ShowDialog() != true)
                     return Result.Cancelled;
 
                 var sectionParams = window.Params;
 
-                // 2. Seleccionar Toposolid base
-                TaskDialog.Show("Paso 1/2", "Selecciona el Toposolid base (terreno existente).");
-
-                var topoRef = uidoc.Selection.PickObject(
-                    ObjectType.Element,
-                    new ToposolidFilter(),
-                    "Clic sobre el Toposolid base");
-
+                TaskDialog.Show("Paso 1/2", "Selecciona el Toposolid base.");
+                var topoRef = uidoc.Selection.PickObject(ObjectType.Element,
+                    new ToposolidFilter(), "Clic sobre el Toposolid base");
                 var toposolid = doc.GetElement(topoRef) as Toposolid;
+
                 if (toposolid == null)
                 {
-                    TaskDialog.Show("Error", "El elemento seleccionado no es un Toposolid.");
+                    TaskDialog.Show("Error", "El elemento no es un Toposolid.");
                     return Result.Failed;
                 }
 
-                // 3. Seleccionar líneas del eje
-                TaskDialog.Show("Paso 2/2", "Selecciona las líneas del eje de la vía — Enter para confirmar.");
-
+                TaskDialog.Show("Paso 2/2", "Selecciona las líneas del eje — Enter para confirmar.");
                 var axisPoints = PointExtractor.FromModelLines(uidoc, out string extractMsg);
 
                 if (axisPoints.Count < 2)
                 {
-                    TaskDialog.Show("Error", $"Se necesitan al menos 2 puntos de eje.\n{extractMsg}");
+                    TaskDialog.Show("Error", $"Se necesitan al menos 2 puntos.\n{extractMsg}");
                     return Result.Failed;
                 }
 
-                // 4. Crear la subdivisión de la vía
                 var svc = new RoadSectionService(doc);
-                var id = svc.CreateRoadSubdivision(toposolid, axisPoints, sectionParams, out string roadMsg);
+                var result = svc.CreateRoadSubdivision(toposolid, axisPoints, sectionParams, out string roadMsg);
 
                 TaskDialog.Show("Resultado",
-                    id != ElementId.InvalidElementId
+                    result == Result.Succeeded
                         ? $"✓ {roadMsg}\n{extractMsg}"
                         : $"✗ {roadMsg}");
 
-                return id != ElementId.InvalidElementId ? Result.Succeeded : Result.Failed;
+                return result;
             }
             catch (Autodesk.Revit.Exceptions.OperationCanceledException)
             {
@@ -69,6 +61,12 @@ namespace WARBIMPRO.Commands
             }
             catch (Exception ex)
             {
+                // Error detallado para debug
+                TaskDialog.Show("Error detallado",
+                    $"Tipo: {ex.GetType().Name}\n\n" +
+                    $"Mensaje: {ex.Message}\n\n" +
+                    $"Inner: {ex.InnerException?.Message}\n\n" +
+                    $"Stack:\n{ex.StackTrace}");
                 message = ex.Message;
                 return Result.Failed;
             }

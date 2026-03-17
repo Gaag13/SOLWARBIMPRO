@@ -1,66 +1,88 @@
 ﻿<Window x:Class="WARBIMPRO.Views.RoadSectionWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Sección Tipo — Vía"
-        Width="380" Height="400"
+        Title="Sección Tipo — Vía y Andenes"
+        Width="400" Height="500"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
 
-    <StackPanel Margin="16">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="16">
 
-        <TextBlock Text="Parámetros de la vía"
-                   FontSize="14" FontWeight="SemiBold"
-                   Margin="0,0,0,16"/>
+            <!-- VÍA -->
+            <TextBlock Text="Vía" FontSize="13" FontWeight="SemiBold"
+                       Foreground="#2B6CB0" Margin="0,0,0,8"/>
 
-        <!-- Ancho -->
-        <DockPanel Margin="0,0,0,8">
-            <TextBlock Text="Ancho de vía (m):" Width="220" VerticalAlignment="Center"/>
-            <TextBox x:Name="TxtWidth" Text="6.0" Height="26" Padding="4,0"
-                     VerticalContentAlignment="Center"/>
-        </DockPanel>
+            <DockPanel Margin="0,0,0,6">
+                <TextBlock Text="Ancho de vía (m):" Width="220" VerticalAlignment="Center"/>
+                <TextBox x:Name="TxtWidth" Text="6.0" Height="26" Padding="4,0"
+                         VerticalContentAlignment="Center"/>
+            </DockPanel>
+            <DockPanel Margin="0,0,0,6">
+                <TextBlock Text="Pendiente transversal (%):" Width="220" VerticalAlignment="Center"/>
+                <TextBox x:Name="TxtCrossSlope" Text="2.0" Height="26" Padding="4,0"
+                         VerticalContentAlignment="Center"/>
+            </DockPanel>
+            <DockPanel Margin="0,0,0,6">
+                <TextBlock Text="Cota inicio eje (m):" Width="220" VerticalAlignment="Center"/>
+                <TextBox x:Name="TxtStartElev" Text="0.0" Height="26" Padding="4,0"
+                         VerticalContentAlignment="Center"/>
+            </DockPanel>
+            <DockPanel Margin="0,0,0,6">
+                <TextBlock Text="Pendiente longitudinal (%):" Width="220" VerticalAlignment="Center"/>
+                <TextBox x:Name="TxtLongSlope" Text="5.0" Height="26" Padding="4,0"
+                         VerticalContentAlignment="Center"/>
+            </DockPanel>
+            <DockPanel Margin="0,0,0,6">
+                <TextBlock Text="Espaciado estaciones (m):" Width="220" VerticalAlignment="Center"/>
+                <TextBox x:Name="TxtSpacing" Text="5.0" Height="26" Padding="4,0"
+                         VerticalContentAlignment="Center"/>
+            </DockPanel>
 
-        <!-- Pendiente transversal -->
-        <DockPanel Margin="0,0,0,8">
-            <TextBlock Text="Pendiente transversal (%):" Width="220" VerticalAlignment="Center"/>
-            <TextBox x:Name="TxtCrossSlope" Text="2.0" Height="26" Padding="4,0"
-                     VerticalContentAlignment="Center"/>
-        </DockPanel>
+            <Separator Margin="0,10,0,10"/>
 
-        <!-- Cota de inicio -->
-        <DockPanel Margin="0,0,0,8">
-            <TextBlock Text="Cota inicio eje (m):" Width="220" VerticalAlignment="Center"/>
-            <TextBox x:Name="TxtStartElev" Text="0.0" Height="26" Padding="4,0"
-                     VerticalContentAlignment="Center"/>
-        </DockPanel>
+            <!-- ANDÉN IZQUIERDO -->
+            <TextBlock Text="Andén Izquierdo" FontSize="13" FontWeight="SemiBold"
+                       Foreground="#276749" Margin="0,0,0,8"/>
 
-        <!-- Pendiente longitudinal -->
-        <DockPanel Margin="0,0,0,8">
-            <TextBlock Text="Pendiente longitudinal (%):" Width="220" VerticalAlignment="Center"/>
-            <TextBox x:Name="TxtLongSlope" Text="5.0" Height="26" Padding="4,0"
-                     VerticalContentAlignment="Center"/>
-        </DockPanel>
+            <CheckBox x:Name="ChkLeftSidewalk" Content="Incluir andén izquierdo"
+                      IsChecked="True" Margin="0,0,0,6"
+                      Checked="ChkSidewalk_Changed" Unchecked="ChkSidewalk_Changed"/>
+            <DockPanel x:Name="PanelLeft" Margin="0,0,0,6">
+                <TextBlock Text="Ancho andén izq. (m):" Width="220" VerticalAlignment="Center"/>
+                <TextBox x:Name="TxtLeftWidth" Text="1.5" Height="26" Padding="4,0"
+                         VerticalContentAlignment="Center"/>
+            </DockPanel>
 
-        <!-- Espaciado -->
-        <DockPanel Margin="0,0,0,0">
-            <TextBlock Text="Espaciado estaciones (m):" Width="220" VerticalAlignment="Center"/>
-            <TextBox x:Name="TxtSpacing" Text="5.0" Height="26" Padding="4,0"
-                     VerticalContentAlignment="Center"/>
-        </DockPanel>
+            <Separator Margin="0,10,0,10"/>
 
-        <!-- Nota informativa -->
-        <Border Background="#EBF8FF" BorderBrush="#90CDF4" BorderThickness="1"
-                CornerRadius="4" Padding="8" Margin="0,12,0,0">
-            <TextBlock Text="ℹ  La pendiente longitudinal se aplica desde la cota de inicio hacia el final del eje."
-                       FontSize="11" TextWrapping="Wrap" Foreground="#2C5282"/>
-        </Border>
+            <!-- ANDÉN DERECHO -->
+            <TextBlock Text="Andén Derecho" FontSize="13" FontWeight="SemiBold"
+                       Foreground="#276749" Margin="0,0,0,8"/>
 
-        <!-- Botones -->
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-            <Button Content="Cancelar" Width="80" Height="30"
-                    Margin="0,0,8,0" Click="BtnCancel_Click"/>
-            <Button x:Name="BtnOk" Content="Crear Vía" Width="100" Height="30"
-                    IsDefault="True" Click="BtnOk_Click"/>
+            <CheckBox x:Name="ChkRightSidewalk" Content="Incluir andén derecho"
+                      IsChecked="True" Margin="0,0,0,6"
+                      Checked="ChkSidewalk_Changed" Unchecked="ChkSidewalk_Changed"/>
+            <DockPanel x:Name="PanelRight" Margin="0,0,0,6">
+                <TextBlock Text="Ancho andén der. (m):" Width="220" VerticalAlignment="Center"/>
+                <TextBox x:Name="TxtRightWidth" Text="1.5" Height="26" Padding="4,0"
+                         VerticalContentAlignment="Center"/>
+            </DockPanel>
+
+            <DockPanel Margin="0,0,0,6">
+                <TextBlock Text="Pendiente andenes (%):" Width="220" VerticalAlignment="Center"/>
+                <TextBox x:Name="TxtSidewalkSlope" Text="3.0" Height="26" Padding="4,0"
+                         VerticalContentAlignment="Center"/>
+            </DockPanel>
+
+            <!-- Botones -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                <Button Content="Cancelar" Width="80" Height="30"
+                        Margin="0,0,8,0" Click="BtnCancel_Click"/>
+                <Button Content="Crear Vía" Width="100" Height="30"
+                        IsDefault="True" Click="BtnOk_Click"/>
+            </StackPanel>
+
         </StackPanel>
-
-    </StackPanel>
+    </ScrollViewer>
 </Window>
