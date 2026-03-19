@@ -1,5 +1,8 @@
-﻿using WARBIMPRO.Models;
+﻿using Autodesk.Revit.DB;
+using WARBIMPRO.Models;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -7,17 +10,78 @@ namespace WARBIMPRO.Views
 {
     public partial class RoadSectionWindow : Window
     {
+        private readonly Document _doc;
         public RoadSectionParams Params { get; private set; }
 
-        public RoadSectionWindow()
+        private ElementId _roadMaterialId = ElementId.InvalidElementId;
+        private ElementId _leftMaterialId = ElementId.InvalidElementId;
+        private ElementId _rightMaterialId = ElementId.InvalidElementId;
+
+        public RoadSectionWindow(Document doc)
         {
+            _doc = doc;
             InitializeComponent();
         }
+
+
+        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2) return; // evitar doble clic
+            DragMove();
+        }
+
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
+            Close();
+        }
+
 
         private void ChkSidewalk_Changed(object sender, RoutedEventArgs e)
         {
             if (PanelLeft != null) PanelLeft.IsEnabled = ChkLeftSidewalk.IsChecked == true;
             if (PanelRight != null) PanelRight.IsEnabled = ChkRightSidewalk.IsChecked == true;
+        }
+
+        private void BtnRoadMaterial_Click(object sender, RoutedEventArgs e)
+        {
+            var mat = PickMaterial("Material — Vía");
+            if (mat == null) return;
+            _roadMaterialId = mat.Id;
+            BtnRoadMaterial.Content = "● " + mat.Name;
+        }
+
+        private void BtnLeftMaterial_Click(object sender, RoutedEventArgs e)
+        {
+            var mat = PickMaterial("Material — Andén Izquierdo");
+            if (mat == null) return;
+            _leftMaterialId = mat.Id;
+            BtnLeftMaterial.Content = "● " + mat.Name;
+        }
+
+        private void BtnRightMaterial_Click(object sender, RoutedEventArgs e)
+        {
+            var mat = PickMaterial("Material — Andén Derecho");
+            if (mat == null) return;
+            _rightMaterialId = mat.Id;
+            BtnRightMaterial.Content = "● " + mat.Name;
+        }
+
+        private Material PickMaterial(string title)
+        {
+            var materials = new FilteredElementCollector(_doc)
+                .OfClass(typeof(Material))
+                .Cast<Material>()
+                .OrderBy(m => m.Name)
+                .ToList();
+
+            var picker = new MaterialPickerWindow(materials, title) { Owner = this };
+            return picker.ShowDialog() == true ? picker.SelectedMaterial : null;
         }
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)
@@ -58,7 +122,10 @@ namespace WARBIMPRO.Views
                 LeftSidewalkWidthMeters = leftW,
                 HasRightSidewalk = ChkRightSidewalk.IsChecked == true,
                 RightSidewalkWidthMeters = rightW,
-                SidewalkSlopePercent = swSlope
+                SidewalkSlopePercent = swSlope,
+                RoadMaterialId = _roadMaterialId,
+                LeftMaterialId = _leftMaterialId,
+                RightMaterialId = _rightMaterialId,
             };
 
             DialogResult = true;
@@ -75,4 +142,6 @@ namespace WARBIMPRO.Views
             double.TryParse(text.Trim().Replace(',', '.'),
                 NumberStyles.Any, CultureInfo.InvariantCulture, out value);
     }
+
+
 }

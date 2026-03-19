@@ -17,11 +17,13 @@ namespace WARBIMPRO.Services
             _doc = doc;
         }
 
+        // onProgress es opcional — si no se pasa, funciona igual que antes
         public Result CreateRoadSubdivision(
             Toposolid hostToposolid,
             List<XYZ> axisPoints,
             RoadSectionParams p,
-            out string message)
+            out string message,
+            Action<int, string> onProgress = null)
         {
             message = string.Empty;
             try
@@ -40,12 +42,18 @@ namespace WARBIMPRO.Services
 
                 var stations = new List<StationData>();
 
+                // ── Fase 1: Calcular estaciones (0 → 70%) ───────────────────
+                onProgress?.Invoke(0, "Calculando estaciones...");
+
+                double totalStations = Math.Ceiling(totalLen / spacing) + 1;
+                int stationIdx = 0;
+
                 for (double d = 0; d <= totalLen + 0.001; d += spacing)
                 {
                     double dist = Math.Min(d, totalLen);
                     GetPoseAtDistance(segments, dist, out XYZ origin, out XYZ axisDir);
 
-                    double axisZ = startZ - (dist * longSlope);
+                    double axisZ = startZ - dist * longSlope;
                     double roadEdgeZ = axisZ - halfRoad * crossSlope;
                     double leftSwEdgeZ = roadEdgeZ - leftSW * swSlope;
                     double rightSwEdgeZ = roadEdgeZ - rightSW * swSlope;
@@ -54,23 +62,17 @@ namespace WARBIMPRO.Services
 
                     double outerOffset = halfRoad + Math.Max(leftSW, rightSW) + 0.5 * M2F;
                     double terrainZL = GetTerrainElevation(hostToposolid,
-                        origin.X + perp.X * outerOffset,
-                        origin.Y + perp.Y * outerOffset, startZ);
+                        origin.X + perp.X * outerOffset, origin.Y + perp.Y * outerOffset, startZ);
                     double terrainZR = GetTerrainElevation(hostToposolid,
-                        origin.X - perp.X * outerOffset,
-                        origin.Y - perp.Y * outerOffset, startZ);
+                        origin.X - perp.X * outerOffset, origin.Y - perp.Y * outerOffset, startZ);
 
                     var st = new StationData
                     {
                         AxisPt = new XYZ(origin.X, origin.Y, axisZ),
-                        LeftRoadEdge = new XYZ(origin.X + perp.X * halfRoad,
-                                                origin.Y + perp.Y * halfRoad, roadEdgeZ),
-                        RightRoadEdge = new XYZ(origin.X - perp.X * halfRoad,
-                                                origin.Y - perp.Y * halfRoad, roadEdgeZ),
-                        LeftOutPt = new XYZ(origin.X + perp.X * outerOffset,
-                                                origin.Y + perp.Y * outerOffset, terrainZL),
-                        RightOutPt = new XYZ(origin.X - perp.X * outerOffset,
-                                                origin.Y - perp.Y * outerOffset, terrainZR)
+                        LeftRoadEdge = new XYZ(origin.X + perp.X * halfRoad, origin.Y + perp.Y * halfRoad, roadEdgeZ),
+                        RightRoadEdge = new XYZ(origin.X - perp.X * halfRoad, origin.Y - perp.Y * halfRoad, roadEdgeZ),
+                        LeftOutPt = new XYZ(origin.X + perp.X * outerOffset, origin.Y + perp.Y * outerOffset, terrainZL),
+                        RightOutPt = new XYZ(origin.X - perp.X * outerOffset, origin.Y - perp.Y * outerOffset, terrainZR),
                     };
 
                     if (p.HasLeftSidewalk)
@@ -86,6 +88,11 @@ namespace WARBIMPRO.Services
                             rightSwEdgeZ);
 
                     stations.Add(st);
+
+                    // Reportar progreso 0-70%
+                    stationIdx++;
+                    int pct = (int)(stationIdx / totalStations * 70);
+                    onProgress?.Invoke(pct, $"Estación {stationIdx} de {(int)totalStations}...");
                 }
 
                 using (var trans = new Transaction(_doc, "WARBIMPRO: Crear Vía y Andenes"))
@@ -93,10 +100,12 @@ namespace WARBIMPRO.Services
                     trans.Start();
                     try
                     {
+                        // ── Fase 2: Vértices (70 → 78%) ─────────────────────
+                        onProgress?.Invoke(70, "Insertando vértices...");
+
                         var editor = hostToposolid.GetSlabShapeEditor();
                         editor.Enable();
 
-                        // Crear todos los vértices sobre el terreno base
                         var axisVerts = stations.Select(s => editor.DrawPoint(s.AxisPt)).ToList();
                         var leftRoadVerts = stations.Select(s => editor.DrawPoint(s.LeftRoadEdge)).ToList();
                         var rightRoadVerts = stations.Select(s => editor.DrawPoint(s.RightRoadEdge)).ToList();
@@ -111,7 +120,9 @@ namespace WARBIMPRO.Services
                         if (p.HasRightSidewalk && stations.All(s => s.RightSwEdge != null))
                             rightSwVerts = stations.Select(s => editor.DrawPoint(s.RightSwEdge)).ToList();
 
-                        // Split lines longitudinales
+                        // ── Fase 3: Split Lines (78 → 88%) ──────────────────
+                        onProgress?.Invoke(78, "Dibujando Split Lines longitudinales...");
+
                         for (int i = 0; i < stations.Count - 1; i++)
                         {
                             editor.DrawSplitLine(axisVerts[i], axisVerts[i + 1]);
@@ -123,7 +134,8 @@ namespace WARBIMPRO.Services
                             if (rightSwVerts != null) editor.DrawSplitLine(rightSwVerts[i], rightSwVerts[i + 1]);
                         }
 
-                        // Split lines transversales
+                        onProgress?.Invoke(84, "Dibujando Split Lines transversales...");
+
                         for (int i = 0; i < stations.Count; i++)
                         {
                             editor.DrawSplitLine(leftRoadVerts[i], axisVerts[i]);
@@ -134,46 +146,57 @@ namespace WARBIMPRO.Services
                                 editor.DrawSplitLine(leftRoadVerts[i], leftSwVerts[i]);
                                 editor.DrawSplitLine(leftSwVerts[i], leftOutVerts[i]);
                             }
-                            else
-                                editor.DrawSplitLine(leftRoadVerts[i], leftOutVerts[i]);
+                            else editor.DrawSplitLine(leftRoadVerts[i], leftOutVerts[i]);
 
                             if (rightSwVerts != null)
                             {
                                 editor.DrawSplitLine(rightRoadVerts[i], rightSwVerts[i]);
                                 editor.DrawSplitLine(rightSwVerts[i], rightOutVerts[i]);
                             }
-                            else
-                                editor.DrawSplitLine(rightRoadVerts[i], rightOutVerts[i]);
+                            else editor.DrawSplitLine(rightRoadVerts[i], rightOutVerts[i]);
                         }
 
-                        // ── Subdivisión 1: VÍA ──────────────────────────────
-                        var roadBorder = new List<XYZ>();
-                        roadBorder.AddRange(stations.Select(s => s.LeftRoadEdge));
-                        roadBorder.AddRange(stations.Select(s => s.RightRoadEdge).Reverse());
-                        var roadLoop = BuildCurveLoop(roadBorder, startZ);
-                        hostToposolid.CreateSubDivision(_doc, new List<CurveLoop> { roadLoop });
+                        // ── Fase 4: Subdivisiones (88 → 100%) ───────────────
+                        onProgress?.Invoke(88, "Creando subdivisión de vía...");
 
-                        // ── Subdivisión 2: ANDÉN IZQUIERDO ──────────────────
+                        var roadLoop = BuildRealBorderLoop(
+                            stations.Select(s => s.LeftRoadEdge).ToList(),
+                            stations.Select(s => s.RightRoadEdge).ToList());
+                        if (roadLoop != null)
+                        {
+                            var roadSubDiv = hostToposolid.CreateSubDivision(_doc, new List<CurveLoop> { roadLoop });
+                            ApplyMaterial(roadSubDiv, p.RoadMaterialId);
+                        }
+
                         if (p.HasLeftSidewalk && leftSwVerts != null)
                         {
-                            var leftBorder = new List<XYZ>();
-                            leftBorder.AddRange(stations.Select(s => s.LeftSwEdge));
-                            leftBorder.AddRange(stations.Select(s => s.LeftRoadEdge).Reverse());
-                            var leftLoop = BuildCurveLoop(leftBorder, startZ);
-                            hostToposolid.CreateSubDivision(_doc, new List<CurveLoop> { leftLoop });
+                            onProgress?.Invoke(93, "Creando andén izquierdo...");
+                            var leftLoop = BuildRealBorderLoop(
+                                stations.Select(s => s.LeftSwEdge).ToList(),
+                                stations.Select(s => s.LeftRoadEdge).ToList());
+                            if (leftLoop != null)
+                            {
+                                var leftSubDiv = hostToposolid.CreateSubDivision(_doc, new List<CurveLoop> { leftLoop });
+                                ApplyMaterial(leftSubDiv, p.LeftMaterialId);
+                            }
                         }
 
-                        // ── Subdivisión 3: ANDÉN DERECHO ────────────────────
                         if (p.HasRightSidewalk && rightSwVerts != null)
                         {
-                            var rightBorder = new List<XYZ>();
-                            rightBorder.AddRange(stations.Select(s => s.RightRoadEdge));
-                            rightBorder.AddRange(stations.Select(s => s.RightSwEdge).Reverse());
-                            var rightLoop = BuildCurveLoop(rightBorder, startZ);
-                            hostToposolid.CreateSubDivision(_doc, new List<CurveLoop> { rightLoop });
+                            onProgress?.Invoke(97, "Creando andén derecho...");
+                            var rightLoop = BuildRealBorderLoop(
+                                stations.Select(s => s.RightRoadEdge).ToList(),
+                                stations.Select(s => s.RightSwEdge).ToList());
+                            if (rightLoop != null)
+                            {
+                                var rightSubDiv = hostToposolid.CreateSubDivision(_doc, new List<CurveLoop> { rightLoop });
+                                ApplyMaterial(rightSubDiv, p.RightMaterialId);
+                            }
                         }
 
                         trans.Commit();
+                        onProgress?.Invoke(100, "¡Completado!");
+
                         message = $"Creado: vía {p.RoadWidthMeters}m" +
                                   (p.HasLeftSidewalk ? $" + andén izq {p.LeftSidewalkWidthMeters}m" : "") +
                                   (p.HasRightSidewalk ? $" + andén der {p.RightSidewalkWidthMeters}m" : "") +
@@ -189,6 +212,92 @@ namespace WARBIMPRO.Services
                 return Result.Failed;
             }
         }
+
+        // ── BuildRealBorderLoop ──────────────────────────────────────────────
+
+        private CurveLoop BuildRealBorderLoop(List<XYZ> leftSide, List<XYZ> rightSide)
+        {
+            if (leftSide == null || rightSide == null) return null;
+            if (leftSide.Count < 2 || rightSide.Count < 2) return null;
+
+            const double minLen = 0.01;
+
+            var left = leftSide.Select(p => new XYZ(p.X, p.Y, 0.0)).ToList();
+            var right = rightSide.Select(p => new XYZ(p.X, p.Y, 0.0)).ToList();
+
+            var border = new List<XYZ>();
+            border.AddRange(left);
+            border.AddRange(Enumerable.Reverse(right));
+
+            var clean = new List<XYZ> { border[0] };
+            for (int i = 1; i < border.Count; i++)
+                if (border[i].DistanceTo(clean.Last()) > minLen)
+                    clean.Add(border[i]);
+
+            while (clean.Count > 2 && clean.Last().DistanceTo(clean[0]) < minLen)
+                clean.RemoveAt(clean.Count - 1);
+
+            if (clean.Count < 3) return null;
+
+            var curves = new List<Curve>();
+            for (int i = 0; i < clean.Count; i++)
+            {
+                XYZ a = clean[i];
+                XYZ b = clean[(i + 1) % clean.Count];
+                if (a.DistanceTo(b) > minLen)
+                    curves.Add(Line.CreateBound(a, b));
+            }
+
+            if (curves.Count < 3) return null;
+
+            for (int i = 0; i < curves.Count; i++)
+            {
+                double gap = curves[i].GetEndPoint(1)
+                                      .DistanceTo(curves[(i + 1) % curves.Count].GetEndPoint(0));
+                if (gap > 0.001) return null;
+            }
+
+            var loop = new CurveLoop();
+            foreach (var c in curves)
+                loop.Append(c);
+
+            return loop;
+        }
+
+        // ── ApplyMaterial ────────────────────────────────────────────────────
+
+        private void ApplyMaterial(Element subdivision, ElementId materialId)
+        {
+            if (subdivision == null) return;
+            if (materialId == null || materialId == ElementId.InvalidElementId) return;
+
+            try
+            {
+                var matParam = subdivision.get_Parameter(BuiltInParameter.MATERIAL_ID_PARAM);
+                if (matParam != null && !matParam.IsReadOnly)
+                {
+                    matParam.Set(materialId);
+                    return;
+                }
+
+                foreach (Parameter param in subdivision.Parameters)
+                {
+                    if (param.StorageType == StorageType.ElementId
+                        && !param.IsReadOnly
+                        && param.Definition.Name.ToLower().Contains("material"))
+                    {
+                        param.Set(materialId);
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"ApplyMaterial: {ex.Message}");
+            }
+        }
+
+        // ── Helpers sin cambios ──────────────────────────────────────────────
 
         private double GetTerrainElevation(Toposolid topo, double x, double y, double defaultZ)
         {
@@ -254,59 +363,5 @@ namespace WARBIMPRO.Services
             pt = last.Start + last.Dir * last.Length;
             dir = last.Dir;
         }
-
-        /// <summary>
-        /// Construye un CurveLoop válido usando el Convex Hull de los puntos.
-        /// Esto garantiza que el contorno sea convexo y no tenga segmentos cruzados
-        /// independientemente de la orientación del eje (recto, diagonal, curvo).
-        /// </summary>
-        private CurveLoop BuildCurveLoop(List<XYZ> pts, double baseZ)
-        {
-            var hull = ConvexHull(pts);
-            var loop = new CurveLoop();
-
-            for (int i = 0; i < hull.Count; i++)
-            {
-                var a = new XYZ(hull[i].X, hull[i].Y, baseZ);
-                var b = new XYZ(hull[(i + 1) % hull.Count].X, hull[(i + 1) % hull.Count].Y, baseZ);
-                if (a.DistanceTo(b) > 0.01)
-                    loop.Append(Line.CreateBound(a, b));
-            }
-            return loop;
-        }
-
-        /// <summary>
-        /// Convex Hull 2D — Andrew's monotone chain.
-        /// Devuelve los puntos del contorno exterior en orden antihorario.
-        /// </summary>
-        private List<XYZ> ConvexHull(List<XYZ> pts)
-        {
-            var sorted = pts.OrderBy(p => p.X).ThenBy(p => p.Y).ToList();
-            var hull = new List<XYZ>();
-
-            // Lower hull
-            foreach (var p in sorted)
-            {
-                while (hull.Count >= 2 && Cross(hull[hull.Count - 2], hull[hull.Count - 1], p) <= 0)
-                    hull.RemoveAt(hull.Count - 1);
-                hull.Add(p);
-            }
-
-            // Upper hull
-            int lower = hull.Count + 1;
-            for (int i = sorted.Count - 2; i >= 0; i--)
-            {
-                var p = sorted[i];
-                while (hull.Count >= lower && Cross(hull[hull.Count - 2], hull[hull.Count - 1], p) <= 0)
-                    hull.RemoveAt(hull.Count - 1);
-                hull.Add(p);
-            }
-
-            hull.RemoveAt(hull.Count - 1);
-            return hull;
-        }
-
-        private double Cross(XYZ o, XYZ a, XYZ b)
-            => (a.X - o.X) * (b.Y - o.Y) - (a.Y - o.Y) * (b.X - o.X);
     }
 }

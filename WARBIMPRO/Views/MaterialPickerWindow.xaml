@@ -1,0 +1,108 @@
+﻿<Window x:Class="WARBIMPRO.Views.MaterialPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Seleccionar Material"
+        Width="360" Height="500"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None"
+        AllowsTransparency="True">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="GlobalStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Border CornerRadius="10" Background="#2C2C54">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="30" ShadowDepth="0" Color="#000000" Opacity="0.6"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="48"/>
+                <RowDefinition Height="1"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- ── TÍTULO ── -->
+            <Border Grid.Row="0" Background="#23234A" CornerRadius="10,10,0,0">
+                <Grid Margin="16,0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="28" Height="28" Background="#276749"
+                                CornerRadius="6" Margin="0,0,10,0">
+                            <TextBlock Text="🎨" FontSize="14"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Seleccionar Material"
+                                       Foreground="White" FontSize="13" FontWeight="SemiBold"/>
+                            <TextBlock Text="WARBIMPRO · Revit Tools"
+                                       Foreground="#6060A0" FontSize="10"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ── SEPARADOR ── -->
+            <Rectangle Grid.Row="1" Height="1">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#276749" Offset="0"/>
+                        <GradientStop Color="#4B4B7A" Offset="0.5"/>
+                        <GradientStop Color="Transparent" Offset="1"/>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+
+            <!-- ── CONTENIDO ── -->
+            <StackPanel Grid.Row="2" Margin="16,16,16,8">
+
+                <!-- Búsqueda -->
+                <TextBlock Text="BUSCAR MATERIAL"
+                           Style="{StaticResource SectionLabelStyle}"
+                           Margin="0,0,0,6"/>
+
+                <TextBox x:Name="TxtSearch"
+                         Style="{StaticResource InlineSearchStyle}"
+                         Margin="0,0,0,12"
+                         TextChanged="TxtSearch_TextChanged"/>
+
+                <!-- Lista -->
+                <TextBlock Text="MATERIALES DEL PROYECTO"
+                           Style="{StaticResource SectionLabelStyle}"
+                           Margin="0,0,0,6"/>
+
+                <ListBox x:Name="LstMaterials"
+                         Height="280"
+                         Style="{StaticResource ListBoxStyle}"
+                         ItemContainerStyle="{StaticResource TemplateListBoxItemStyle}"
+                         DisplayMemberPath="Name"
+                         MouseDoubleClick="LstMaterials_DoubleClick"/>
+
+            </StackPanel>
+
+            <!-- ── FOOTER ── -->
+            <Border Grid.Row="3" Background="#23234A"
+                    CornerRadius="0,0,10,10" Padding="16,12">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Cancelar"
+                            Width="90" Height="34"
+                            Margin="0,0,8,0"
+                            Style="{StaticResource BtnReset}"
+                            Click="BtnCancel_Click"/>
+                    <Button Content="Seleccionar"
+                            Width="110" Height="34"
+                            Style="{StaticResource BtnPrimary}"
+                            Click="BtnOk_Click"/>
+                </StackPanel>
+            </Border>
+
+        </Grid>
+    </Border>
+</Window>

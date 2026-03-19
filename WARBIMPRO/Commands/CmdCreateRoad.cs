@@ -6,6 +6,7 @@ using WARBIMPRO.Services;
 using WARBIMPRO.Utils;
 using WARBIMPRO.Views;
 using System;
+using System.Windows.Threading;
 
 namespace WARBIMPRO.Commands
 {
@@ -19,12 +20,14 @@ namespace WARBIMPRO.Commands
 
             try
             {
-                var window = new RoadSectionWindow();
+                // 1. Ventana de parámetros
+                var window = new RoadSectionWindow(doc);
                 if (window.ShowDialog() != true)
                     return Result.Cancelled;
 
                 var sectionParams = window.Params;
 
+                // 2. Seleccionar Toposolid
                 TaskDialog.Show("Paso 1/2", "Selecciona el Toposolid base.");
                 var topoRef = uidoc.Selection.PickObject(ObjectType.Element,
                     new ToposolidFilter(), "Clic sobre el Toposolid base");
@@ -36,6 +39,7 @@ namespace WARBIMPRO.Commands
                     return Result.Failed;
                 }
 
+                // 3. Seleccionar eje
                 TaskDialog.Show("Paso 2/2", "Selecciona las líneas del eje — Enter para confirmar.");
                 var axisPoints = PointExtractor.FromModelLines(uidoc, out string extractMsg);
 
@@ -45,13 +49,31 @@ namespace WARBIMPRO.Commands
                     return Result.Failed;
                 }
 
-                var svc = new RoadSectionService(doc);
-                var result = svc.CreateRoadSubdivision(toposolid, axisPoints, sectionParams, out string roadMsg);
+                // 4. Abrir ventana de progreso y ejecutar
+                var progressWindow = new RoadProgressWindow();
+                progressWindow.Show();
 
-                TaskDialog.Show("Resultado",
-                    result == Result.Succeeded
-                        ? $"✓ {roadMsg}\n{extractMsg}"
-                        : $"✗ {roadMsg}");
+                var svc = new RoadSectionService(doc);
+                var result = svc.CreateRoadSubdivision(
+                    toposolid,
+                    axisPoints,
+                    sectionParams,
+                    out string roadMsg,
+                    // Callback de progreso — igual que RunWithProgress en familias
+                    (percent, status) =>
+                    {
+                        progressWindow.ProgressViewModel.Report(percent, status);
+                        Dispatcher.CurrentDispatcher.Invoke(
+                            () => { },
+                            DispatcherPriority.Render);
+                    });
+
+                // 5. Resultado — solo mostrar TaskDialog si hay error
+                if (result != Result.Succeeded)
+                {
+                    progressWindow.Close();
+                    TaskDialog.Show("Error", $"✗ {roadMsg}");
+                }
 
                 return result;
             }
@@ -61,7 +83,6 @@ namespace WARBIMPRO.Commands
             }
             catch (Exception ex)
             {
-                // Error detallado para debug
                 TaskDialog.Show("Error detallado",
                     $"Tipo: {ex.GetType().Name}\n\n" +
                     $"Mensaje: {ex.Message}\n\n" +

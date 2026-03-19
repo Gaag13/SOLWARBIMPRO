@@ -2,87 +2,346 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Sección Tipo — Vía y Andenes"
-        Width="400" Height="500"
-        ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen">
+        Width="460" Height="660"
+        ResizeMode="CanMinimize"
+        FontFamily="Segoe UI"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="16">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="GlobalStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
 
-            <!-- VÍA -->
-            <TextBlock Text="Vía" FontSize="13" FontWeight="SemiBold"
-                       Foreground="#2B6CB0" Margin="0,0,0,8"/>
+    <Border CornerRadius="10" Background="#2C2C54">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="30" ShadowDepth="0" Color="#000000" Opacity="0.6"/>
+        </Border.Effect>
 
-            <DockPanel Margin="0,0,0,6">
-                <TextBlock Text="Ancho de vía (m):" Width="220" VerticalAlignment="Center"/>
-                <TextBox x:Name="TxtWidth" Text="6.0" Height="26" Padding="4,0"
-                         VerticalContentAlignment="Center"/>
-            </DockPanel>
-            <DockPanel Margin="0,0,0,6">
-                <TextBlock Text="Pendiente transversal (%):" Width="220" VerticalAlignment="Center"/>
-                <TextBox x:Name="TxtCrossSlope" Text="2.0" Height="26" Padding="4,0"
-                         VerticalContentAlignment="Center"/>
-            </DockPanel>
-            <DockPanel Margin="0,0,0,6">
-                <TextBlock Text="Cota inicio eje (m):" Width="220" VerticalAlignment="Center"/>
-                <TextBox x:Name="TxtStartElev" Text="0.0" Height="26" Padding="4,0"
-                         VerticalContentAlignment="Center"/>
-            </DockPanel>
-            <DockPanel Margin="0,0,0,6">
-                <TextBlock Text="Pendiente longitudinal (%):" Width="220" VerticalAlignment="Center"/>
-                <TextBox x:Name="TxtLongSlope" Text="5.0" Height="26" Padding="4,0"
-                         VerticalContentAlignment="Center"/>
-            </DockPanel>
-            <DockPanel Margin="0,0,0,6">
-                <TextBlock Text="Espaciado estaciones (m):" Width="220" VerticalAlignment="Center"/>
-                <TextBox x:Name="TxtSpacing" Text="5.0" Height="26" Padding="4,0"
-                         VerticalContentAlignment="Center"/>
-            </DockPanel>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="52"/>
+                <RowDefinition Height="1"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-            <Separator Margin="0,10,0,10"/>
+            <!-- ── TÍTULO ── -->
+            <Border Grid.Row="0" Background="#23234A" CornerRadius="10,10,0,0"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid Margin="12,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-            <!-- ANDÉN IZQUIERDO -->
-            <TextBlock Text="Andén Izquierdo" FontSize="13" FontWeight="SemiBold"
-                       Foreground="#276749" Margin="0,0,0,8"/>
+                    <!-- Icono + texto -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="30" Height="30" Background="#2B6CB0"
+                                CornerRadius="7" Margin="0,0,12,0">
+                            <TextBlock Text="🛣" FontSize="15"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Sección Tipo — Vía y Andenes"
+                                       Foreground="White" FontSize="13" FontWeight="SemiBold"
+                                       FontFamily="Segoe UI"/>
+                            <TextBlock Text="WARBIMPRO · Revit Tools"
+                                       Foreground="#6060A0" FontSize="10"
+                                       FontFamily="Segoe UI"/>
+                        </StackPanel>
+                    </StackPanel>
 
-            <CheckBox x:Name="ChkLeftSidewalk" Content="Incluir andén izquierdo"
-                      IsChecked="True" Margin="0,0,0,6"
-                      Checked="ChkSidewalk_Changed" Unchecked="ChkSidewalk_Changed"/>
-            <DockPanel x:Name="PanelLeft" Margin="0,0,0,6">
-                <TextBlock Text="Ancho andén izq. (m):" Width="220" VerticalAlignment="Center"/>
-                <TextBox x:Name="TxtLeftWidth" Text="1.5" Height="26" Padding="4,0"
-                         VerticalContentAlignment="Center"/>
-            </DockPanel>
+                    <!-- Botones cerrar / minimizar -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="&#xE949;"
+                                Style="{StaticResource WindowButtonStyle}"
+                                Click="MinimizeButton_Click"/>
+                        <Button Content="&#xE106;"
+                                Style="{StaticResource WindowButtonStyle}"
+                                Click="CloseButton_Click"/>
+                    </StackPanel>
 
-            <Separator Margin="0,10,0,10"/>
+                </Grid>
+            </Border>
 
-            <!-- ANDÉN DERECHO -->
-            <TextBlock Text="Andén Derecho" FontSize="13" FontWeight="SemiBold"
-                       Foreground="#276749" Margin="0,0,0,8"/>
+            <!-- ── SEPARADOR ── -->
+            <Rectangle Grid.Row="1" Height="1">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#2B6CB0" Offset="0"/>
+                        <GradientStop Color="#4B4B7A" Offset="0.5"/>
+                        <GradientStop Color="Transparent" Offset="1"/>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
 
-            <CheckBox x:Name="ChkRightSidewalk" Content="Incluir andén derecho"
-                      IsChecked="True" Margin="0,0,0,6"
-                      Checked="ChkSidewalk_Changed" Unchecked="ChkSidewalk_Changed"/>
-            <DockPanel x:Name="PanelRight" Margin="0,0,0,6">
-                <TextBlock Text="Ancho andén der. (m):" Width="220" VerticalAlignment="Center"/>
-                <TextBox x:Name="TxtRightWidth" Text="1.5" Height="26" Padding="4,0"
-                         VerticalContentAlignment="Center"/>
-            </DockPanel>
+            <!-- ── CONTENIDO ── -->
+            <ScrollViewer Grid.Row="2"
+                          Style="{StaticResource DarkScrollViewer}"
+                          Padding="22,18,22,10">
+                <StackPanel>
 
-            <DockPanel Margin="0,0,0,6">
-                <TextBlock Text="Pendiente andenes (%):" Width="220" VerticalAlignment="Center"/>
-                <TextBox x:Name="TxtSidewalkSlope" Text="3.0" Height="26" Padding="4,0"
-                         VerticalContentAlignment="Center"/>
-            </DockPanel>
+                    <!-- ══ VÍA ══ -->
+                    <Border Background="#1E1E42" CornerRadius="8"
+                            Padding="14,12" Margin="0,0,0,16">
+                        <StackPanel>
 
-            <!-- Botones -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-                <Button Content="Cancelar" Width="80" Height="30"
-                        Margin="0,0,8,0" Click="BtnCancel_Click"/>
-                <Button Content="Crear Vía" Width="100" Height="30"
-                        IsDefault="True" Click="BtnOk_Click"/>
-            </StackPanel>
+                            <TextBlock Text="🛣  Vía"
+                                       Foreground="#63B3ED"
+                                       FontSize="12" FontWeight="Bold"
+                                       Margin="0,0,0,14"/>
 
-        </StackPanel>
-    </ScrollViewer>
+                            <!-- Ancho -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="130"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Ancho de vía (m)"
+                                           Foreground="#AAAACC" FontSize="12"
+                                           VerticalAlignment="Center"/>
+                                <TextBox x:Name="TxtWidth" Grid.Column="1"
+                                         Text="6.0"
+                                         Style="{StaticResource SearchBoxStyle}"
+                                         Height="32"/>
+                            </Grid>
+
+                            <!-- Pendiente transversal -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="130"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Pendiente transversal (%)"
+                                           Foreground="#AAAACC" FontSize="12"
+                                           VerticalAlignment="Center"/>
+                                <TextBox x:Name="TxtCrossSlope" Grid.Column="1"
+                                         Text="2.0"
+                                         Style="{StaticResource SearchBoxStyle}"
+                                         Height="32"/>
+                            </Grid>
+
+                            <!-- Cota inicio -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="130"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Cota inicio eje (m)"
+                                           Foreground="#AAAACC" FontSize="12"
+                                           VerticalAlignment="Center"/>
+                                <TextBox x:Name="TxtStartElev" Grid.Column="1"
+                                         Text="0.0"
+                                         Style="{StaticResource SearchBoxStyle}"
+                                         Height="32"/>
+                            </Grid>
+
+                            <!-- Pendiente longitudinal -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="130"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Pendiente longitudinal (%)"
+                                           Foreground="#AAAACC" FontSize="12"
+                                           VerticalAlignment="Center"/>
+                                <TextBox x:Name="TxtLongSlope" Grid.Column="1"
+                                         Text="5.0"
+                                         Style="{StaticResource SearchBoxStyle}"
+                                         Height="32"/>
+                            </Grid>
+
+                            <!-- Espaciado -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="130"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Espaciado estaciones (m)"
+                                           Foreground="#AAAACC" FontSize="12"
+                                           VerticalAlignment="Center"/>
+                                <TextBox x:Name="TxtSpacing" Grid.Column="1"
+                                         Text="5.0"
+                                         Style="{StaticResource SearchBoxStyle}"
+                                         Height="32"/>
+                            </Grid>
+
+                            <!-- Material vía -->
+                            <Border Height="1" Background="#2C2C54" Margin="0,4,0,10"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="160"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Material"
+                                           Foreground="#AAAACC" FontSize="12"
+                                           VerticalAlignment="Center"/>
+                                <Button x:Name="BtnRoadMaterial" Grid.Column="1"
+                                        Content="Sin material"
+                                        Height="32"
+                                        HorizontalContentAlignment="Center"
+                                        Padding="10,0"
+                                        Click="BtnRoadMaterial_Click"
+                                        Style="{StaticResource BtnSecondary}"
+                                        Foreground="#AAAACC"/>
+                            </Grid>
+
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ══ ANDÉN IZQUIERDO ══ -->
+                    <Border Background="#1E1E42" CornerRadius="8"
+                            Padding="14,12" Margin="0,0,0,16">
+                        <StackPanel>
+
+                            <TextBlock Text="🚶  Andén Izquierdo"
+                                       Foreground="#68D391"
+                                       FontSize="12" FontWeight="Bold"
+                                       Margin="0,0,0,10"/>
+
+                            <CheckBox x:Name="ChkLeftSidewalk"
+                                      Content="Incluir andén izquierdo"
+                                      IsChecked="True"
+                                      Style="{StaticResource CheckBoxStyle}"
+                                      Margin="0,0,0,12"
+                                      Checked="ChkSidewalk_Changed"
+                                      Unchecked="ChkSidewalk_Changed"/>
+
+                            <StackPanel x:Name="PanelLeft">
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="130"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Ancho (m)"
+                                               Foreground="#AAAACC" FontSize="12"
+                                               VerticalAlignment="Center"/>
+                                    <TextBox x:Name="TxtLeftWidth" Grid.Column="1"
+                                             Text="1.5"
+                                             Style="{StaticResource SearchBoxStyle}"
+                                             Height="32"/>
+                                </Grid>
+
+                                <Border Height="1" Background="#2C2C54" Margin="0,4,0,10"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="160"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Material"
+                                               Foreground="#AAAACC" FontSize="12"
+                                               VerticalAlignment="Center"/>
+                                    <Button x:Name="BtnLeftMaterial" Grid.Column="1"
+                                            Content="Sin material"
+                                            Height="32"
+                                            HorizontalContentAlignment="Center"
+                                            Padding="10,0"
+                                            Click="BtnLeftMaterial_Click"
+                                            Style="{StaticResource BtnSecondary}"
+                                            Foreground="#AAAACC"/>
+                                </Grid>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ══ ANDÉN DERECHO ══ -->
+                    <Border Background="#1E1E42" CornerRadius="8"
+                            Padding="14,12" Margin="0,0,0,16">
+                        <StackPanel>
+
+                            <TextBlock Text="🚶  Andén Derecho"
+                                       Foreground="#68D391"
+                                       FontSize="12" FontWeight="Bold"
+                                       Margin="0,0,0,10"/>
+
+                            <CheckBox x:Name="ChkRightSidewalk"
+                                      Content="Incluir andén derecho"
+                                      IsChecked="True"
+                                      Style="{StaticResource CheckBoxStyle}"
+                                      Margin="0,0,0,12"
+                                      Checked="ChkSidewalk_Changed"
+                                      Unchecked="ChkSidewalk_Changed"/>
+
+                            <StackPanel x:Name="PanelRight">
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="130"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Ancho (m)"
+                                               Foreground="#AAAACC" FontSize="12"
+                                               VerticalAlignment="Center"/>
+                                    <TextBox x:Name="TxtRightWidth" Grid.Column="1"
+                                             Text="1.5"
+                                             Style="{StaticResource SearchBoxStyle}"
+                                             Height="32"/>
+                                </Grid>
+
+                                <Border Height="1" Background="#2C2C54" Margin="0,4,0,10"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="160"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Material"
+                                               Foreground="#AAAACC" FontSize="12"
+                                               VerticalAlignment="Center"/>
+                                    <Button x:Name="BtnRightMaterial" Grid.Column="1"
+                                            Content="Sin material"
+                                            Height="32"
+                                            HorizontalContentAlignment="Center"
+                                            Padding="10,0"
+                                            Click="BtnRightMaterial_Click"
+                                            Style="{StaticResource BtnSecondary}"
+                                            Foreground="#AAAACC"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Pendiente andenes — va aquí porque aplica a ambos -->
+                            <Border Height="1" Background="#2C2C54" Margin="0,12,0,10"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="130"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Pendiente andenes (%)"
+                                           Foreground="#AAAACC" FontSize="12"
+                                           VerticalAlignment="Center"/>
+                                <TextBox x:Name="TxtSidewalkSlope" Grid.Column="1"
+                                         Text="3.0"
+                                         Style="{StaticResource SearchBoxStyle}"
+                                         Height="32"/>
+                            </Grid>
+
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- ── FOOTER ── -->
+            <Border Grid.Row="3" Background="#23234A"
+                    CornerRadius="0,0,10,10" Padding="20,14">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Cancelar"
+                            Width="90" Height="36"
+                            Margin="0,0,10,0"
+                            Style="{StaticResource BtnReset}"
+                            Click="BtnCancel_Click"/>
+                    <Button Content="Crear Vía ▶"
+                            Width="120" Height="36"
+                            Style="{StaticResource BtnPrimary}"
+                            Click="BtnOk_Click"/>
+                </StackPanel>
+            </Border>
+
+        </Grid>
+    </Border>
 </Window>
