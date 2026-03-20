@@ -38,7 +38,7 @@
 	<!-- https://github.com/Nice3point/Revit.Build.Tasks -->
 	<PropertyGroup>
 		<IsRepackable>false</IsRepackable>
-		<DeployRevitAddin>false</DeployRevitAddin>
+		<DeployRevitAddin>true</DeployRevitAddin>
 	</PropertyGroup>
 
     <ItemGroup>
@@ -85,6 +85,7 @@
 		<PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
 		<PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.*" />
+        <PackageReference Include="Refractored.MvvmHelpers" Version="1.6.2" />
         <PackageReference Include="System.Text.Json" Version="10.0.1" />
     </ItemGroup>
 	<ItemGroup Condition="$(Configuration.Contains('R25')) OR $(Configuration.Contains('R26'))">
