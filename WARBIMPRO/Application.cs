@@ -66,8 +66,8 @@ namespace WARBIMPRO
 
             panelFamilys.AddPushButton<CmdBimFamilyCreator>("Creador de\nFamilias")
                .SetAvailabilityController<AvailabilityButton>()
-               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/creador20x20_dark.png")
-               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/creador20x20_light.png")
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/familia20x20_dark.png")
+               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/familia20x20_light.png")
                .SetLongDescription("Crea familias de Revit personalizadas de manera rápida y sencilla, permitiéndote definir parámetros, geometrías y comportamientos específicos para tus familias, facilitando la creación de elementos únicos y adaptados a las necesidades de tu proyecto.");
 
             var panelViews = Application.CreatePanel("VISTAS", "WARBIMPRO");
@@ -131,7 +131,7 @@ namespace WARBIMPRO
                 .SetLargeImage("/WARBIMPRO;component/Resources/Icons/topografia20x20_light.png")
                 .SetLongDescription("Realiza un análisis de triangulación de Delaunay en tu proyecto de Revit, permitiéndote generar una malla de triángulos a partir de puntos seleccionados para mejorar la visualización y el análisis topográfico en tu modelo.");
 
-            paneltopografia.AddPushButton<CmdCreateRoad>("Crear Carretera")
+            paneltopografia.AddPushButton<CmdCreateRoad>("Crear\n Carretera")
                 .SetAvailabilityController<AvailabilityButton>()
                 .SetLargeImage("/WARBIMPRO;component/Resources/Icons/road20x20_dark.png")
                 .SetLargeImage("/WARBIMPRO;component/Resources/Icons/road20x20_light.png")
