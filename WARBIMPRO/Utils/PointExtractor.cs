@@ -194,9 +194,11 @@ namespace WARBIMPRO.Utils
         public bool AllowReference(Reference r, XYZ p) => true;
     }
 
+#if REVIT2024_OR_GREATER
     public class ToposolidFilter : ISelectionFilter
     {
         public bool AllowElement(Element e) => e is Toposolid;
         public bool AllowReference(Reference r, XYZ p) => true;
     }
+#endif
 }

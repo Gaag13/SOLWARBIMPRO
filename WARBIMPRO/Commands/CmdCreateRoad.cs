@@ -10,7 +10,10 @@ using System.Windows.Threading;
 
 namespace WARBIMPRO.Commands
 {
-    [Transaction(TransactionMode.Manual)]
+
+#if REVIT2024_OR_GREATER
+ [Transaction(TransactionMode.Manual)]
+
     public class CmdCreateRoad : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
@@ -93,4 +96,5 @@ namespace WARBIMPRO.Commands
             }
         }
     }
+#endif
 }

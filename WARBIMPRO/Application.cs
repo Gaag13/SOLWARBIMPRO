@@ -123,7 +123,7 @@ namespace WARBIMPRO
                 .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Cantidades20x20_dark.png")
                 .SetLargeImage("/WARBIMPRO;component/Resources/Icons/Cantidades20x20_light.png")
                 .SetLongDescription("Genera un informe detallado de cantidades para tu proyecto, incluyendo materiales, áreas y volúmenes, con la posibilidad de exportar los datos a Excel para su análisis y presentación.");
-
+#if REVIT2024_OR_GREATER
             var paneltopografia = Application.CreatePanel("TOPOGRAFÍA", "WARBIMPRO");
             paneltopografia.AddPushButton<CmdTestDelaunay>("Toposolid")
                 .SetAvailabilityController<AvailabilityButton>()
@@ -131,13 +131,15 @@ namespace WARBIMPRO
                 .SetLargeImage("/WARBIMPRO;component/Resources/Icons/topografia20x20_light.png")
                 .SetLongDescription("Realiza un análisis de triangulación de Delaunay en tu proyecto de Revit, permitiéndote generar una malla de triángulos a partir de puntos seleccionados para mejorar la visualización y el análisis topográfico en tu modelo.");
 
+
+
             paneltopografia.AddPushButton<CmdCreateRoad>("Crear\n Carretera")
                 .SetAvailabilityController<AvailabilityButton>()
                 .SetLargeImage("/WARBIMPRO;component/Resources/Icons/road20x20_dark.png")
                 .SetLargeImage("/WARBIMPRO;component/Resources/Icons/road20x20_light.png")
                 .SetLongDescription("Crea una carretera en tu proyecto de Revit a partir de una ruta definida por puntos seleccionados, permitiéndote generar un modelo de carretera preciso y detallado para mejorar la planificación y el diseño de infraestructuras en tu proyecto.");
+#endif
 
-            
         }
     }
 }

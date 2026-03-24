@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using WARBIMPRO.Models;
 
+#if REVIT2024_OR_GREATER
+
 namespace WARBIMPRO.Services
 {
     public class RoadSectionService
@@ -16,6 +18,8 @@ namespace WARBIMPRO.Services
         {
             _doc = doc;
         }
+
+
 
         // onProgress es opcional — si no se pasa, funciona igual que antes
         public Result CreateRoadSubdivision(
@@ -106,6 +110,8 @@ namespace WARBIMPRO.Services
                         var editor = hostToposolid.GetSlabShapeEditor();
                         editor.Enable();
 
+#if !REVIT2025_OR_GREATER
+
                         var axisVerts = stations.Select(s => editor.DrawPoint(s.AxisPt)).ToList();
                         var leftRoadVerts = stations.Select(s => editor.DrawPoint(s.LeftRoadEdge)).ToList();
                         var rightRoadVerts = stations.Select(s => editor.DrawPoint(s.RightRoadEdge)).ToList();
@@ -155,6 +161,60 @@ namespace WARBIMPRO.Services
                             }
                             else editor.DrawSplitLine(rightRoadVerts[i], rightOutVerts[i]);
                         }
+#else
+
+                        var axisVerts = stations.Select(s => editor.AddPoint(s.AxisPt)).ToList();
+                        var leftRoadVerts = stations.Select(s => editor.AddPoint(s.LeftRoadEdge)).ToList();
+                        var rightRoadVerts = stations.Select(s => editor.AddPoint(s.RightRoadEdge)).ToList();
+                        var leftOutVerts = stations.Select(s => editor.AddPoint(s.LeftOutPt)).ToList();
+                        var rightOutVerts = stations.Select(s => editor.AddPoint(s.RightOutPt)).ToList();
+
+                        List<SlabShapeVertex> leftSwVerts = null;
+                        List<SlabShapeVertex> rightSwVerts = null;
+
+                        if (p.HasLeftSidewalk && stations.All(s => s.LeftSwEdge != null))
+                            leftSwVerts = stations.Select(s => editor.AddPoint(s.LeftSwEdge)).ToList();
+                        if (p.HasRightSidewalk && stations.All(s => s.RightSwEdge != null))
+                            rightSwVerts = stations.Select(s => editor.AddPoint(s.RightSwEdge)).ToList();
+
+                        // ── Fase 3: Split Lines (78 → 88%) ──────────────────
+                        onProgress?.Invoke(78, "Dibujando Split Lines longitudinales...");
+
+                        for (int i = 0; i < stations.Count - 1; i++)
+                        {
+                            editor.AddSplitLine(axisVerts[i], axisVerts[i + 1]);
+                            editor.AddSplitLine(leftRoadVerts[i], leftRoadVerts[i + 1]);
+                            editor.AddSplitLine(rightRoadVerts[i], rightRoadVerts[i + 1]);
+                            editor.AddSplitLine(leftOutVerts[i], leftOutVerts[i + 1]);
+                            editor.AddSplitLine(rightOutVerts[i], rightOutVerts[i + 1]);
+                            if (leftSwVerts != null) editor.AddSplitLine(leftSwVerts[i], leftSwVerts[i + 1]);
+                            if (rightSwVerts != null) editor.AddSplitLine(rightSwVerts[i], rightSwVerts[i + 1]);
+                        }
+
+                        onProgress?.Invoke(84, "Dibujando Split Lines transversales...");
+
+                        for (int i = 0; i < stations.Count; i++)
+                        {
+                            editor.AddSplitLine(leftRoadVerts[i], axisVerts[i]);
+                            editor.AddSplitLine(axisVerts[i], rightRoadVerts[i]);
+
+                            if (leftSwVerts != null)
+                            {
+                                editor.AddSplitLine(leftRoadVerts[i], leftSwVerts[i]);
+                                editor.AddSplitLine(leftSwVerts[i], leftOutVerts[i]);
+                            }
+                            else editor.AddSplitLine(leftRoadVerts[i], leftOutVerts[i]);
+
+                            if (rightSwVerts != null)
+                            {
+                                editor.AddSplitLine(rightRoadVerts[i], rightSwVerts[i]);
+                                editor.AddSplitLine(rightSwVerts[i], rightOutVerts[i]);
+                            }
+                            else editor.AddSplitLine(rightRoadVerts[i], rightOutVerts[i]);
+                        }
+
+#endif
+
 
                         // ── Fase 4: Subdivisiones (88 → 100%) ───────────────
                         onProgress?.Invoke(88, "Creando subdivisión de vía...");
@@ -213,7 +273,9 @@ namespace WARBIMPRO.Services
             }
         }
 
-        // ── BuildRealBorderLoop ──────────────────────────────────────────────
+
+
+                        // ── BuildRealBorderLoop ──────────────────────────────────────────────
 
         private CurveLoop BuildRealBorderLoop(List<XYZ> leftSide, List<XYZ> rightSide)
         {
@@ -365,3 +427,4 @@ namespace WARBIMPRO.Services
         }
     }
 }
+#endif

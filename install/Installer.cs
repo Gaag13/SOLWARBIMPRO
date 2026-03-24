@@ -4,10 +4,8 @@ using WixSharp;
 using WixSharp.CommonTasks;
 using WixSharp.Controls;
 using Assembly = System.Reflection.Assembly;
-
 const string outputName = "WARBIMPRO";
 const string projectName = "WARBIMPRO";
-
 var project = new Project
 {
     OutDir = "output",
@@ -25,13 +23,10 @@ var project = new Project
         ProductIcon = @"install\Resources\Icons\ShellIcon.ico"
     }
 };
-
 var wixEntities = Generator.GenerateWixEntities(args);
 project.RemoveDialogsBetween(NativeDialogs.WelcomeDlg, NativeDialogs.CustomizeDlg);
-
 BuildSingleUserMsi();
 BuildMultiUserUserMsi();
-
 void BuildSingleUserMsi()
 {
     project.InstallScope = InstallScope.perUser;
@@ -42,7 +37,6 @@ void BuildSingleUserMsi()
     ];
     project.BuildMsi();
 }
-
 void BuildMultiUserUserMsi()
 {
     project.InstallScope = InstallScope.perMachine;

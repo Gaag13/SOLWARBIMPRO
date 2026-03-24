@@ -4,8 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+
+#if REVIT2024_OR_GREATER
 namespace WARBIMPRO.Services
 {
+
+
+
     public class SurfaceCreationService
     {
         private readonly Document _doc;
@@ -54,7 +59,10 @@ namespace WARBIMPRO.Services
                             typeId,
                             levelId);
 
-                        // Agregar los puntos interiores con sus cotas
+
+#if !REVIT2025_OR_GREATER
+
+                         // Agregar los puntos interiores con sus cotas
                         // Esto es lo que controla la forma de la superficie
                         var editHandle = toposolid.GetSlabShapeEditor();
                         if (editHandle != null)
@@ -63,6 +71,17 @@ namespace WARBIMPRO.Services
                             foreach (var pt in points)
                                 editHandle.DrawPoint(pt);
                         }
+#else
+                        // Agregar los puntos interiores con sus cotas
+                        // Esto es lo que controla la forma de la superficie
+                        var editHandle = toposolid.GetSlabShapeEditor();
+                        if (editHandle != null)
+                        {
+                            editHandle.Enable();
+                            foreach (var pt in points)
+                                editHandle.AddPoint(pt);
+                        }
+#endif
 
                         trans.Commit();
                         message = $"Toposolid creado: {points.Count} puntos, {triangles.Count} triángulos Delaunay.";
@@ -137,6 +156,7 @@ namespace WARBIMPRO.Services
 
         private double Cross(XYZ o, XYZ a, XYZ b)
             => (a.X - o.X) * (b.Y - o.Y) - (a.Y - o.Y) * (b.X - o.X);
+#if REVIT2024_OR_GREATER
 
         private ElementId GetToposolidTypeId()
         {
@@ -150,7 +170,7 @@ namespace WARBIMPRO.Services
 
             return type.Id;
         }
-
+#endif
         private ElementId GetDefaultLevelId()
         {
             var level = new FilteredElementCollector(_doc)
@@ -166,3 +186,4 @@ namespace WARBIMPRO.Services
         }
     }
 }
+#endif
