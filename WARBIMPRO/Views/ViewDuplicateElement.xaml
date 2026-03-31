@@ -146,7 +146,7 @@
                                    Foreground="#3498db"
                                    FontWeight="Bold"
                                    Margin="0,0,0,6"/>
-                        <TextBlock Text="Base (b)"
+                        <TextBlock Text="Base (m)"
                                    Style="{StaticResource TextBlockStyle}"
                                    FontSize="12"/>
                         <TextBox Text="{Binding ParamValue1}"
@@ -154,7 +154,7 @@
                                  Height="34"
                                  FontSize="13"
                                  Margin="0,0,0,10"/>
-                        <TextBlock Text="Altura (h)"
+                        <TextBlock Text="Altura (m)"
                                    Style="{StaticResource TextBlockStyle}"
                                    FontSize="12"/>
                         <TextBox Text="{Binding ParamValue2}"
@@ -172,7 +172,7 @@
                                    Foreground="#3498db"
                                    FontWeight="Bold"
                                    Margin="0,0,0,6"/>
-                        <TextBlock Text="Ancho"
+                        <TextBlock Text="Ancho (m)"
                                    Style="{StaticResource TextBlockStyle}"
                                    FontSize="12"/>
                         <TextBox Text="{Binding ParamValue1}"
@@ -180,7 +180,7 @@
                                  Height="34"
                                  FontSize="13"
                                  Margin="0,0,0,10"/>
-                        <TextBlock Text="Largo"
+                        <TextBlock Text="Largo (m)"
                                    Style="{StaticResource TextBlockStyle}"
                                    FontSize="12"/>
                         <TextBox Text="{Binding ParamValue2}"
@@ -188,7 +188,7 @@
                                  Height="34"
                                  FontSize="13"
                                  Margin="0,0,0,10"/>
-                        <TextBlock Text="Espesor"
+                        <TextBlock Text="Espesor (m)"
                                    Style="{StaticResource TextBlockStyle}"
                                    FontSize="12"/>
                         <TextBox Text="{Binding ParamValue3}"

@@ -199,9 +199,14 @@ namespace WARBIMPRO.Services
 
         private static string? BuscarTemplate() => new[]
         {
-            @"C:\ProgramData\Autodesk\RVT 2024\Family Templates\Spanish\Metric Generic Model.rft",
-            @"C:\ProgramData\Autodesk\RVT 2024\Family Templates\English\Metric Generic Model.rft",
-            @"C:\ProgramData\Autodesk\RVT 2023\Family Templates\Spanish\Metric Generic Model.rft",
+                 @"C:\ProgramData\Autodesk\RVT 2022\Family Templates\English\Metric Generic Model.rft",
+                @"C:\ProgramData\Autodesk\RVT 2022\Family Templates\Spanish\Metric Generic Model.rft",
+                @"C:\ProgramData\Autodesk\RVT 2023\Family Templates\Spanish\Metric Generic Model.rft",
+                @"C:\ProgramData\Autodesk\RVT 2023\Family Templates\English\Metric Generic Model.rft",
+                @"C:\ProgramData\Autodesk\RVT 2024\Family Templates\Spanish\Metric Generic Model.rft",
+                @"C:\ProgramData\Autodesk\RVT 2024\Family Templates\English\Metric Generic Model.rft",
+                @"C:\ProgramData\Autodesk\RVT 2025\Family Templates\English\Metric Generic Model.rft",
+                @"C:\ProgramData\Autodesk\RVT 2025\Family Templates\Spanish\Metric Generic Model.rft",
         }.FirstOrDefault(File.Exists);
     }
 }

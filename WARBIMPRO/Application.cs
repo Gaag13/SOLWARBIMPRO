@@ -1,8 +1,9 @@
 ﻿using Nice3point.Revit.Toolkit.Decorators;
 using Nice3point.Revit.Toolkit.External;
 using WARBIMPRO.Commands;
-using WARBIMPRO.Models;
 using WARBIMPRO.DockablePanes;
+using WARBIMPRO.Models;
+using WARBIMPRO.Services;
 
 namespace WARBIMPRO
 {
@@ -12,9 +13,11 @@ namespace WARBIMPRO
     [UsedImplicitly]
     public class Application : ExternalApplication
     {
+       
         public override void OnStartup()
         {
-            CreateRibbon();            
+            CreateRibbon();
+
             DockablePaneProvider.Register(Application, new Guid("0525d7a0-5b14-462b-aa81-1198eb12b387"), "Family Browser")
                 .SetConfiguration(data => {
 
@@ -83,6 +86,7 @@ namespace WARBIMPRO
 
             panelViews.AddPushButton<CmdDuplicateElement>("Duplicar\nElemento EST")
                .SetAvailabilityController<AvailabilityButton>()
+               //.SetAvailabilityController<AvailabilityStructuralElements>()
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/duplicate20x20_dark.png")
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/duplicate20x20_light.png")
                .SetLongDescription("Duplica elementos estructurales en tu proyecto de Revit de manera rápida y sencilla, permitiéndote seleccionar un elemento estructural existente y crear una copia exacta en la misma ubicación o en " +
@@ -132,13 +136,15 @@ namespace WARBIMPRO
                 .SetLongDescription("Realiza un análisis de triangulación de Delaunay en tu proyecto de Revit, permitiéndote generar una malla de triángulos a partir de puntos seleccionados para mejorar la visualización y el análisis topográfico en tu modelo.");
 
 
-
             paneltopografia.AddPushButton<CmdCreateRoad>("Crear\n Carretera")
                 .SetAvailabilityController<AvailabilityButton>()
                 .SetLargeImage("/WARBIMPRO;component/Resources/Icons/road20x20_dark.png")
                 .SetLargeImage("/WARBIMPRO;component/Resources/Icons/road20x20_light.png")
                 .SetLongDescription("Crea una carretera en tu proyecto de Revit a partir de una ruta definida por puntos seleccionados, permitiéndote generar un modelo de carretera preciso y detallado para mejorar la planificación y el diseño de infraestructuras en tu proyecto.");
 #endif
+
+            
+
 
 // se modifico para revit 2023 en adelante
 
