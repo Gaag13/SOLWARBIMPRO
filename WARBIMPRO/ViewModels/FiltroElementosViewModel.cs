@@ -154,6 +154,8 @@ namespace WARBIMPRO.ViewModels
         public ICommand SetPresetCommand { get; }
         public ICommand CloseCommand { get; }
         public ICommand SetTabCommand { get; }
+        public ICommand CreateFilterCommand { get; }
+        public ICommand CreateTemplateCommand { get; }
 
         public Action CloseAction { get; set; }
 
@@ -169,6 +171,8 @@ namespace WARBIMPRO.ViewModels
             SetPresetCommand = new RelayCommand(param => SetPresetColor(param as string));
             CloseCommand = new RelayCommand(_ => CloseAction?.Invoke());
             SetTabCommand = new RelayCommand(param => { if (param is string tab) ActiveTab = tab; });
+            CreateFilterCommand = new RelayCommand(_ => ExecuteCreateFilter());
+            CreateTemplateCommand = new RelayCommand(_ => ExecuteCreateTemplate());
 
             LoadData();
         }
@@ -274,8 +278,51 @@ namespace WARBIMPRO.ViewModels
             catch (Exception ex) { StatusText = $"✗ Error: {ex.Message}"; }
         }
 
-        // ─── Helpers ──────────────────────────────────────────────────────────
+        private void ExecuteCreateFilter()
+        {
+            try
+            {
+                var selCats = Categories.Where(c => c.IsSelected).ToList();
+                var selLevels = Levels.Where(l => l.IsSelected).ToList();
+                var selTypes = AvailableTypes.Where(t => t.IsSelected).ToList();
 
+                if (!selCats.Any())
+                {
+                    StatusText = "⚠ Selecciona al menos una categoría";
+                    return;
+                }
+
+                var created = _service.CreateViewFilters(
+                    selCats, selLevels, selTypes.Any() ? selTypes : null,
+                    IsAllModelMode, SelectedColor, Opacity);
+
+                StatusText = $"⊞ {created.Count} filtro(s) creado(s) en la vista";
+            }
+            catch (Exception ex) { StatusText = $"✗ Error: {ex.Message}"; }
+        }
+
+        private void ExecuteCreateTemplate()
+        {
+            try
+            {
+                var selCats = Categories.Where(c => c.IsSelected).ToList();
+                if (!selCats.Any())
+                {
+                    StatusText = "⚠ Crea filtros primero antes de generar el template";
+                    return;
+                }
+
+                // Nombre automático basado en la selección
+                var catStr = string.Join("_", selCats.Take(2).Select(c => c.Name));
+                var templateName = $"WBP_Template_{catStr}";
+
+                var finalName = _service.CreateViewTemplate(templateName);
+                StatusText = $"✓ ViewTemplate '{finalName}' creado";
+            }
+            catch (Exception ex) { StatusText = $"✗ Error: {ex.Message}"; }
+        }
+
+        // ─── Helpers ──────────────────────────────────────────────────────────
         private List<Autodesk.Revit.DB.ElementId> GetCurrentElementIds()
         {
             var selCats = Categories.Where(c => c.IsSelected).ToList();
@@ -290,6 +337,7 @@ namespace WARBIMPRO.ViewModels
                 IsAllModelMode,
                 selTypeIds.Any() ? selTypeIds : null);
         }
+
 
         private void UpdateStatus()
         {

@@ -479,26 +479,109 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
+
+                <!-- Status -->
                 <Border Grid.Column="0" CornerRadius="20" Background="#2C2C54"
                         BorderBrush="#4B4B7A" BorderThickness="1" Padding="12,5" Margin="0,0,8,0">
                     <TextBlock Text="{Binding StatusText}" Foreground="#7A7AAA"
                                FontSize="11" FontFamily="Consolas"
                                TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
                 </Border>
-                <Button Grid.Column="1" Margin="0,0,6,0" Style="{StaticResource BtnReset}" Command="{Binding ResetCommand}">
+
+                <!-- Reset -->
+                <Button Grid.Column="1" Margin="0,0,6,0"
+                        Style="{StaticResource BtnReset}" Command="{Binding ResetCommand}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="↺" FontSize="13" Margin="0,0,5,0"/>
                         <TextBlock Text="Reset"/>
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="2" Margin="0,0,6,0" Style="{StaticResource BtnSecondary}" Command="{Binding IsolateCommand}">
+
+                <!-- Aislar -->
+                <Button Grid.Column="2" Margin="0,0,6,0"
+                        Style="{StaticResource BtnSecondary}" Command="{Binding IsolateCommand}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="⬡" FontSize="13" Margin="0,0,5,0"/>
                         <TextBlock Text="Aislar"/>
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="3" Style="{StaticResource BtnPrimary}" Command="{Binding ApplyColorCommand}">
+
+                <!-- Crear Filtro Vista -->
+                <Button Grid.Column="3" Margin="0,0,6,0"
+                        Command="{Binding CreateFilterCommand}">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Foreground"  Value="#A855F7"/>
+                            <Setter Property="FontWeight"  Value="Bold"/>
+                            <Setter Property="FontSize"    Value="12"/>
+                            <Setter Property="Cursor"      Value="Hand"/>
+                            <Setter Property="Padding"     Value="14,8"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="Bd" CornerRadius="5" Background="#2C2C54"
+                                                BorderBrush="#6A3A9A" BorderThickness="1"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bd" Property="BorderBrush" Value="#A855F7"/>
+                                                <Setter TargetName="Bd" Property="Background"  Value="#2A1A3A"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="⊞" FontSize="13" Margin="0,0,5,0"/>
+                        <TextBlock Text="Crear Filtro"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- Crear View Template -->
+                <Button Grid.Column="4" Margin="0,0,6,0"
+                        Command="{Binding CreateTemplateCommand}">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Foreground"  Value="#22C55E"/>
+                            <Setter Property="FontWeight"  Value="Bold"/>
+                            <Setter Property="FontSize"    Value="12"/>
+                            <Setter Property="Cursor"      Value="Hand"/>
+                            <Setter Property="Padding"     Value="14,8"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="Bd" CornerRadius="5" Background="#2C2C54"
+                                                BorderBrush="#1A5A2A" BorderThickness="1"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bd" Property="BorderBrush" Value="#22C55E"/>
+                                                <Setter TargetName="Bd" Property="Background"  Value="#0E2A18"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="📋" FontSize="11" Margin="0,0,5,0"/>
+                        <TextBlock Text="View Template"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- Aplicar Color -->
+                <Button Grid.Column="5"
+                        Style="{StaticResource BtnPrimary}" Command="{Binding ApplyColorCommand}">
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Width="9" Height="9" Margin="0,0,7,0">
                             <Ellipse.Fill>

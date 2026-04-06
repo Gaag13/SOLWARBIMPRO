@@ -284,5 +284,238 @@ namespace WARBIMPRO.Services
 
             return collector.Count();
         }
+        // ─── Crear filtros de vista ──────────────────────────────────────────
+        // Crea un ParameterFilterElement por cada combinación categoría+tipo+nivel
+        // y los asigna a la vista activa con el color elegido.
+        // Devuelve la lista de nombres de filtros creados.
+        public List<string> CreateViewFilters(
+            IEnumerable<CategoryItem> selectedCategories,
+            IEnumerable<LevelItem> selectedLevels,
+            IEnumerable<TypeItem> selectedTypes,
+            bool allModel,
+            System.Windows.Media.Color wpfColor,
+            int opacityPercent)
+        {
+            var view = _uiApp.ActiveUIDocument.ActiveView;
+            var revitColor = new Autodesk.Revit.DB.Color(wpfColor.R, wpfColor.G, wpfColor.B);
+            int transparency = 100 - opacityPercent;
+            var solidId = GetSolidFillPatternId();
+
+            var cats = selectedCategories.ToList();
+            var levels = selectedLevels.ToList();
+            var types = selectedTypes?.ToList() ?? new List<TypeItem>();
+            bool hasTypes = types.Any();
+            bool hasLevels = !allModel && levels.Any();
+
+            // Construir OverrideGraphicSettings del color
+            var ogs = BuildOgs(revitColor, solidId, transparency);
+
+            var createdNames = new List<string>();
+
+            using var tx = new Transaction(_doc, "Crear Filtros Vista - WARBIMPRO");
+            tx.Start();
+
+            if (hasTypes)
+            {
+                // Un filtro por cada tipo (y opcionalmente por nivel)
+                foreach (var type in types)
+                {
+                    foreach (var cat in cats)
+                    {
+                        var catIds = new List<ElementId>
+                            { Category.GetCategory(_doc, cat.BuiltInCategory).Id };
+
+                        var rules = new List<FilterRule>();
+
+                        // Regla por nombre de tipo
+                        rules.Add(ParameterFilterRuleFactory.CreateEqualsRule(
+                            new ElementId(BuiltInParameter.ALL_MODEL_TYPE_NAME),
+                            type.Name, false));
+
+                        // Regla por nivel (si aplica)
+                        if (hasLevels)
+                        {
+                            foreach (var level in levels)
+                            {
+#if REVIT2024_OR_GREATER
+                                var lvlId = new ElementId(long.Parse(level.Id));
+#else
+                                var lvlId = new ElementId(int.Parse(level.Id));
+#endif
+                                var levelName = _doc.GetElement(lvlId)?.Name ?? level.Name;
+                                var filterName = SanitizeName(
+                                    $"WBP_{cat.Name}_{type.Name}_{levelName}");
+
+                                var levelRules = new List<FilterRule>(rules)
+                                {
+                                    ParameterFilterRuleFactory.CreateEqualsRule(
+                                        new ElementId(BuiltInParameter.SCHEDULE_LEVEL_PARAM),
+                                        lvlId)
+                                };
+
+                                // Intentar con ReferenceLevel si SCHEDULE_LEVEL no aplica
+                                var pfe = GetOrCreateFilter(filterName, catIds,
+                                    BuildLogicalAnd(levelRules));
+
+                                ApplyFilterToView(view, pfe, ogs);
+                                createdNames.Add(filterName);
+                            }
+                        }
+                        else
+                        {
+                            // Sin filtro de nivel
+                            var filterName = SanitizeName($"WBP_{cat.Name}_{type.Name}");
+                            var pfe = GetOrCreateFilter(filterName, catIds,
+                                BuildLogicalAnd(rules));
+                            ApplyFilterToView(view, pfe, ogs);
+                            createdNames.Add(filterName);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Sin tipos seleccionados → un filtro por categoría (y nivel si aplica)
+                foreach (var cat in cats)
+                {
+                    var catIds = new List<ElementId>
+                        { Category.GetCategory(_doc, cat.BuiltInCategory).Id };
+
+                    if (hasLevels)
+                    {
+                        foreach (var level in levels)
+                        {
+#if REVIT2024_OR_GREATER
+                            var lvlId = new ElementId(long.Parse(level.Id));
+#else
+                            var lvlId = new ElementId(int.Parse(level.Id));
+#endif
+                            var levelName = _doc.GetElement(lvlId)?.Name ?? level.Name;
+                            var filterName = SanitizeName($"WBP_{cat.Name}_{levelName}");
+
+                            var rule = ParameterFilterRuleFactory.CreateEqualsRule(
+                                new ElementId(BuiltInParameter.SCHEDULE_LEVEL_PARAM), lvlId);
+
+                            var pfe = GetOrCreateFilter(filterName, catIds,
+                                new ElementParameterFilter(rule));
+                            ApplyFilterToView(view, pfe, ogs);
+                            createdNames.Add(filterName);
+                        }
+                    }
+                    else
+                    {
+                        // Solo categoría, sin reglas de parámetro
+                        var filterName = SanitizeName($"WBP_{cat.Name}_Todo");
+                        var pfe = GetOrCreateFilterNoRule(filterName, catIds);
+                        ApplyFilterToView(view, pfe, ogs);
+                        createdNames.Add(filterName);
+                    }
+                }
+            }
+
+            tx.Commit();
+            return createdNames;
+        }
+
+        // ─── Crear ViewTemplate desde la vista activa ────────────────────────
+        // Duplica la vista activa como ViewTemplate con los filtros ya aplicados.
+        public string CreateViewTemplate(string templateName)
+        {
+            var view = _uiApp.ActiveUIDocument.ActiveView;
+            var safeName = SanitizeName(templateName);
+
+            using var tx = new Transaction(_doc, "Crear ViewTemplate - WARBIMPRO");
+            tx.Start();
+
+            // Duplicar la vista
+            var newViewId = view.Duplicate(ViewDuplicateOption.Duplicate);
+            var newView = _doc.GetElement(newViewId) as View;
+
+            // Asegurarse de que el nombre sea único
+            string finalName = safeName;
+            int suffix = 1;
+            while (new FilteredElementCollector(_doc)
+                       .OfClass(typeof(View))
+                       .Cast<View>()
+                       .Any(v => v.IsTemplate && v.Name == finalName))
+            {
+                finalName = $"{safeName}_{suffix++}";
+            }
+
+            newView.Name = finalName;
+            //newView.IsTemplate = true;
+
+            tx.Commit();
+            return finalName;
+        }
+
+        // ─── Helpers privados ────────────────────────────────────────────────
+        private OverrideGraphicSettings BuildOgs(
+            Autodesk.Revit.DB.Color color, ElementId solidId, int transparency)
+        {
+            var ogs = new OverrideGraphicSettings();
+            ogs.SetSurfaceForegroundPatternColor(color); ogs.SetSurfaceForegroundPatternId(solidId); ogs.SetSurfaceForegroundPatternVisible(true);
+            ogs.SetSurfaceBackgroundPatternColor(color); ogs.SetSurfaceBackgroundPatternId(solidId); ogs.SetSurfaceBackgroundPatternVisible(true);
+            ogs.SetCutForegroundPatternColor(color); ogs.SetCutForegroundPatternId(solidId); ogs.SetCutForegroundPatternVisible(true);
+            ogs.SetCutBackgroundPatternColor(color); ogs.SetCutBackgroundPatternId(solidId); ogs.SetCutBackgroundPatternVisible(true);
+            ogs.SetProjectionLineColor(color);
+            ogs.SetCutLineColor(color);
+            ogs.SetSurfaceTransparency(transparency);
+            return ogs;
+        }
+
+        private ElementFilter BuildLogicalAnd(List<FilterRule> rules)
+        {
+            if (rules.Count == 1)
+                return new ElementParameterFilter(rules[0]);
+            return new LogicalAndFilter(
+                rules.Select(r => (ElementFilter)new ElementParameterFilter(r)).ToList());
+        }
+
+        private ParameterFilterElement GetOrCreateFilter(
+            string name, List<ElementId> catIds, ElementFilter filter)
+        {
+            var existing = new FilteredElementCollector(_doc)
+                .OfClass(typeof(ParameterFilterElement))
+                .Cast<ParameterFilterElement>()
+                .FirstOrDefault(f => f.Name == name);
+
+            if (existing != null)
+            {
+                existing.SetElementFilter(filter);
+                return existing;
+            }
+            return ParameterFilterElement.Create(_doc, name, catIds, filter);
+        }
+
+        private ParameterFilterElement GetOrCreateFilterNoRule(
+            string name, List<ElementId> catIds)
+        {
+            var existing = new FilteredElementCollector(_doc)
+                .OfClass(typeof(ParameterFilterElement))
+                .Cast<ParameterFilterElement>()
+                .FirstOrDefault(f => f.Name == name);
+
+            if (existing != null) return existing;
+            return ParameterFilterElement.Create(_doc, name, catIds);
+        }
+
+        private static void ApplyFilterToView(
+            View view, ParameterFilterElement pfe, OverrideGraphicSettings ogs)
+        {
+            if (!view.GetFilters().Contains(pfe.Id))
+                view.AddFilter(pfe.Id);
+            view.SetFilterOverrides(pfe.Id, ogs);
+            view.SetFilterVisibility(pfe.Id, true);
+        }
+
+        private static string SanitizeName(string name)
+        {
+            // Revit no permite estos caracteres en nombres de filtro
+            var invalid = new[] { '\\', ':', '{', '}', '[', ']', '|', ';', '<', '>', '?', '`', '~' };
+            foreach (var c in invalid)
+                name = name.Replace(c, '_');
+            return name.Length > 100 ? name.Substring(0, 100) : name;
+        }
     }
 }
