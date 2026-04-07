@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using Nice3point.Revit.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
-using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using WARBIMPRO.Models;
 
 namespace WARBIMPRO.Services
@@ -268,6 +269,32 @@ namespace WARBIMPRO.Services
                 var emptyOgs = new OverrideGraphicSettings();
                 foreach (var el in collector)
                     view.SetElementOverrides(el.Id, emptyOgs);
+
+                if(view.ViewTemplateId != ElementId.InvalidElementId)
+                {
+                    var template = _doc.GetElement(view.ViewTemplateId) as View;
+
+                    if (template == null)
+                    {
+                        var filters = template.GetFilters();
+                        foreach (var fId in filters)
+                        {
+                            template.RemoveFilter(fId);
+                        }
+                    }                   
+                }
+                else                
+                {
+                    // Si la vista no tiene template, también limpiar filtros de vista
+                    var filters = view.GetFilters();
+                    foreach (var fId in filters)
+                    {
+                        view.RemoveFilter(fId);
+                    }
+                }
+
+
+
                 tx.Commit();
             }
         }
@@ -330,7 +357,7 @@ namespace WARBIMPRO.Services
                         // Regla por nombre de tipo
                         rules.Add(ParameterFilterRuleFactory.CreateEqualsRule(
                             new ElementId(BuiltInParameter.ALL_MODEL_TYPE_NAME),
-                            type.Name, false));
+                            type.Name));
 
                         // Regla por nivel (si aplica)
                         if (hasLevels)
@@ -350,7 +377,13 @@ namespace WARBIMPRO.Services
                                 {
                                     ParameterFilterRuleFactory.CreateEqualsRule(
                                         new ElementId(BuiltInParameter.SCHEDULE_LEVEL_PARAM),
-                                        lvlId)
+                                        lvlId),
+                                    ParameterFilterRuleFactory.CreateEqualsRule(
+                                        new ElementId(BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM),
+                                        lvlId),
+                                    ParameterFilterRuleFactory.CreateEqualsRule(
+                                        new ElementId(BuiltInParameter.FAMILY_BASE_LEVEL_PARAM),
+                                        lvlId),
                                 };
 
                                 // Intentar con ReferenceLevel si SCHEDULE_LEVEL no aplica
@@ -395,6 +428,7 @@ namespace WARBIMPRO.Services
 
                             var rule = ParameterFilterRuleFactory.CreateEqualsRule(
                                 new ElementId(BuiltInParameter.SCHEDULE_LEVEL_PARAM), lvlId);
+                           
 
                             var pfe = GetOrCreateFilter(filterName, catIds,
                                 new ElementParameterFilter(rule));
@@ -417,20 +451,17 @@ namespace WARBIMPRO.Services
             return createdNames;
         }
 
-        // ─── Crear ViewTemplate desde la vista activa ────────────────────────
-        // Duplica la vista activa como ViewTemplate con los filtros ya aplicados.
+       
+
         public string CreateViewTemplate(string templateName)
         {
             var view = _uiApp.ActiveUIDocument.ActiveView;
             var safeName = SanitizeName(templateName);
-
             using var tx = new Transaction(_doc, "Crear ViewTemplate - WARBIMPRO");
             tx.Start();
-
             // Duplicar la vista
             var newViewId = view.Duplicate(ViewDuplicateOption.Duplicate);
             var newView = _doc.GetElement(newViewId) as View;
-
             // Asegurarse de que el nombre sea único
             string finalName = safeName;
             int suffix = 1;
@@ -441,13 +472,17 @@ namespace WARBIMPRO.Services
             {
                 finalName = $"{safeName}_{suffix++}";
             }
+            // ✅ Así se crea un ViewTemplate en Revit API
+            var templateId = view.CreateViewTemplate();
+            var template = _doc.GetElement(templateId.Id) as View;
+            template.Name = finalName;
 
-            newView.Name = finalName;
-            //newView.IsTemplate = true;
+            newView.ViewTemplateId = template.Id; 
 
             tx.Commit();
             return finalName;
         }
+
 
         // ─── Helpers privados ────────────────────────────────────────────────
         private OverrideGraphicSettings BuildOgs(
