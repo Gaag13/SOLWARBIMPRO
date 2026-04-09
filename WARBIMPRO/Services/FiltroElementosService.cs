@@ -378,12 +378,7 @@ namespace WARBIMPRO.Services
                                     ParameterFilterRuleFactory.CreateEqualsRule(
                                         new ElementId(BuiltInParameter.SCHEDULE_LEVEL_PARAM),
                                         lvlId),
-                                    ParameterFilterRuleFactory.CreateEqualsRule(
-                                        new ElementId(BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM),
-                                        lvlId),
-                                    ParameterFilterRuleFactory.CreateEqualsRule(
-                                        new ElementId(BuiltInParameter.FAMILY_BASE_LEVEL_PARAM),
-                                        lvlId),
+                                    
                                 };
 
                                 // Intentar con ReferenceLevel si SCHEDULE_LEVEL no aplica
