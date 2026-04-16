@@ -88,6 +88,7 @@
         <PackageReference Include="ClosedXML" Version="0.95.4" />
         <PackageReference Include="dotenv.net" Version="4.0.0" />
         <PackageReference Include="FireSharp" Version="2.0.4" />
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
         <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="3.0.1" />
 		<PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*" />
