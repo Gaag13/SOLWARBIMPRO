@@ -336,91 +336,67 @@ namespace WARBIMPRO.Services
                 {
                     Category category = Category.GetCategory(_doc, cat.BuiltInCategory);
                     if (category == null) continue;
+
                     var catIds = new List<ElementId> { category.Id };
 
-                    // ⭐ CORRECCIÓN CLAVE: Obtener el parámetro específico para ESTA categoría
-                    ElementId levelParamId = GetValidLevelParameterId(_doc, cat.BuiltInCategory);
+                    // 🔥 Parámetro correcto por categoría (ya lo tienes bien)
+                    ElementId levelParamId = GetFilterableLevelParameter(cat.BuiltInCategory);
 
                     foreach (var type in types)
                     {
                         if (type == null) continue;
 
-                        // Regla de tipo (siempre funciona)
-                        FilterRule typeRule = ParameterFilterRuleFactory.CreateEqualsRule(
-                            new ElementId(BuiltInParameter.ALL_MODEL_TYPE_NAME), type.Name);
+                        // 🔹 REGLA TIPO (string)
+                        var typeProvider = new ParameterValueProvider(
+                            new ElementId(BuiltInParameter.ALL_MODEL_TYPE_NAME));
 
-                      
-                            // Caso: Tipo + Nivel
-                            foreach (var level in levels)
+                        var typeRule = new FilterStringRule(
+                            typeProvider,
+                            new FilterStringEquals(),
+                            type.Name);
+
+                        var typeFilter = new ElementParameterFilter(typeRule);
+
+                        foreach (var level in levels)
+                        {
+                            if (level == null) continue;
+
+                            ElementId lvlId = GetIdFromString(level.Id);
+                            if (lvlId == ElementId.InvalidElementId) continue;
+
+                            var filterName = SanitizeName($"WBP_{cat.Name}_{type.Name}_{level.Name}");
+
+                            try
                             {
-                                if (level == null) continue;
-                                ElementId lvlId = GetIdFromString(level.Id);
-                                if (lvlId == ElementId.InvalidElementId) continue;
+                                // 🔹 REGLA NIVEL (ElementId)
+                                var levelProvider = new ParameterValueProvider(levelParamId);
 
-                              string prueba = string.Join(", ", levels.Select(l => l.Name));
+                                var levelRule = new FilterElementIdRule(
+                                    levelProvider,
+                                    new FilterNumericEquals(),
+                                    lvlId);
 
-                                 TaskDialog.Show("Debug - WARBIMPRO", $"Nivel inválido: {lvlId}");
+                                var levelFilter = new ElementParameterFilter(levelRule);
 
-                                var filterName = SanitizeName($"WBP_{cat.Name}_{type.Name}_{level.Name}");
+                                // 🔥 AQUÍ ESTÁ LA MAGIA (lo que te faltaba)
+                                var andFilter = new LogicalAndFilter(typeFilter, levelFilter);
 
-                                try
+                                var pfe = GetOrCreateFilter(filterName, catIds, andFilter);
+
+                                if (pfe != null)
                                 {
-                                    // ⭐ REGLA DE NIVEL: Usando el parámetro específico de la categoría
-                                    FilterRule levelRule = ParameterFilterRuleFactory.CreateEqualsRule(
-                                        levelParamId, lvlId);
-
-                                    var rules = new List<FilterRule> { typeRule, levelRule };
-                                    //var elementFilter = new ElementParameterFilter(rules);
-                                    
-                                    
-
-
-                                    var pfe = GetOrCreateFilter(filterName, catIds, BuildLogicalAnd(rules));
-
-                                    if (pfe != null)
-                                    {
-                                        ApplyFilterToView(view, pfe, ogs);
-                                        createdNames.Add(filterName);
-                                        reporte.AppendLine($"✓ {filterName}");
-                                    }
-                            }
-                                catch (Exception ex)
-                                {
-                                    totalFallidos++;
-                                    reporte.AppendLine($"✗ {filterName}: {ex.Message}");
+                                    ApplyFilterToView(view, pfe, ogs);
+                                    createdNames.Add(filterName);
+                                    reporte.AppendLine($"✓ {filterName}");
+                                    totalCreados++;
                                 }
                             }
-                        
-                        //else if (hasLevels && levelParamId == null)
-                        //{
-                        //    // Advertencia: categoría no soporta filtro por nivel
-                        //    reporte.AppendLine($"⚠ {cat.Name} no soporta filtro por nivel - se omitió");
-
-                        //    // Crear solo filtro por tipo
-                        //    var filterName = SanitizeName($"WBP_{cat.Name}_{type.Name}");
-                        //    var rules = new List<FilterRule> { typeRule };
-                        //    var pfe = GetOrCreateFilter(filterName, catIds, BuildLogicalAnd(rules));
-                        //    if (pfe != null)
-                        //    {
-                        //        ApplyFilterToView(view, pfe, ogs);
-                        //        createdNames.Add(filterName);
-                        //        totalCreados++;
-                        //    }
-                        //}
-                        //else
-                        //{
-                        //    // Caso: Solo tipo (sin nivel)
-                        //    var filterName = SanitizeName($"WBP_{cat.Name}_{type.Name}");
-                        //    var rules = new List<FilterRule> { typeRule };
-                        //    var pfe = GetOrCreateFilter(filterName, catIds, BuildLogicalAnd(rules));
-                        //    if (pfe != null)
-                        //    {
-                        //        ApplyFilterToView(view, pfe, ogs);
-                        //        createdNames.Add(filterName);
-                        //        totalCreados++;
-                        //        reporte.AppendLine($"✓ {filterName} (solo tipo)");
-                        //    }
-                        //}
+                            catch (Exception ex)
+                            {
+                                totalFallidos++;
+                                reporte.AppendLine($"✗ {filterName}: {ex.Message}");
+                            }
+                        }
                     }
                 }
 
@@ -429,55 +405,55 @@ namespace WARBIMPRO.Services
                     $"Fallidos: {totalFallidos}\n\n" +
                     $"Detalles:\n{reporte.ToString()}");
             }
-            //else
-            //{
-            //    // Sin tipos seleccionados → un filtro por categoría + nivel
-            //    foreach (var cat in cats)
-            //    {
-            //        Category category = Category.GetCategory(_doc, cat.BuiltInCategory);
-            //        if (category == null) continue;
-            //        var catIds = new List<ElementId> { category.Id };
+            else
+            {
+                // Sin tipos seleccionados → un filtro por categoría + nivel
+                foreach (var cat in cats)
+                {
+                    Category category = Category.GetCategory(_doc, cat.BuiltInCategory);
+                    if (category == null) continue;
+                    var catIds = new List<ElementId> { category.Id };
 
-            //        if (hasLevels)
-            //        {
-            //            // ⭐ Obtener parámetro específico para esta categoría
-            //            ElementId levelParamId = GetValidLevelParameterId(_doc, cat.BuiltInCategory);
+                    if (hasLevels)
+                    {
+                        // ⭐ Obtener parámetro específico para esta categoría
+                        ElementId levelParamId = GetFilterableLevelParameter( cat.BuiltInCategory);
 
-            //            if (levelParamId != null)
-            //            {
-            //                foreach (var level in levels)
-            //                {
-            //                    var lvlId = GetIdFromString(level.Id);
-            //                    if (lvlId == ElementId.InvalidElementId) continue;
+                        if (levelParamId != null)
+                        {
+                            foreach (var level in levels)
+                            {
+                                var lvlId = GetIdFromString(level.Id);
+                                if (lvlId == ElementId.InvalidElementId) continue;
 
-            //                    var levelName = _doc.GetElement(lvlId)?.Name ?? level.Name;
-            //                    var filterName = SanitizeName($"WBP_{cat.Name}_{levelName}");
+                                var levelName = _doc.GetElement(lvlId)?.Name ?? level.Name;
+                                var filterName = SanitizeName($"WBP_{cat.Name}_{levelName}");
 
-            //                    var rule = ParameterFilterRuleFactory.CreateEqualsRule(levelParamId, lvlId);
-            //                    var pfe = GetOrCreateFilter(filterName, catIds,
-            //                        new ElementParameterFilter(rule));
+                                var rule = ParameterFilterRuleFactory.CreateEqualsRule(levelParamId, lvlId);
+                                var pfe = GetOrCreateFilter(filterName, catIds,
+                                    new ElementParameterFilter(rule));
 
-            //                    ApplyFilterToView(view, pfe, ogs);
-            //                    createdNames.Add(filterName);
-            //                }
-            //            }
-            //            else
-            //            {
-            //                // Categoría no soporta filtro por nivel
-            //                TaskDialog.Show("Advertencia",
-            //                    $"La categoría {cat.Name} no soporta filtros por nivel en Revit");
-            //            }
-            //        }
-            //        else if (allModel)
-            //        {
-            //            // Solo categoría, sin reglas de parámetro (todo el modelo)
-            //            var filterName = SanitizeName($"WBP_{cat.Name}_Todo");
-            //            var pfe = GetOrCreateFilterNoRule(filterName, catIds);
-            //            ApplyFilterToView(view, pfe, ogs);
-            //            createdNames.Add(filterName);
-            //        }
-            //    }
-            //}
+                                ApplyFilterToView(view, pfe, ogs);
+                                createdNames.Add(filterName);
+                            }
+                        }
+                        else
+                        {
+                            // Categoría no soporta filtro por nivel
+                            TaskDialog.Show("Advertencia",
+                                $"La categoría {cat.Name} no soporta filtros por nivel en Revit");
+                        }
+                    }
+                    else if (allModel)
+                    {
+                        // Solo categoría, sin reglas de parámetro (todo el modelo)
+                        var filterName = SanitizeName($"WBP_{cat.Name}_Todo");
+                        var pfe = GetOrCreateFilterNoRule(filterName, catIds);
+                        ApplyFilterToView(view, pfe, ogs);
+                        createdNames.Add(filterName);
+                    }
+                }
+            }
 
             tx.Commit();
             return createdNames;
@@ -486,139 +462,12 @@ namespace WARBIMPRO.Services
         /// Obtiene el BuiltInParameter de nivel correcto y filtrable para una categoría específica.
         /// Este método usa un mapeo categoría-específico en lugar de una prioridad genérica.
         /// </summary>
-        private ElementId GetValidLevelParameterId(Document doc, BuiltInCategory category)
-        {
-            BuiltInParameter levelParam;
-
-            // Mapeo específico por categoría (basado en lo que Revit acepta manualmente)
-            switch (category)
-            {
-                // ========== ESTRUCTURA ==========
-                case BuiltInCategory.OST_StructuralColumns:
-                    levelParam = BuiltInParameter.FAMILY_BASE_LEVEL_PARAM;
-                    break;
-
-                case BuiltInCategory.OST_StructuralFraming:
-                    levelParam = BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM;
-                    break;
-
-                case BuiltInCategory.OST_StructuralFoundation:
-                    levelParam = BuiltInParameter.LEVEL_PARAM;
-                    break;
-
-                //case BuiltInCategory.OST_Rebar:
-                //    levelParam = BuiltInParameter.REBAR_ELEM_SCHEDULE_LEVEL;
-                //    break;
-
-                // ========== MUROS ==========
-                case BuiltInCategory.OST_Walls:
-                case BuiltInCategory.OST_StackedWalls:
-                    levelParam = BuiltInParameter.WALL_BASE_CONSTRAINT;
-                    break;
-
-                // ========== PISOS ==========
-                case BuiltInCategory.OST_Floors:
-                    levelParam = BuiltInParameter.LEVEL_PARAM;
-                    break;
-
-                // ========== ARQUITECTURA ==========
-                case BuiltInCategory.OST_Doors:
-                case BuiltInCategory.OST_Windows:
-                case BuiltInCategory.OST_Furniture:
-                    levelParam = BuiltInParameter.FAMILY_LEVEL_PARAM;
-                    break;
-
-                case BuiltInCategory.OST_Stairs:
-                    levelParam = BuiltInParameter.STAIRS_BASE_LEVEL_PARAM;
-                    break;
-
-                //case BuiltInCategory.OST_Ramps:
-                //    levelParam = BuiltInParameter.RAMP_BASE_LEVEL_PARAM;
-                //    break;
-
-                case BuiltInCategory.OST_Roofs:
-                    levelParam = BuiltInParameter.ROOF_BASE_LEVEL_PARAM;
-                    break;
-
-                //// ========== MEP ==========
-                //case BuiltInCategory.OST_DuctCurves:
-                //    levelParam = BuiltInParameter.RBS_DUCT_LEVEL_PARAM;
-                //    break;
-
-                //case BuiltInCategory.OST_PipeCurves:
-                //    levelParam = BuiltInParameter.RBS_PIPE_LEVEL_PARAM;
-                //    break;
-
-                //case BuiltInCategory.OST_CableTray:
-                //    levelParam = BuiltInParameter.RBS_CABLETRAY_LEVEL_PARAM;
-                //    break;
-
-                case BuiltInCategory.OST_MechanicalEquipment:
-                case BuiltInCategory.OST_ElectricalEquipment:
-                case BuiltInCategory.OST_PlumbingFixtures:
-                    levelParam = BuiltInParameter.FAMILY_LEVEL_PARAM;
-                    break;
-
-                // ========== DEFAULT ==========
-                default:
-                    // Fallback: intenta con FAMILY_LEVEL_PARAM primero
-                    levelParam = BuiltInParameter.FAMILY_LEVEL_PARAM;
-                    break;
-            }
-
-            var paramId = new ElementId(levelParam);
-            var catId = new ElementId(category);
-
-            //// Verifica que el parámetro sea filtrable para esta categoría
-            //if (ParameterFilterUtilities.IsParameterApplicable(, paramId))
-            //{
-            //    return paramId;
-            //}
-
-            // Si el mapeo falló, intenta con detección dinámica
-            return GetValidLevelParameterIdDynamic(doc, category);
-        }
+       
         /// <summary>
         /// Método fallback: detecta dinámicamente el parámetro de nivel filtrable
         /// cuando el mapeo estático no funciona.
         /// </summary>
-        private ElementId GetValidLevelParameterIdDynamic(Document doc, BuiltInCategory category)
-        {
-            var catId = new ElementId(category);
-
-            // Obtener todos los parámetros filtrables para esta categoría
-            var filterableParams = ParameterFilterUtilities.GetFilterableParametersInCommon(
-                doc, new List<ElementId> { catId });
-
-            // Lista de parámetros de nivel ordenados por frecuencia de uso
-            var levelParamsToTry = new[]
-            {
-                BuiltInParameter.FAMILY_BASE_LEVEL_PARAM,
-                BuiltInParameter.FAMILY_LEVEL_PARAM,
-                BuiltInParameter.LEVEL_PARAM,
-                BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM,
-                BuiltInParameter.WALL_BASE_CONSTRAINT,
-                BuiltInParameter.STAIRS_BASE_LEVEL_PARAM,
-                //BuiltInParameter.RAMP_BASE_LEVEL_PARAM,
-                BuiltInParameter.ROOF_BASE_LEVEL_PARAM,
-                //BuiltInParameter.RBS_DUCT_LEVEL_PARAM,
-                //BuiltInParameter.RBS_PIPE_LEVEL_PARAM,
-                //BuiltInParameter.RBS_CABLETRAY_LEVEL_PARAM,
-                //BuiltInParameter.REBAR_ELEM_SCHEDULE_LEVEL,
-                BuiltInParameter.SCHEDULE_LEVEL_PARAM
-    };
-
-            foreach (var param in levelParamsToTry)
-            {
-                var paramId = new ElementId(param);
-                if (filterableParams.Contains(paramId))
-                {
-                    return paramId;
-                }
-            }
-
-            return null; // No se encontró parámetro filtrable
-        }
+       
 
         private ElementId GetIdFromString(string id)
         {
@@ -628,34 +477,40 @@ namespace WARBIMPRO.Services
     return new ElementId(int.Parse(id));
 #endif
         }
-        private BuiltInParameter GetFilterableLevelParameter(BuiltInCategory category)
+        private ElementId GetFilterableLevelParameter(BuiltInCategory category)
         {
             switch (category)
             {
                 case BuiltInCategory.OST_StructuralColumns:
-                    return BuiltInParameter.FAMILY_BASE_LEVEL_PARAM; // "Base Level"
-                case BuiltInCategory.OST_StructuralFraming:
-                    return BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM; // "Reference Level"
-                case BuiltInCategory.OST_StructuralFoundation:
-                    return BuiltInParameter.LEVEL_PARAM;
+                    return new ElementId(BuiltInParameter.SCHEDULE_BASE_LEVEL_PARAM);
+
+                case BuiltInCategory.OST_StructuralFraming:
+                    return new ElementId(BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM);
+
+                case BuiltInCategory.OST_StructuralFoundation:
+                    return new ElementId(BuiltInParameter.LEVEL_PARAM);
+
                 case BuiltInCategory.OST_Walls:
-                    return BuiltInParameter.WALL_BASE_CONSTRAINT; // "Base Constraint"
-                case BuiltInCategory.OST_Floors:
+                    return new ElementId(BuiltInParameter.WALL_BASE_CONSTRAINT);
+
+                case BuiltInCategory.OST_Floors:
                 case BuiltInCategory.OST_Roofs:
                 case BuiltInCategory.OST_Ceilings:
-                    return BuiltInParameter.LEVEL_PARAM;
+                    return new ElementId(BuiltInParameter.SCHEDULE_LEVEL_PARAM);
+
                 case BuiltInCategory.OST_Doors:
                 case BuiltInCategory.OST_Windows:
                 case BuiltInCategory.OST_Furniture:
-                    return BuiltInParameter.FAMILY_LEVEL_PARAM;
+                    return new ElementId(BuiltInParameter.FAMILY_LEVEL_PARAM);
+
                 case BuiltInCategory.OST_DuctCurves:
                 case BuiltInCategory.OST_PipeCurves:
                 case BuiltInCategory.OST_CableTray:
-                    return BuiltInParameter.RBS_START_LEVEL_PARAM;
+                    return new ElementId(BuiltInParameter.RBS_START_LEVEL_PARAM);
+
                 default:
-                    // Por defecto intentamos con Level, pero para MEP o elementos 
-                    // basados en línea suele ser Reference Level
-                    return BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM;
+                    // 🔥 fallback seguro
+                    return new ElementId(BuiltInParameter.LEVEL_PARAM);
             }
         }
         public string CreateViewTemplate(string templateName)
