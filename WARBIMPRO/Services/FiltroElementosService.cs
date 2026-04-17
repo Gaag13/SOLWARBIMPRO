@@ -63,7 +63,7 @@ namespace WARBIMPRO.Services
               {
                 // ESTRUCTURA
               new CategoryItem { Name = "Muros", Icon = "🧱", TapGroup = "Estructura", BuiltInCategory = BuiltInCategory.OST_Walls, SupportTypes = true },
-              new CategoryItem { Name = "Muros Comp.", Icon = "▓", TapGroup = "Estructura", BuiltInCategory = BuiltInCategory.OST_StackedWalls, SupportTypes = false },
+              new CategoryItem { Name = "Muros Comp.", Icon = "▓", TapGroup = "Estructura", BuiltInCategory = BuiltInCategory.OST_StackedWalls, SupportTypes = true },
               new CategoryItem { Name = "Columnas", Icon = "🏛", TapGroup = "Estructura", BuiltInCategory = BuiltInCategory.OST_StructuralColumns, SupportTypes = true },
               new CategoryItem { Name = "Vigas", Icon = "━", TapGroup = "Estructura", BuiltInCategory = BuiltInCategory.OST_StructuralFraming, SupportTypes = true },
               new CategoryItem { Name = "Losas", Icon = "⬜", TapGroup = "Estructura", BuiltInCategory = BuiltInCategory.OST_Floors, SupportTypes = true },
