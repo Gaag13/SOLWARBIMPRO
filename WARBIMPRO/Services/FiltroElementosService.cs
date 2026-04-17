@@ -62,7 +62,7 @@ namespace WARBIMPRO.Services
             return new List<CategoryItem>
               {
                 // ESTRUCTURA
-              new CategoryItem { Name = "Muros", Icon = "🧱", TapGroup = "Estructura", BuiltInCategory = BuiltInCategory.OST_Walls, SupportTypes = false },
+              new CategoryItem { Name = "Muros", Icon = "🧱", TapGroup = "Estructura", BuiltInCategory = BuiltInCategory.OST_Walls, SupportTypes = true },
               new CategoryItem { Name = "Muros Comp.", Icon = "▓", TapGroup = "Estructura", BuiltInCategory = BuiltInCategory.OST_StackedWalls, SupportTypes = false },
               new CategoryItem { Name = "Columnas", Icon = "🏛", TapGroup = "Estructura", BuiltInCategory = BuiltInCategory.OST_StructuralColumns, SupportTypes = true },
               new CategoryItem { Name = "Vigas", Icon = "━", TapGroup = "Estructura", BuiltInCategory = BuiltInCategory.OST_StructuralFraming, SupportTypes = true },
@@ -233,7 +233,7 @@ namespace WARBIMPRO.Services
         {
             var uidoc = _uiApp.ActiveUIDocument;
             var view = uidoc.ActiveView;
-            using (var tx = new Transaction(_doc, "Reset Overrides - FiltroElementos"))
+            using (var tx = new Transaction(_doc, "Reset all Overrides - FiltroElementos"))
             {
                 tx.Start();
                 if (view.IsInTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate))
@@ -243,10 +243,11 @@ namespace WARBIMPRO.Services
                 var emptyOgs = new OverrideGraphicSettings();
                 foreach (var el in collector)
                     view.SetElementOverrides(el.Id, emptyOgs);
+
                 if (view.ViewTemplateId != ElementId.InvalidElementId)
                 {
                     var template = _doc.GetElement(view.ViewTemplateId) as View;
-                    if (template == null)
+                    if (template != null)
                     {
                         var filters = template.GetFilters();
                         foreach (var fId in filters)
@@ -264,6 +265,25 @@ namespace WARBIMPRO.Services
                         view.RemoveFilter(fId);
                     }
                 }
+                tx.Commit();
+            }
+        }
+
+        public void ResetColors()
+        {
+            var uidoc = _uiApp.ActiveUIDocument;
+            var view = uidoc.ActiveView;
+            using (var tx = new Transaction(_doc, "Reset Colors - FiltroElementos"))
+            {
+                tx.Start();
+                if (view.IsInTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate))
+                    view.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
+                var collector = new FilteredElementCollector(_doc, view.Id)
+                .WhereElementIsNotElementType();
+                var emptyOgs = new OverrideGraphicSettings();
+                foreach (var el in collector)
+                    view.SetElementOverrides(el.Id, emptyOgs);
+                
                 tx.Commit();
             }
         }
@@ -297,27 +317,27 @@ namespace WARBIMPRO.Services
             bool hasTypes = types.Any();
             bool hasLevels = !allModel && levels.Any();
 
-            // Preparar las listas de nombres para el mensaje
-            string catNames = string.Join(", ", cats.Select(c => c.Name));
-            string typeNames = hasTypes ? string.Join(", ", types.Select(t => t.Name)) : "Ninguno";
-            string levelNames = hasLevels ? string.Join(", ", levels.Select(l => l.Name)) : (allModel ? "Todo el modelo" : "Ninguno");
+            //// Preparar las listas de nombres para el mensaje
+            //string catNames = string.Join(", ", cats.Select(c => c.Name));
+            //string typeNames = hasTypes ? string.Join(", ", types.Select(t => t.Name)) : "Ninguno";
+            //string levelNames = hasLevels ? string.Join(", ", levels.Select(l => l.Name)) : (allModel ? "Todo el modelo" : "Ninguno");
 
-            // Construir el mensaje principal
-            string mainContent = $"Categorías ({cats.Count}): {catNames}\n" +
-                $"Tipos ({types.Count}): {typeNames}\n" +
-                $"Niveles ({levels.Count}): {levelNames}\n" +
-                $"Modo: {(allModel ? "Todo el Modelo" : "Por Nivel")}";
+            //// Construir el mensaje principal
+            //string mainContent = $"Categorías ({cats.Count}): {catNames}\n" +
+            //    $"Tipos ({types.Count}): {typeNames}\n" +
+            //    $"Niveles ({levels.Count}): {levelNames}\n" +
+            //    $"Modo: {(allModel ? "Todo el Modelo" : "Por Nivel")}";
 
-            // Configurar y mostrar el TaskDialog
-            TaskDialog mainDialog = new TaskDialog("Debug - WARBIMPRO")
-            {
-                MainInstruction = "Resumen de Selección para Filtros",
-                MainContent = mainContent,
-                CommonButtons = TaskDialogCommonButtons.Ok,
-                DefaultButton = TaskDialogResult.Ok,
-                MainIcon = TaskDialogIcon.TaskDialogIconInformation
-            };
-            mainDialog.Show();
+            //// Configurar y mostrar el TaskDialog
+            //TaskDialog mainDialog = new TaskDialog("Debug - WARBIMPRO")
+            //{
+            //    MainInstruction = "Resumen de Selección para Filtros",
+            //    MainContent = mainContent,
+            //    CommonButtons = TaskDialogCommonButtons.Ok,
+            //    DefaultButton = TaskDialogResult.Ok,
+            //    MainIcon = TaskDialogIcon.TaskDialogIconInformation
+            //};
+            //mainDialog.Show();
 
             // Construir OverrideGraphicSettings del color
             var ogs = BuildOgs(revitColor, solidId, transparency);
@@ -326,6 +346,7 @@ namespace WARBIMPRO.Services
             using var tx = new Transaction(_doc, "Crear Filtros Vista - WARBIMPRO");
             tx.Start();
 
+            //si se seleccionan tipos, se crean filtros específicos por tipo + nivel (si aplica)
             if (hasTypes)
             {
                 int totalCreados = 0;
@@ -357,46 +378,63 @@ namespace WARBIMPRO.Services
 
                         var typeFilter = new ElementParameterFilter(typeRule);
 
-                        foreach (var level in levels)
+                        if (hasLevels && levelParamId != null)
                         {
-                            if (level == null) continue;
-
-                            ElementId lvlId = GetIdFromString(level.Id);
-                            if (lvlId == ElementId.InvalidElementId) continue;
-
-                            var filterName = SanitizeName($"WBP_{cat.Name}_{type.Name}_{level.Name}");
-
-                            try
+                            foreach (var level in levels)
                             {
-                                // 🔹 REGLA NIVEL (ElementId)
-                                var levelProvider = new ParameterValueProvider(levelParamId);
+                                if (level == null) continue;
 
-                                var levelRule = new FilterElementIdRule(
-                                    levelProvider,
-                                    new FilterNumericEquals(),
-                                    lvlId);
+                                ElementId lvlId = GetIdFromString(level.Id);
+                                if (lvlId == ElementId.InvalidElementId) continue;
 
-                                var levelFilter = new ElementParameterFilter(levelRule);
+                                var filterName = SanitizeName($"WBP_{cat.Name}_{type.Name}_{level.Name}");
 
-                                // 🔥 AQUÍ ESTÁ LA MAGIA (lo que te faltaba)
-                                var andFilter = new LogicalAndFilter(typeFilter, levelFilter);
-
-                                var pfe = GetOrCreateFilter(filterName, catIds, andFilter);
-
-                                if (pfe != null)
+                                try
                                 {
-                                    ApplyFilterToView(view, pfe, ogs);
-                                    createdNames.Add(filterName);
-                                    reporte.AppendLine($"✓ {filterName}");
-                                    totalCreados++;
+                                    // 🔹 REGLA NIVEL (ElementId)
+                                    var levelProvider = new ParameterValueProvider(levelParamId);
+
+                                    var levelRule = new FilterElementIdRule(
+                                        levelProvider,
+                                        new FilterNumericEquals(),
+                                        lvlId);
+
+                                    var levelFilter = new ElementParameterFilter(levelRule);
+
+                                    // 🔥 AQUÍ ESTÁ LA MAGIA (lo que te faltaba)
+                                    var andFilter = new LogicalAndFilter(typeFilter, levelFilter);
+
+                                    var pfe = GetOrCreateFilter(filterName, catIds, andFilter);
+
+                                    if (pfe != null)
+                                    {
+                                        ApplyFilterToView(view, pfe, ogs);
+                                        createdNames.Add(filterName);
+                                        reporte.AppendLine($"✓ {filterName}");
+                                        totalCreados++;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    totalFallidos++;
+                                    reporte.AppendLine($"✗ {filterName}: {ex.Message}");
                                 }
                             }
-                            catch (Exception ex)
+                        }
+                        else 
+                        {
+                            // Caso solo por tipo
+                            var filterName = SanitizeName($"WBP_{cat.Name}_{type.Name}");
+                            var rules = new List<FilterRule> { typeRule };
+                            var pfe = GetOrCreateFilter(filterName, catIds, BuildLogicalAnd(rules));
+                            if (pfe != null)
                             {
-                                totalFallidos++;
-                                reporte.AppendLine($"✗ {filterName}: {ex.Message}");
+                                ApplyFilterToView(view, pfe, ogs);
+                                totalCreados++;
                             }
                         }
+
+                           
                     }
                 }
 
@@ -405,6 +443,7 @@ namespace WARBIMPRO.Services
                     $"Fallidos: {totalFallidos}\n\n" +
                     $"Detalles:\n{reporte.ToString()}");
             }
+            // Si no hay tipos, se crean filtros por categoría + nivel (si aplica)
             else
             {
                 // Sin tipos seleccionados → un filtro por categoría + nivel
@@ -457,17 +496,7 @@ namespace WARBIMPRO.Services
 
             tx.Commit();
             return createdNames;
-        }
-        /// <summary>
-        /// Obtiene el BuiltInParameter de nivel correcto y filtrable para una categoría específica.
-        /// Este método usa un mapeo categoría-específico en lugar de una prioridad genérica.
-        /// </summary>
-       
-        /// <summary>
-        /// Método fallback: detecta dinámicamente el parámetro de nivel filtrable
-        /// cuando el mapeo estático no funciona.
-        /// </summary>
-       
+        }       
 
         private ElementId GetIdFromString(string id)
         {

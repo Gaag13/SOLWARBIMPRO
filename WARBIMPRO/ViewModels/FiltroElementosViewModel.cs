@@ -151,6 +151,7 @@ namespace WARBIMPRO.ViewModels
         public ICommand ApplyColorCommand { get; }
         public ICommand IsolateCommand { get; }
         public ICommand ResetCommand { get; }
+        public ICommand ResetColorCommand { get; }
         public ICommand SetPresetCommand { get; }
         public ICommand CloseCommand { get; }
         public ICommand SetTabCommand { get; }
@@ -168,6 +169,7 @@ namespace WARBIMPRO.ViewModels
             ApplyColorCommand = new RelayCommand(_ => ExecuteApplyColor());
             IsolateCommand = new RelayCommand(_ => ExecuteIsolate());
             ResetCommand = new RelayCommand(_ => ExecuteReset());
+            ResetColorCommand = new RelayCommand(_ => ExecuteResetColor());
             SetPresetCommand = new RelayCommand(param => SetPresetColor(param as string));
             CloseCommand = new RelayCommand(_ => CloseAction?.Invoke());
             SetTabCommand = new RelayCommand(param => { if (param is string tab) ActiveTab = tab; });
@@ -274,6 +276,21 @@ namespace WARBIMPRO.ViewModels
                 AvailableTypes.Clear();
                 HasAvailableTypes = false;
                 StatusText = "↺ Filtros y overrides restablecidos";
+            }
+            catch (Exception ex) { StatusText = $"✗ Error: {ex.Message}"; }
+        }
+        private void ExecuteResetColor()
+        {
+            try
+            {
+                _service.ResetColors();
+                foreach (var l in Levels) l.IsSelected = false;
+                foreach (var c in Categories) c.IsSelected = false;
+                foreach (var t in AvailableTypes) t.IsSelected = false;
+                AllLevelsSelected = false;
+                AvailableTypes.Clear();
+                HasAvailableTypes = false;
+                StatusText = "↺ Overrides restablecidos";
             }
             catch (Exception ex) { StatusText = $"✗ Error: {ex.Message}"; }
         }
