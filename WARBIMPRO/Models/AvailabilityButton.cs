@@ -49,7 +49,14 @@ namespace WARBIMPRO.Models
                 if (element?.Category == null)
                     continue;
 
+#if REVIT2024_OR_GREATER
+
                 var category = (BuiltInCategory)element.Category.Id.Value;
+#else              
+
+                var category = (BuiltInCategory)element.Category.Id.IntegerValue;
+#endif
+
 
                 if (allowedCategories.Contains(category))
                     return true;
