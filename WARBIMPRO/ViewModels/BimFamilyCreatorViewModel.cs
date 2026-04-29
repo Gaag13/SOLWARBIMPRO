@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Input;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using MvvmHelpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WARBIMPRO.Models;
@@ -19,7 +18,7 @@ using RelayCommand = WARBIMPRO.Utils.RelayCommand;
 
 namespace WARBIMPRO.ViewModels
 {
-    public class BimFamilyCreatorViewModel : BaseViewModel
+    public class BimFamilyCreatorViewModel : ObservableObject
     {
         // ── Revit context ────────────────────────────────────
         private readonly UIApplication _uiApp;

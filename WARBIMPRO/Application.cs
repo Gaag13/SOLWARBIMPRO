@@ -14,7 +14,7 @@ namespace WARBIMPRO
     [UsedImplicitly]
     public class Application : ExternalApplication
     {
-       
+
         public override void OnStartup()
         {
             CreateRibbon();
@@ -54,14 +54,14 @@ namespace WARBIMPRO
               .SetLargeImage("/WARBIMPRO;component/Resources/Icons/lista20x20_light.png")
               .SetLongDescription("Accede a un navegador de familias " +
               "integrado en Revit que te permite explorar, filtrar y " +
-              "seleccionar familias de tu proyecto de manera eficiente, facilitando la gestión y organización de tus recursos de modelado.");      
-            
+              "seleccionar familias de tu proyecto de manera eficiente, facilitando la gestión y organización de tus recursos de modelado.");
+
             panelFamilys.AddPushButton<CmdExportFamilies>("Exportar\nFamilias")
                .SetAvailabilityController<AvailabilityButton>()
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/export20x20_dark.png")
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/export20x20_light.png")
                .SetLongDescription("Exporta familias de Revit a archivos individuales de manera rápida y sencilla, permitiéndote seleccionar las familias que deseas exportar y guardarlas en una ubicación de tu elección para su uso en otros proyectos o para compartir con otros usuarios.");
-            
+
             panelFamilys.AddPushButton<CmdGrids3D>("Rejillas 3D\n2D")
                .SetAvailabilityController<AvailabilityButton>()
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/burbuja20x20_dark.png")
@@ -92,8 +92,8 @@ namespace WARBIMPRO
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/duplicate20x20_light.png")
                .SetLongDescription("Duplica elementos estructurales en tu proyecto de Revit de manera rápida y sencilla, permitiéndote seleccionar un elemento estructural existente y crear una copia exacta en la misma ubicación o en " +
                "una ubicación diferente, facilitando la creación de elementos repetitivos y mejorando la eficiencia de tu modelado.");
-               
-          
+
+
             panelViews.AddPushButton<CmdTranferViewTemplate>("Transferir\nPlantilla")
                .SetAvailabilityController<AvailabilityButton>()
                .SetLargeImage("/WARBIMPRO;component/Resources/Icons/transfer20x20_dark.png")
@@ -144,10 +144,10 @@ namespace WARBIMPRO
                 .SetLongDescription("Crea una carretera en tu proyecto de Revit a partir de una ruta definida por puntos seleccionados, permitiéndote generar un modelo de carretera preciso y detallado para mejorar la planificación y el diseño de infraestructuras en tu proyecto.");
 #endif
 
-            
 
 
-// se modifico para revit 2023 en adelante
+
+            // se modifico para revit 2023 en adelante
 
         }
     }

@@ -1,7 +1,7 @@
 ﻿// ─────────────────────────────────────────────────────────────
 // BimConfigView.xaml.cs  —  code-behind mínimo
 // ─────────────────────────────────────────────────────────────
-using MvvmHelpers;
+
 using System.Windows;
 using System.Windows.Input;
 using WARBIMPRO.Services;

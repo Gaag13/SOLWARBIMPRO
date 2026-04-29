@@ -1,11 +1,12 @@
-﻿using System;
-using Installer;
+﻿using Installer;
 using WixSharp;
 using WixSharp.CommonTasks;
 using WixSharp.Controls;
-using Assembly = System.Reflection.Assembly;
+
 const string outputName = "WARBIMPRO";
 const string projectName = "WARBIMPRO";
+
+var versioning = Versioning.CreateFromVersionStringAsync(args[0]);
 var project = new Project
 {
     OutDir = "output",
@@ -13,37 +14,41 @@ var project = new Project
     Platform = Platform.x64,
     UI = WUI.WixUI_FeatureTree,
     MajorUpgrade = MajorUpgrade.Default,
-    GUID = new Guid("F4D1544B-BC00-4FC4-924A-381791AF64EC"),
+    GUID = new Guid("CD7BC71A-CC64-4575-9D9C-6ECBED3DEFB3"),
     BannerImage = @"install\Resources\Icons\BannerImage.png",
     BackgroundImage = @"install\Resources\Icons\BackgroundImage.png",
-    Version = Assembly.GetExecutingAssembly().GetName().Version.ClearRevision(),
+    Version = versioning.VersionPrefix,
     ControlPanelInfo =
     {
         Manufacturer = Environment.UserName,
         ProductIcon = @"install\Resources\Icons\ShellIcon.ico"
     }
 };
-var wixEntities = Generator.GenerateWixEntities(args);
+
+var wixEntities = Generator.GenerateWixEntities(args[1..]);
 project.RemoveDialogsBetween(NativeDialogs.WelcomeDlg, NativeDialogs.CustomizeDlg);
+
 BuildSingleUserMsi();
 BuildMultiUserUserMsi();
+
 void BuildSingleUserMsi()
 {
-    project.InstallScope = InstallScope.perUser;
-    project.OutFileName = $"{outputName}-{project.Version}-SingleUser";
+    project.Scope = InstallScope.perUser;
+    project.OutFileName = $"{outputName}-{versioning.Version}-SingleUser";
     project.Dirs =
     [
         new InstallDir(@"%AppDataFolder%\Autodesk\Revit\Addins\", wixEntities)
     ];
     project.BuildMsi();
 }
+
 void BuildMultiUserUserMsi()
 {
-    project.InstallScope = InstallScope.perMachine;
-    project.OutFileName = $"{outputName}-{project.Version}-MultiUser";
+    project.Scope = InstallScope.perMachine;
+    project.OutFileName = $"{outputName}-{versioning.Version}-MultiUser";
     project.Dirs =
     [
-        new InstallDir(@"%CommonAppDataFolder%\Autodesk\Revit\Addins\", wixEntities)
+        new InstallDir(versioning.VersionPrefix.Major >= 2027 ? @"%ProgramFiles%\Autodesk\Revit\Addins" : @"%CommonAppDataFolder%\Autodesk\Revit\Addins", wixEntities)
     ];
     project.BuildMsi();
 }

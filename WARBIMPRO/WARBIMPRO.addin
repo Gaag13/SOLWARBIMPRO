@@ -1,11 +1,14 @@
-﻿<RevitAddIns>
+<RevitAddIns>
     <AddIn Type="Application">
         <Name>WARBIMPRO</Name>
-        <Assembly>WARBIMPRO/WARBIMPRO.dll</Assembly>
-        <AddInId>1B1D5C3A-9943-46F9-AC54-3E6CD12579B5</AddInId>
+        <Assembly>WARBIMPRO\WARBIMPRO.dll</Assembly>
+        <AddInId>CC4B3ED2-B4AF-42E4-A9F7-07663A98C661</AddInId>
         <FullClassName>WARBIMPRO.Application</FullClassName>
         <VendorId>Development</VendorId>
         <VendorDescription></VendorDescription>
-        <VendorEmail>warbimpro@gmail.com</VendorEmail>
     </AddIn>
+    <ManifestSettings>
+        <UseRevitContext>False</UseRevitContext>
+        <ContextName>WARBIMPRO</ContextName>
+    </ManifestSettings>
 </RevitAddIns>

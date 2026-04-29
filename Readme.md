@@ -1,197 +1,205 @@
 # WARBIMPRO
 
-![Revit](https://img.shields.io/badge/Revit-2023--2026-blue)
-![Lenguaje](https://img.shields.io/badge/Lenguaje-C%23-green)
-![Framework](https://img.shields.io/badge/.NET-Framework%204.8%20%7C%20.NET%208-purple)
-![Estado](https://img.shields.io/badge/Estado-En%20desarrollo-success)
+Autodesk Revit plugin project organized into multiple solution files that target versions 2023 - 2027.
 
-**WARBIMPRO** es un **complemento (Add-in) profesional para Autodesk Revit** desarrollado en **C# utilizando la Revit API**, diseñado para mejorar la **productividad BIM, automatizar tareas repetitivas y optimizar la gestión de modelos dentro de Revit**.
+## Table of content
 
-El complemento incorpora herramientas para **gestión de familias, control de vistas, cuantificación de elementos y automatización de flujos de trabajo**, permitiendo a modeladores BIM, ingenieros y arquitectos trabajar de forma más eficiente.
+<!-- TOC -->
+* [Prerequisites](#prerequisites)
+* [Solution Structure](#solution-structure)
+* [Project Structure](#project-structure)
+* [Building](#building)
+  * [Building the MSI installer and the Autodesk bundle on local machine](#building-the-msi-installer-and-the-autodesk-bundle-on-local-machine)
+* [Conditional compilation for a specific Revit version](#conditional-compilation-for-a-specific-revit-version)
+* [Managing Supported Revit Versions](#managing-supported-revit-versions)
+  * [Solution configurations](#solution-configurations)
+  * [Project configurations](#project-configurations)
+* [API references](#api-references)
+* [Learn More](#learn-more)
+<!-- TOC -->
 
----
+## Prerequisites
 
-# Vista General
+Before you can build this project, you need to install .NET and IDE.
+If you haven't already installed these, you can do so by visiting the following:
 
-WARBIMPRO integra un conjunto de herramientas directamente en el **Ribbon de Revit**, facilitando tareas comunes dentro del modelado BIM como:
+- [.NET Framework 4.8](https://dotnet.microsoft.com/download/dotnet-framework/net48)
+- [.NET 10](https://dotnet.microsoft.com/en-us/download/dotnet)
+- [JetBrains Rider](https://www.jetbrains.com/rider/) or [Visual Studio](https://visualstudio.microsoft.com/)
 
-- Gestión de familias
-- Organización de vistas
-- Automatización de modelado
-- Extracción de cantidades
-- Exportación de datos a Excel
+## Solution Structure
 
-El objetivo del proyecto es **mejorar la eficiencia en proyectos BIM reduciendo tareas manuales y repetitivas**.
+| Folder  | Description                                                                |
+|---------|----------------------------------------------------------------------------|
+| build   | ModularPipelines build system. Used to automate project builds             |
+| install | Add-in installer, called implicitly by the ModularPipelines build          |
+| source  | Project source code folder. Contains all solution projects                 |
+| output  | Folder of generated files by the build system, such as bundles, installers |
 
----
+## Project Structure
 
-# Funcionalidades Principales
+| Folder     | Description                                                                                                                                                                                          |
+|------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Commands   | External commands invoked from the Revit ribbon. Registered in the `Application` class                                                                                                               |
+| Models     | Classes that encapsulate the app's data, include data transfer objects (DTOs). More [details](https://learn.microsoft.com/en-us/dotnet/architecture/maui/mvvm).                                      |
+| ViewModels | Classes that implement properties and commands to which the view can bind data. More [details](https://learn.microsoft.com/en-us/dotnet/architecture/maui/mvvm).                                     |
+| Views      | Classes that are responsible for defining the structure, layout and appearance of what the user sees on the screen. More [details](https://learn.microsoft.com/en-us/dotnet/architecture/maui/mvvm). |
+| Resources  | Images, sounds, localisation files, etc.                                                                                                                                                             |
+| Utils      | Utilities, extensions, helpers used across the application                                                                                                                                           |
 
-## Gestión de Sesión
+## Building
 
-### Inicio de Sesión
+We recommend JetBrains Rider as preferred IDE, since it has outstanding .NET support. If you don't have Rider installed, you can download it
+from [here](https://www.jetbrains.com/rider/).
 
-El plugin incluye un sistema de **inicio de sesión y registro de usuarios**, permitiendo autenticarse dentro de la plataforma WARBIMPRO y habilitando futuras integraciones con servicios en la nube.
+1. Open JetBrains Rider
+2. In the `Solutions Configuration` drop-down menu, select `Release.R27` or `Debug.R27`. Suffix `R27` means compiling for the Revit 2027.
+3. After the solution loads, you can build it by clicking on `Build -> Build Solution`.
+4. `Debug` button will start Revit add-in in the debug mode.
 
----
+   ![image](https://github.com/user-attachments/assets/d209d863-a6d5-43a9-83e1-5eeb2b9fddac)
 
-# Herramientas de Gestión de Familias
+Also, you can use Visual Studio. If you don't have Visual Studio installed, download it from [here](https://visualstudio.microsoft.com/downloads/).
 
-## Importar Familias
+1. Open Visual Studio
+2. In the `Solutions Configuration` drop-down menu, select `Release.R27` or `Debug.R27`. Suffix `R27` means compiling for the Revit 2027.
+3. After the solution loads, you can build it by clicking on `Build -> Build Solution`.
 
-Permite **cargar múltiples familias de Revit (.rfa)** desde una ruta específica de manera rápida y organizada.
+### Building the MSI installer and the Autodesk bundle on local machine
 
-Beneficios:
+To build the project for all versions, create the installer and bundle, this project uses [ModularPipelines](https://github.com/thomhurst/ModularPipelines)
 
-- Importación masiva de familias
-- Gestión eficiente de bibliotecas BIM
-- Ahorro de tiempo en proyectos grandes
+To execute your ModularPipelines build locally, you can follow these steps:
 
----
+1. **Navigate to your project directory**. Open a terminal / command prompt and navigate to your project's root directory.
+2. **Run the build**. Once you have navigated to your project's root directory, you can run the ModularPipelines build by calling:
 
-## Explorador de Familias (Family Browser)
+   Compile:
+   ```shell
+   cd build; dotnet run
+   ```
 
-Incluye un **Dockable Panel** que permite explorar las familias cargadas en el proyecto.
+   Create installer and bundle:
+   ```shell
+   cd build; dotnet run -- pack
+   ```
 
-El explorador organiza las familias por:
+   This command will execute the ModularPipelines build defined in your project.
 
-- **Familia**
-- **Tipos de familia**
-- **Family Symbols**
+## Conditional compilation for a specific Revit version
 
-Los elementos pueden **arrastrarse directamente al modelo**, facilitando la inserción de componentes BIM.
+To write code compatible with different Revit versions, use the directives **#if**, **#elif**, **#else**, **#endif**.
 
----
+```c#
+#if REVIT2027
+    //Your code here
+#endif
+```
 
-## Exportar Familias
+To target a specific Revit version, set the solution configuration in your IDE interface to match that version.
+E.g., select the `Debug.R27` configuration for the Revit 2027 API.
 
-Permite **exportar familias del proyecto como archivos individuales (.rfa)**.
+The project has available constants such as `REVIT2027`, `REVIT2027_OR_GREATER`. 
+Create conditions, experiment to achieve the desired result.
 
-Esto permite:
+> For generating directives, a Revit MSBuild SDK is used.
+> You can find more detailed documentation about it here: [Revit MSBuild SDK](https://github.com/Nice3point/Revit.Build.Tasks)
 
-- Crear bibliotecas reutilizables
-- Compartir contenido BIM entre proyectos
-- Organizar recursos de modelado
+To support the latest APIs in legacy Revit versions:
 
----
+```c#
+#if REVIT2021_OR_GREATER
+    UnitUtils.ConvertFromInternalUnits(69, UnitTypeId.Millimeters);
+#else
+    UnitUtils.ConvertFromInternalUnits(69, DisplayUnitType.DUT_MILLIMETERS);
+#endif
+```
 
-# Herramientas de Gestión de Vistas
+`#if REVIT2021_OR_GREATER` сompiles a block of code for Revit versions 21, 22, 23 and greater.
 
-## Buscar en Vistas
+To support removed APIs in newer versions of Revit, you can invert the constant:
 
-Permite **buscar y gestionar vistas dentro del proyecto**, facilitando la organización en modelos complejos.
+```c#
+#if !REVIT2023_OR_GREATER
+    var builtinCategory = (BuiltInCategory) category.Id.IntegerValue;
+#endif
+```
 
----
+`#if !REVIT2023_OR_GREATER` сompiles a block of code for Revit versions 22, 21, 20 and lower.
 
-## Duplicar Elementos Estructurales
+## Managing Supported Revit Versions
 
-Herramienta para **duplicar elementos estructurales rápidamente**, optimizando la creación de elementos repetitivos en el modelo.
+To extend or reduce the range of supported Revit API versions, you need to update the solution and project configurations.
 
----
+### Solution configurations
 
-## Transferir Plantillas de Vista
+Solution configurations determine which projects are built and how they are configured.
 
-Permite **transferir View Templates entre proyectos de Revit**, ayudando a mantener consistencia visual y estándares BIM.
+To support multiple Revit versions:
+- Open the `.sln` file.
+- Add or remove configurations for each Revit version.
 
----
+Example:
 
-# Cuantificación del Modelo
+```text
+GlobalSection(SolutionConfigurationPlatforms) = preSolution
+    Debug.R25|Any CPU = Debug.R25|Any CPU
+    Debug.R26|Any CPU = Debug.R26|Any CPU
+    Debug.R27|Any CPU = Debug.R27|Any CPU
+    Release.R25|Any CPU = Release.R25|Any CPU
+    Release.R26|Any CPU = Release.R26|Any CPU
+    Release.R27|Any CPU = Release.R27|Any CPU
+EndGlobalSection
+```
 
-## Cuantificación de Elementos
+For example `Debug.R27` is the Debug configuration for Revit 2027 version.
 
-El módulo de cuantificación permite generar informes de:
+> If you are just ending maintenance for some version, removing the Solution configurations without modifying the Project configurations is enough.
 
-- Áreas
-- Volúmenes
-- Cantidades de materiales
+### Project configurations
 
-Los datos pueden **exportarse a Excel** para análisis adicional o generación de reportes.
+Project configurations define build conditions for specific versions.
 
----
+To add or remove support:
+- Open `.csproj` file
+- Add or remove configurations for Debug and Release builds.
 
-# Interfaz de Usuario
+Example:
 
-WARBIMPRO detecta automáticamente el **tema de Revit** y adapta los iconos según el entorno:
+```xml
+<PropertyGroup>
+    <Configurations>Debug.R25;Debug.R26;Debug.R27</Configurations>
+    <Configurations>$(Configurations);Release.R25;Release.R26;Release.R27</Configurations>
+</PropertyGroup>
+```
 
-- Soporte para **tema claro**
-- Soporte para **tema oscuro**
+> Edit the `.csproj` file only manually, IDEs often break configurations.
 
-Esto mejora la visibilidad y la experiencia de usuario.
+Revit MSBuild SDK automatically sets the required `TargetFramework` based on the `RevitVersion`, extracted from the solution configuration name. 
 
----
+If you need to add support for an unreleased or unsupported version of Revit that the SDK doesn't yet know about, you can add a conditional block to specify the `TargetFramework` manually:
 
-# Arquitectura del Proyecto
+```xml
+<PropertyGroup>
+    <TargetFramework Condition="$(RevitVersion) == '2027'">net10.0-windows7.0</TargetFramework>
+</PropertyGroup>
+```
 
-El proyecto sigue una arquitectura basada en **MVVM (Model-View-ViewModel)**, permitiendo una mejor organización del código y facilitando el mantenimiento y escalabilidad.
+## API references
 
-Estructura principal:
+To support CI/CD pipelines and build a project for Revit versions not installed on your computer, use Nuget packages.
 
+> Revit API dependencies are available in the [Revit.API](https://github.com/Nice3point/RevitApi) repository.
 
+The Nuget package version must include wildcards `Version="$(RevitVersion).*"` to automatically include adding a specific package version, depending on the selected solution configuration.
 
+```xml
+<ItemGroup>
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*"/>
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*"/>
+</ItemGroup>
+```
 
+## Learn More
 
----
-
-# Tecnologías Utilizadas
-
-- **C#**
-- **Revit API**
-- **.NET Framework 4.8**
-- **.NET 8**
-- **Arquitectura MVVM**
-
----
-
-# Compatibilidad
-
-Actualmente el plugin es compatible con:
-
-- Revit 2023
-- Revit 2024
-- Revit 2025
-- Revit 2026
-
----
-
-# Instalación
-
-Una vez compilado o instalado el paquete del plugin, aparecerá automáticamente una nueva pestaña en el **Ribbon de Revit llamada WARBIMPRO**.
-
----
-
-# Autor
-
-**Giancarlo Arciniegas**  
-BIM Developer
-
-GitHub:  
-https://github.com/Gaag13
-
-Instagram:
-[WARBIMPRO](https://www.instagram.com/warbimpro/)
----
-
-# Contribuciones
-
-Las contribuciones, sugerencias y reportes de errores son bienvenidos a través de **GitHub Issues o Pull Requests**.
-
----
-
-# Roadmap Futuro
-
-Entre las mejoras planificadas se encuentran:
-
-- Integración con servicios en la nube
-- Análisis avanzado de cantidades
-- Herramientas de estimación de costos
-- Automatización de reportes BIM
-- Paneles de análisis de datos
-
----
-
-# Capturas del Plugin
-
-Puedes agregar imágenes del plugin así:
-
-```markdown
-
+* You can explore more on the [RevitTemplates Wiki](https://github.com/Nice3point/RevitTemplates/wiki) page.

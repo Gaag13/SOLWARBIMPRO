@@ -1,4 +1,4 @@
-﻿using MvvmHelpers;
+﻿
 using System.Windows;
 using System.Windows.Input;
 using WARBIMPRO.Services;
@@ -7,7 +7,7 @@ using RelayCommand = WARBIMPRO.Utils.RelayCommand;
 
 namespace WARBIMPRO.ViewModels
 {
-    public class BimConfigViewModel : BaseViewModel
+    public class BimConfigViewModel : ObservableObject
     {
         private readonly Window _window;
 
