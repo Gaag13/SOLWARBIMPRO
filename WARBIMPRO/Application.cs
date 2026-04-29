@@ -1,10 +1,6 @@
-﻿using Nice3point.Revit.Extensions.UI;
-using Nice3point.Revit.Toolkit.Decorators;
-using Nice3point.Revit.Toolkit.External;
-using WARBIMPRO.Commands;
+﻿using WARBIMPRO.Commands;
 using WARBIMPRO.DockablePanes;
 using WARBIMPRO.Models;
-using WARBIMPRO.Services;
 
 namespace WARBIMPRO
 {
