@@ -16,8 +16,8 @@ namespace WARBIMPRO.Commands
         {
             try
             {
-                var uiDoc = UiDocument;
-                var uiApp = UiApplication;
+                var uiDoc = Application.ActiveUIDocument;
+                var uiApp = Application;
 
                 if (uiDoc?.ActiveView == null)
                 {

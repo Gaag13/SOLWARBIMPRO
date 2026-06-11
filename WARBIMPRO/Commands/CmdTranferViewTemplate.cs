@@ -19,7 +19,7 @@ namespace WARBIMPRO.Commands
     {
         public override void Execute()
         {
-            var viewModel = new TransferViewTemplateViewModel(UiApplication);
+            var viewModel = new TransferViewTemplateViewModel(Application);
             var view = new TranferTemplatesView(viewModel)
             {
                 DataContext = viewModel

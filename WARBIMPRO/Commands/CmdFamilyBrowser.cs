@@ -13,8 +13,8 @@ namespace WARBIMPRO.Commands
     {
         public override void Execute()
         {
-            var uidoc = UiDocument;
-            var uiapp = UiApplication;
+            var uidoc = Application.ActiveUIDocument;
+            var uiapp = Application;
 
             var vm= new FamilyBrowserViewModel(uidoc);
             var view = new ViewFamilyBrowser(vm);

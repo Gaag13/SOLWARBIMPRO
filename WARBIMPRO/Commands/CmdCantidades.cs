@@ -15,7 +15,7 @@ namespace WARBIMPRO.Commands
     {
         public override void Execute()
         {
-            var uidoc = UiDocument;            
+            var uidoc = Application.ActiveUIDocument;           
             var viewModel = new CantidadesViewModel(uidoc);
             var view = new ViewCantidades(viewModel);
             view.ShowDialog();

@@ -14,7 +14,7 @@ namespace WARBIMPRO.Commands
     {
         public override void Execute()
         {
-            var uidoc = UiDocument;
+            var uidoc = Application.ActiveUIDocument;
             var doc = uidoc.Document;
 
             var selection = uidoc.Selection.GetElementIds();

@@ -12,7 +12,7 @@ namespace WARBIMPRO.Commands
     {
         public override void Execute()
         {
-            var vm = new BimFamilyCreatorViewModel(UiApplication);
+            var vm = new BimFamilyCreatorViewModel(Application);
             var view = new BimFamilyCreatorView(vm);
             view.ShowDialog();
         }

@@ -12,8 +12,8 @@ namespace WARBIMPRO.Commands
     {
         public override void Execute()
         {
-            var activeView = Document.ActiveView;
-
+            var activeView = Application.ActiveUIDocument.ActiveView;
+            var doc = Application.ActiveUIDocument.Document;
             if (activeView == null)
             {
                 TaskDialog.Show("Error", "No hay una vista activa.");
@@ -26,21 +26,21 @@ namespace WARBIMPRO.Commands
                 return;
             }
 
-            var rebars = new FilteredElementCollector(Document, activeView.Id)
+            var rebars = new FilteredElementCollector(doc, activeView.Id)
                 .OfClass(typeof(Rebar));
 
-            var rebarSystems = new FilteredElementCollector(Document, activeView.Id)
+            var rebarSystems = new FilteredElementCollector(doc, activeView.Id)
                 .OfClass(typeof(RebarInSystem));
 
-            var areaReinf = new FilteredElementCollector(Document, activeView.Id)
+            var areaReinf = new FilteredElementCollector(doc, activeView.Id)
                 .OfClass(typeof(AreaReinforcement));
 
-            var pathReinf = new FilteredElementCollector(Document, activeView.Id)
+            var pathReinf = new FilteredElementCollector(doc, activeView.Id)
                 .OfClass(typeof(PathReinforcement));
 
             int contador = 0;
 
-            using (var tx = new Transaction(Document, "Mostrar Refuerzo 3D"))
+            using (var tx = new Transaction(doc, "Mostrar Refuerzo 3D"))
             {
                 tx.Start();
 
@@ -52,7 +52,7 @@ namespace WARBIMPRO.Commands
 
                 try
                 {
-                    var rebarCat = Document.Settings.Categories
+                    var rebarCat = doc.Settings.Categories
                         .get_Item(BuiltInCategory.OST_Rebar);
 
                     if (rebarCat != null)

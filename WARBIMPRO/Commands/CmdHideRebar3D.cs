@@ -12,7 +12,7 @@ namespace WARBIMPRO.Commands
     {
         public override void Execute()
         {
-            var activeView = Document.ActiveView;
+            var activeView = Application.ActiveUIDocument.ActiveView;
 
             if (activeView == null)
             {

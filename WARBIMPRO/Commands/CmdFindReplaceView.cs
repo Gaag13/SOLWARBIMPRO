@@ -11,7 +11,9 @@ namespace WARBIMPRO.Commands
     {
         public override void Execute()
         {
-            var vm = new FindReplaceViewModel(Document);
+            var doc = Application.ActiveUIDocument.Document;
+
+            var vm = new FindReplaceViewModel(doc);
             var window = new ViewFindReplaceWindow(vm)
             {
                 DataContext = vm

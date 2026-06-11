@@ -13,9 +13,10 @@ namespace WARBIMPRO.Commands
     {
         public override void Execute()
         {
-            var view = ActiveView;
-            
-            var visibleGrids = new FilteredElementCollector(Document, view.Id)
+            var view = Application.ActiveUIDocument.ActiveView;
+
+            var doc = Application.ActiveUIDocument.Document;
+            var visibleGrids = new FilteredElementCollector(doc, view.Id)
                 .OfClass(typeof(Grid))
                 .Cast<Grid>()
                 .ToList();
