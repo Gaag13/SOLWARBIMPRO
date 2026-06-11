@@ -55,7 +55,7 @@
                                   VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Exportando Familias"
+                            <TextBlock Text="Cargando Familias"
                                        Foreground="White"
                                        FontSize="13"
                                        FontWeight="SemiBold"/>
