@@ -8,9 +8,6 @@ using System.Linq;
 #if REVIT2024_OR_GREATER
 namespace WARBIMPRO.Services
 {
-
-
-
     public class SurfaceCreationService
     {
         private readonly Document _doc;
@@ -43,45 +40,46 @@ namespace WARBIMPRO.Services
                 var typeId = GetToposolidTypeId();
                 var levelId = GetDefaultLevelId();
 
-                // 3. Construir el contorno exterior como CurveLoop
-                // Toposolid.Create necesita el borde exterior del área
-                var boundary = BuildBoundaryCurveLoop(points);
+                // 3. Convex hull (lo calculamos UNA vez y lo reutilizamos)
+                var hull = ConvexHull(points);
+
+                // 4. Construir el contorno exterior como CurveLoop a partir del hull
+                var boundary = BuildBoundaryCurveLoop(points, hull);
 
                 using (var trans = new Transaction(_doc, "WARBIMPRO: Crear Toposolid Vial"))
                 {
                     trans.Start();
                     try
                     {
-                        // Crear Toposolid con el contorno
                         var toposolid = Toposolid.Create(
                             _doc,
                             new List<CurveLoop> { boundary },
                             typeId,
                             levelId);
 
+                        var editHandle = toposolid.GetSlabShapeEditor();
+                        if (editHandle != null)
+                        {
+                            editHandle.Enable();
 
 #if !REVIT2025_OR_GREATER
-
-                         // Agregar los puntos interiores con sus cotas
-                        // Esto es lo que controla la forma de la superficie
-                        var editHandle = toposolid.GetSlabShapeEditor();
-                        if (editHandle != null)
-                        {
-                            editHandle.Enable();
+                            // 2024: DrawPoint es tolerante, se puede pasar todos los puntos
                             foreach (var pt in points)
                                 editHandle.DrawPoint(pt);
-                        }
 #else
-                        // Agregar los puntos interiores con sus cotas
-                        // Esto es lo que controla la forma de la superficie
-                        var editHandle = toposolid.GetSlabShapeEditor();
-                        if (editHandle != null)
-                        {
-                            editHandle.Enable();
+                            // 2025+: AddPoint falla si el punto coincide con un vértice
+                            // de borde que ya existe (los del hull). Filtramos esos.
+                            var hullSet = new HashSet<XYZ>(hull, new XYZEqualityComparer(1e-6));
+
                             foreach (var pt in points)
+                            {
+                                if (hullSet.Contains(pt))
+                                    continue; // ya es un vértice del contorno, no re-agregar
+
                                 editHandle.AddPoint(pt);
-                        }
+                            }
 #endif
+                        }
 
                         trans.Commit();
                         message = $"Toposolid creado: {points.Count} puntos, {triangles.Count} triángulos Delaunay.";
@@ -102,19 +100,17 @@ namespace WARBIMPRO.Services
         }
 
         /// <summary>
-        /// Construye el CurveLoop del contorno exterior usando el convex hull de los puntos.
-        /// Proyecta todo a Z=0 porque el contorno es plano — las cotas van en los puntos interiores.
+        /// Construye el CurveLoop del contorno exterior a partir del hull ya calculado.
+        /// Proyecta todo a Z=0 (Z del primer punto) porque el contorno es plano.
         /// </summary>
-        private CurveLoop BuildBoundaryCurveLoop(List<XYZ> points)
+        private CurveLoop BuildBoundaryCurveLoop(List<XYZ> points, List<XYZ> hull)
         {
-            var hull = ConvexHull(points);
             var loop = new CurveLoop();
 
             for (int i = 0; i < hull.Count; i++)
             {
                 var a = hull[i];
                 var b = hull[(i + 1) % hull.Count];
-                // Proyectar a Z del primer punto — el contorno debe ser plano
                 var pa = new XYZ(a.X, a.Y, points[0].Z);
                 var pb = new XYZ(b.X, b.Y, points[0].Z);
                 loop.Append(Line.CreateBound(pa, pb));
@@ -125,14 +121,12 @@ namespace WARBIMPRO.Services
 
         /// <summary>
         /// Convex hull 2D (Andrew's monotone chain).
-        /// Devuelve los puntos del contorno exterior en orden antihorario.
         /// </summary>
         private List<XYZ> ConvexHull(List<XYZ> pts)
         {
             var sorted = pts.OrderBy(p => p.X).ThenBy(p => p.Y).ToList();
             var hull = new List<XYZ>();
 
-            // Lower hull
             foreach (var p in sorted)
             {
                 while (hull.Count >= 2 && Cross(hull[hull.Count - 2], hull[hull.Count - 1], p) <= 0)
@@ -140,7 +134,6 @@ namespace WARBIMPRO.Services
                 hull.Add(p);
             }
 
-            // Upper hull
             int lower = hull.Count + 1;
             for (int i = sorted.Count - 2; i >= 0; i--)
             {
@@ -156,7 +149,6 @@ namespace WARBIMPRO.Services
 
         private double Cross(XYZ o, XYZ a, XYZ b)
             => (a.X - o.X) * (b.Y - o.Y) - (a.Y - o.Y) * (b.X - o.X);
-#if REVIT2024_OR_GREATER
 
         private ElementId GetToposolidTypeId()
         {
@@ -170,7 +162,7 @@ namespace WARBIMPRO.Services
 
             return type.Id;
         }
-#endif
+
         private ElementId GetDefaultLevelId()
         {
             var level = new FilteredElementCollector(_doc)
@@ -183,6 +175,22 @@ namespace WARBIMPRO.Services
                 throw new InvalidOperationException("No se encontró ningún nivel en el proyecto.");
 
             return level.Id;
+        }
+
+        /// <summary>
+        /// Comparador de XYZ con tolerancia, solo en X,Y (para detectar si un punto
+        /// coincide en planta con un vértice del hull, sin importar su Z).
+        /// </summary>
+        private class XYZEqualityComparer : IEqualityComparer<XYZ>
+        {
+            private readonly double _tol;
+            public XYZEqualityComparer(double tol) => _tol = tol;
+
+            public bool Equals(XYZ a, XYZ b) =>
+                Math.Abs(a.X - b.X) < _tol && Math.Abs(a.Y - b.Y) < _tol;
+
+            public int GetHashCode(XYZ p) =>
+                (Math.Round(p.X, 4), Math.Round(p.Y, 4)).GetHashCode();
         }
     }
 }
